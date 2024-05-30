@@ -51,6 +51,15 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	}
 }
 
+// CheckUserInGuild checks if the user is in the specified server.
+func (d *Discord) CheckUserInGuild(gid string, user string) error {
+	_, err := d.Session.GuildMember(gid, user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &kickPermission,

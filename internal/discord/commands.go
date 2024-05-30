@@ -20,7 +20,16 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	userToKick := optionMap["user"].UserValue(nil).ID
 
-	var err error
+	// Check if user exists in guild
+	err := d.CheckUserInGuild(i.GuildID, userToKick)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		StartInteraction(s, i.Interaction, tempstr)
+		return
+	}
+
+	// Attempt to kick user
 	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
 	} else {
@@ -37,6 +46,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("%v\n", tempstr)
 		StartInteraction(s, i.Interaction, tempstr)
 	}
+
 }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
