@@ -29,6 +29,40 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
+	// DM the user regarding the kick
+	channel, err := s.UserChannelCreate(userToKick)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		// Abort kick if failed to DM?
+		//return
+		StartInteraction(s, i.Interaction, tempstr)
+	} else {
+		// Get guild name
+		var guildname string
+		guild, err := d.Session.Guild(i.GuildID)
+		if err != nil {
+			fmt.Printf("Unable to find guild name: %v", err)
+			guildname = i.GuildID
+		} else {
+			guildname = guild.Name
+		}
+
+		tempstr := fmt.Sprintf("You are being kicked from %v for the reason:\n%v",
+			guildname,
+			optionMap["reason"].StringValue(),
+		)
+
+		_, err = s.ChannelMessageSend(channel.ID, tempstr)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			// Abort kick if failed to DM?
+			//return
+			StartInteraction(s, i.Interaction, tempstr)
+		}
+	}
+
 	// Attempt to kick user
 	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
