@@ -87,7 +87,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 // Fields:
 //
 //	user: 		User
-//	duration:	integer
+//	duration:	string
 //	reason:		string
 func (d *Discord) Mute(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
@@ -144,7 +144,7 @@ func (d *Discord) SetNickname(s *discordgo.Session, i *discordgo.InteractionCrea
 // Slowmode attempts to set the current channel to slowmode.
 // Fields:
 //
-//	duration:	integer
+//	duration:	string
 func (d *Discord) Slowmode(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
