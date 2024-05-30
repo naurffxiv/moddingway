@@ -21,10 +21,11 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userToKick := optionMap["user"].UserValue(nil).ID
 
 	var err error
-	if optionMap["reason"] != nil {
+	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
 	} else {
-		err = d.Session.GuildMemberDelete(i.GuildID, userToKick)
+		StartInteraction(s, i.Interaction, "Please provide a reason for the kick.")
+		return
 	}
 
 	if err != nil {
