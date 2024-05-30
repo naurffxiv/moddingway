@@ -1,6 +1,8 @@
 package discord
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -10,7 +12,30 @@ import (
 //	user: 	User
 //	reason: string
 func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+
+	userToKick := optionMap["user"].UserValue(nil).ID
+
+	var err error
+	if optionMap["reason"] != nil {
+		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
+	} else {
+		err = d.Session.GuildMemberDelete(i.GuildID, userToKick)
+	}
+
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		StartInteraction(s, i.Interaction, tempstr)
+	} else {
+		tempstr := fmt.Sprintf("User <@%v> has been kicked.", userToKick)
+		fmt.Printf("%v\n", tempstr)
+		StartInteraction(s, i.Interaction, tempstr)
+	}
 }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
