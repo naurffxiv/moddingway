@@ -182,3 +182,17 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
+
+func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	options := i.ApplicationCommandData().Options
+	channelID := options[0].ChannelValue(nil).ID
+	d.LogChannelID = channelID
+
+	tempstr := fmt.Sprintf("Mod log channel set to: <#%v>", channelID)
+
+	err := StartInteraction(s, i.Interaction, tempstr)
+	if err != nil {
+		fmt.Printf("Unable to send ephemeral message: %v", err)
+	}
+	fmt.Printf("Set the moderation log channel to channel: %v", channelID)
+}
