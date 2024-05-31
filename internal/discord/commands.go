@@ -31,7 +31,12 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		StartInteraction(s, i.Interaction, tempstr)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v", err)
+		}
+
 		return
 	}
 
@@ -40,7 +45,11 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		StartInteraction(s, i.Interaction, tempstr)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v", err)
+		}
 	} else {
 		// Get guild name
 		var guildname string
@@ -61,7 +70,11 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			StartInteraction(s, i.Interaction, tempstr)
+
+			err = StartInteraction(s, i.Interaction, tempstr)
+			if err != nil {
+				fmt.Printf("Unable to send ephemeral message: %v", err)
+			}
 		}
 	}
 
@@ -69,18 +82,30 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
 	} else {
-		StartInteraction(s, i.Interaction, "Please provide a reason for the kick.")
+		err = StartInteraction(s, i.Interaction, "Please provide a reason for the kick.")
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v", err)
+		}
+
 		return
 	}
 
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		StartInteraction(s, i.Interaction, tempstr)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v", err)
+		}
 	} else {
 		tempstr := fmt.Sprintf("User <@%v> has been kicked.", userToKick)
 		fmt.Printf("%v\n", tempstr)
-		StartInteraction(s, i.Interaction, tempstr)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v", err)
+		}
 	}
 
 }
