@@ -21,7 +21,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// Log usage of command
 	err := d.CommandLogger(i.Interaction)
 	if err != nil {
-		fmt.Printf("Failed to log: %v", err)
+		fmt.Printf("Failed to log: %v\n", err)
 	}
 
 	userToKick := optionMap["user"].UserValue(nil).ID
@@ -34,7 +34,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		err = StartInteraction(s, i.Interaction, tempstr)
 		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v", err)
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
 
 		return
@@ -48,7 +48,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		err = StartInteraction(s, i.Interaction, tempstr)
 		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v", err)
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
 	} else {
 		// Get guild name
@@ -73,7 +73,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 			err = StartInteraction(s, i.Interaction, tempstr)
 			if err != nil {
-				fmt.Printf("Unable to send ephemeral message: %v", err)
+				fmt.Printf("Unable to send ephemeral message: %v\n", err)
 			}
 		}
 	}
@@ -84,7 +84,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	} else {
 		err = StartInteraction(s, i.Interaction, "Please provide a reason for the kick.")
 		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v", err)
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
 
 		return
@@ -96,7 +96,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		err = StartInteraction(s, i.Interaction, tempstr)
 		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v", err)
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
 	} else {
 		tempstr := fmt.Sprintf("User <@%v> has been kicked.", userToKick)
@@ -104,7 +104,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		err = StartInteraction(s, i.Interaction, tempstr)
 		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v", err)
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
 	}
 
@@ -222,7 +222,7 @@ func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate
 
 	err := StartInteraction(s, i.Interaction, tempstr)
 	if err != nil {
-		fmt.Printf("Unable to send ephemeral message: %v", err)
+		fmt.Printf("Unable to send ephemeral message: %v\n", err)
 	}
-	fmt.Printf("Set the moderation log channel to channel: %v", channelID)
+	fmt.Printf("Set the moderation log channel to channel: %v\n", channelID)
 }
