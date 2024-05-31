@@ -208,6 +208,11 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	return
 }
 
+// SetModLog sets the specified channel to the moderation log channel
+// All logged commands will be logged to this channel.
+// Fields:
+//
+//	channel:	Channel
 func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	options := i.ApplicationCommandData().Options
 	channelID := options[0].ChannelValue(nil).ID
