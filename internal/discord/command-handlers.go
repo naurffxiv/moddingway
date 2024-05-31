@@ -1,9 +1,13 @@
 package discord
 
 import (
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Set up vars for the DefaultMemberPermissions field in each command definition
@@ -49,6 +53,63 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 // CheckUserInGuild checks if the user is in the specified server.
 func (d *Discord) CheckUserInGuild(gid string, user string) error {
 	_, err := d.Session.GuildMember(gid, user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Discord) CommandLogger(i *discordgo.Interaction) error {
+	if len(d.LogChannelID) == 0 {
+		return errors.New("log channel not set")
+	}
+	options := i.ApplicationCommandData().Options
+
+	// Format embed fields
+	var embedFields []*discordgo.MessageEmbedField
+	// Action field
+	embedFields = append(embedFields, &discordgo.MessageEmbedField{
+		Name:  "Action",
+		Value: fmt.Sprintf("/%v", i.ApplicationCommandData().Name),
+	})
+	// Options fields
+	for _, opt := range options {
+		// Format value based on what type the field is
+		var optValue string
+		switch opt.Type {
+		case discordgo.ApplicationCommandOptionUser:
+			userID := opt.UserValue(nil).ID
+			optValue = fmt.Sprintf("<@%v>", userID)
+		case discordgo.ApplicationCommandOptionString:
+			optValue = opt.StringValue()
+		case discordgo.ApplicationCommandOptionInteger:
+			optValue = fmt.Sprintf("%v", opt.IntValue())
+		}
+
+		embedFields = append(embedFields, &discordgo.MessageEmbedField{
+			Name:  cases.Title(language.English).String(opt.Name),
+			Value: optValue,
+		})
+	}
+
+	actionDescription := fmt.Sprintf("Used `%v` command in <#%v>",
+		i.ApplicationCommandData().Name,
+		i.ChannelID,
+	)
+
+	// Send the embed
+	_, err := d.Session.ChannelMessageSendEmbed(
+		d.LogChannelID,
+		&discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    i.Member.User.Username,
+				IconURL: i.Member.AvatarURL(""),
+			},
+			Description: actionDescription,
+			Fields:      embedFields,
+			Timestamp:   time.Now().Format(time.RFC3339),
+		},
+	)
 	if err != nil {
 		return err
 	}

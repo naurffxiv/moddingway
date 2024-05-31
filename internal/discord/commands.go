@@ -18,10 +18,16 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		optionMap[opt.Name] = opt
 	}
 
+	// Log usage of command
+	err := d.CommandLogger(i.Interaction)
+	if err != nil {
+		fmt.Printf("Failed to log: %v", err)
+	}
+
 	userToKick := optionMap["user"].UserValue(nil).ID
 
 	// Check if user exists in guild
-	err := d.CheckUserInGuild(i.GuildID, userToKick)
+	err = d.CheckUserInGuild(i.GuildID, userToKick)
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
@@ -34,8 +40,6 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		// Abort kick if failed to DM?
-		//return
 		StartInteraction(s, i.Interaction, tempstr)
 	} else {
 		// Get guild name
@@ -57,8 +61,6 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			// Abort kick if failed to DM?
-			//return
 			StartInteraction(s, i.Interaction, tempstr)
 		}
 	}
