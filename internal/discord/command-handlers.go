@@ -60,9 +60,9 @@ func (d *Discord) CheckUserInGuild(gid string, user string) error {
 	return nil
 }
 
-func (d *Discord) CommandLogger(i *discordgo.Interaction) error {
+func (d *Discord) CommandLogger(i *discordgo.Interaction) (*discordgo.Message, error) {
 	if len(d.LogChannelID) == 0 {
-		return errors.New("log channel not set")
+		return nil, errors.New("log channel not set")
 	}
 	options := i.ApplicationCommandData().Options
 
@@ -99,7 +99,7 @@ func (d *Discord) CommandLogger(i *discordgo.Interaction) error {
 	)
 
 	// Send the embed
-	_, err := d.Session.ChannelMessageSendEmbed(
+	return d.Session.ChannelMessageSendEmbed(
 		d.LogChannelID,
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -111,10 +111,6 @@ func (d *Discord) CommandLogger(i *discordgo.Interaction) error {
 			Timestamp:   time.Now().Format(time.RFC3339),
 		},
 	)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 var KickCommand = &discordgo.ApplicationCommand{

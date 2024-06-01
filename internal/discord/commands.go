@@ -26,7 +26,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
 
 	// Log usage of command
-	err := d.CommandLogger(i.Interaction)
+	logMsg, err := d.CommandLogger(i.Interaction)
 	if err != nil {
 		fmt.Printf("Failed to log: %v\n", err)
 	}
@@ -50,15 +50,12 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// DM the user regarding the kick
 	channel, err := s.UserChannelCreate(userToKick)
 	if err != nil {
-		tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
+		tempstr := fmt.Sprintf("Could not create a DM with user %v", userToKick)
 		fmt.Printf("%v: %v\n", tempstr, err)
-
-		err = StartInteraction(s, i.Interaction, tempstr)
-		if err != nil {
-			fmt.Printf("Unable to send ephemeral message: %v\n", err)
-		}
+		dmFailed = true
 	} else {
 		// Get guild name
+		// We could cut down on an API call by hardcoding this
 		var guildname string
 		guild, err := d.Session.Guild(i.GuildID)
 		if err != nil {
@@ -77,11 +74,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
 			fmt.Printf("%v: %v\n", tempstr, err)
-
-			err = StartInteraction(s, i.Interaction, tempstr)
-			if err != nil {
-				fmt.Printf("Unable to send ephemeral message: %v\n", err)
-			}
+			dmFailed = true
 		}
 	}
 
@@ -105,6 +98,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
+		return
 	} else {
 		tempstr := fmt.Sprintf("User <@%v> has been kicked.", userToKick)
 		fmt.Printf("%v\n", tempstr)
@@ -115,6 +109,18 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 	}
 
+	// Inform of failure to DM
+	if dmFailed {
+		err = ContinueInteraction(s, i.Interaction, "Unable to send DM to user.")
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral followup message: %v\n", err)
+		}
+		logMsg.Embeds[0].Description += "\nFailed to notify the user of the kick via DM."
+		_, err = d.Session.ChannelMessageEditEmbed(d.LogChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+	}
 }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
