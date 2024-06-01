@@ -60,7 +60,10 @@ func (d *Discord) CheckUserInGuild(gid string, user string) error {
 	return nil
 }
 
-func (d *Discord) CommandLogger(i *discordgo.Interaction) (*discordgo.Message, error) {
+// LogCommand logs the moderation command in the channel specified by LogChannelID
+// It sends an embed with all command arguments as separate fields
+// It additionally returns the sent message in case any edits need to be made
+func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, error) {
 	if len(d.LogChannelID) == 0 {
 		return nil, errors.New("log channel not set")
 	}

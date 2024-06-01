@@ -26,7 +26,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
 
 	// Log usage of command
-	logMsg, err := d.CommandLogger(i.Interaction)
+	logMsg, err := d.LogCommand(i.Interaction)
 	if err != nil {
 		fmt.Printf("Failed to log: %v\n", err)
 	}
