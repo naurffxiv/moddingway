@@ -6,17 +6,24 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// mapOptions is a helper function that creates a map out of the arguments used in the slash command
+func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.ApplicationCommandInteractionDataOption {
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+	return optionMap
+}
+
 // Kick attempts to kick the user specified user from the server the command was invoked in.
 // Fields:
 //
 //	user: 	User
 //	reason: string
 func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	options := i.ApplicationCommandData().Options
-	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-	for _, opt := range options {
-		optionMap[opt.Name] = opt
-	}
+	dmFailed := false
+	optionMap := mapOptions(i)
 
 	// Log usage of command
 	err := d.CommandLogger(i.Interaction)
