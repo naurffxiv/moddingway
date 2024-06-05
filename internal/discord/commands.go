@@ -54,19 +54,8 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("%v: %v\n", tempstr, err)
 		dmFailed = true
 	} else {
-		// Get guild name
-		// We could cut down on an API call by hardcoding this
-		var guildname string
-		guild, err := d.Session.Guild(i.GuildID)
-		if err != nil {
-			fmt.Printf("Unable to find guild name: %v", err)
-			guildname = i.GuildID
-		} else {
-			guildname = guild.Name
-		}
-
 		tempstr := fmt.Sprintf("You are being kicked from %v for the reason:\n%v",
-			guildname,
+			GuildName,
 			optionMap["reason"].StringValue(),
 		)
 
