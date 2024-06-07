@@ -121,7 +121,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	options := i.ApplicationCommandData().Options
 	channelID := options[0].ChannelValue(nil).ID
-	d.LogChannelID = channelID
+	d.ModLogChannelID = channelID
 
 	tempstr := fmt.Sprintf("Mod log channel set to: <#%v>", channelID)
 
