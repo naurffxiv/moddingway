@@ -10,7 +10,94 @@ import (
 //	user: 	User
 //	reason: string
 func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	dmFailed := false
+	optionMap := mapOptions(i)
+
+	// Log usage of command
+	logMsg, err := d.LogCommand(i.Interaction)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+	}
+
+	userToKick := optionMap["user"].UserValue(nil).ID
+
+	// Check if user exists in guild
+	err = d.CheckUserInGuild(i.GuildID, userToKick)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+
+		return
+	}
+
+	// DM the user regarding the kick
+	channel, err := s.UserChannelCreate(userToKick)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not create a DM with user %v", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		dmFailed = true
+	} else {
+		tempstr := fmt.Sprintf("You are being kicked from `%v` for the following reason:\n%v",
+			GuildName,
+			optionMap["reason"].StringValue(),
+		)
+
+		_, err = s.ChannelMessageSend(channel.ID, tempstr)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not send a DM to user %v", userToKick)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			dmFailed = true
+		}
+	}
+
+	// Attempt to kick user
+	if len(optionMap["reason"].StringValue()) > 0 {
+		err = d.Session.GuildMemberDeleteWithReason(i.GuildID, userToKick, optionMap["reason"].StringValue())
+	} else {
+		err = StartInteraction(s, i.Interaction, "Please provide a reason for the kick.")
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+
+		return
+	}
+
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not kick user <@%v>", userToKick)
+		fmt.Printf("%v: %v\n", tempstr, err)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+		return
+	} else {
+		tempstr := fmt.Sprintf("User <@%v> has been kicked.", userToKick)
+		fmt.Printf("%v\n", tempstr)
+
+		err = StartInteraction(s, i.Interaction, tempstr)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+	}
+
+	// Inform of failure to DM
+	if dmFailed {
+		err = ContinueInteraction(s, i.Interaction, "Unable to send DM to user.")
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral followup message: %v\n", err)
+		}
+		logMsg.Embeds[0].Description += "\nFailed to notify the user of the kick via DM."
+		_, err = d.Session.ChannelMessageEditEmbed(d.ModLogChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+	}
 }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
