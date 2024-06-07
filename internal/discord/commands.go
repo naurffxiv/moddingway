@@ -113,21 +113,21 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	return
 }
 
-// SetModLog sets the specified channel to the moderation log channel
+// SetModLoggingChannel sets the specified channel to the moderation log channel
 // All logged commands will be logged to this channel.
 // Fields:
 //
 //	channel:	Channel
-func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	options := i.ApplicationCommandData().Options
 	channelID := options[0].ChannelValue(nil).ID
-	d.ModLogChannelID = channelID
+	d.ModLoggingChannelID = channelID
 
-	tempstr := fmt.Sprintf("Mod log channel set to: <#%v>", channelID)
+	tempstr := fmt.Sprintf("Mod logging channel set to: <#%v>", channelID)
 
 	err := StartInteraction(s, i.Interaction, tempstr)
 	if err != nil {
 		fmt.Printf("Unable to send ephemeral message: %v\n", err)
 	}
-	fmt.Printf("Set the moderation log channel to channel: %v\n", channelID)
+	fmt.Printf("Set the moderation logging channel to: %v\n", channelID)
 }

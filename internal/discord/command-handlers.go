@@ -32,7 +32,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			PurgeCommand,
 			ExileCommand,
 			UnexileCommand,
-			SetModLogCommand,
+			SetModLoggingCommand,
 		)
 
 		fmt.Printf("Adding commands...\n")
@@ -280,10 +280,10 @@ var UnexileCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var SetModLogCommand = &discordgo.ApplicationCommand{
-	Name:                     "setmodlog",
+var SetModLoggingCommand = &discordgo.ApplicationCommand{
+	Name:                     "setmodloggingchannel",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Set the log channel for moderation.",
+	Description:              "Set the log channel for moderation commands.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionChannel,
@@ -320,7 +320,7 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.Exile(s, i)
 	case "unexile":
 		d.Unexile(s, i)
-	case "setmodlog":
-		d.SetModLog(s, i)
+	case "setmodloggingchannel":
+		d.SetModLoggingChannel(s, i)
 	}
 }
