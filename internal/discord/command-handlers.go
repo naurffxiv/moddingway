@@ -1,9 +1,13 @@
 package discord
 
 import (
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Set up vars for the DefaultMemberPermissions field in each command definition
@@ -45,6 +49,68 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			fmt.Printf("Could not add some commands: %v \n", err)
 		}
 	}
+}
+
+// LogCommand logs the moderation command in the channel specified by LogChannelID
+// It sends an embed with all command arguments as separate fields
+// It additionally returns the sent message in case any edits need to be made
+func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, error) {
+	if len(d.ModLogChannelID) == 0 {
+		return nil, errors.New("log channel not set")
+	}
+	options := i.ApplicationCommandData().Options
+
+	// Format embed fields
+	var embedFields []*discordgo.MessageEmbedField
+	// Action field
+	embedFields = append(embedFields, &discordgo.MessageEmbedField{
+		Name:  "Action",
+		Value: fmt.Sprintf("/%v", i.ApplicationCommandData().Name),
+	})
+	// Options fields
+	for _, opt := range options {
+		// Format value based on what type the field is
+		var optValue string
+		switch opt.Type {
+		case discordgo.ApplicationCommandOptionString:
+			optValue = opt.StringValue()
+		case discordgo.ApplicationCommandOptionInteger:
+			optValue = fmt.Sprintf("%v", opt.IntValue())
+		case discordgo.ApplicationCommandOptionBoolean:
+			optValue = fmt.Sprintf("%t", opt.BoolValue())
+		case discordgo.ApplicationCommandOptionUser:
+			userID := opt.UserValue(nil).ID
+			optValue = fmt.Sprintf("<@%v>", userID)
+		case discordgo.ApplicationCommandOptionChannel:
+			optValue = fmt.Sprintf("<#%v>", opt.ChannelValue(nil).ID)
+		case discordgo.ApplicationCommandOptionNumber:
+			optValue = fmt.Sprintf("%v", opt.FloatValue())
+		}
+
+		embedFields = append(embedFields, &discordgo.MessageEmbedField{
+			Name:  cases.Title(language.English).String(opt.Name),
+			Value: optValue,
+		})
+	}
+
+	actionDescription := fmt.Sprintf("Used `%v` command in <#%v>",
+		i.ApplicationCommandData().Name,
+		i.ChannelID,
+	)
+
+	// Send the embed
+	return d.Session.ChannelMessageSendEmbed(
+		d.ModLogChannelID,
+		&discordgo.MessageEmbed{
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    i.Member.User.Username,
+				IconURL: i.Member.AvatarURL(""),
+			},
+			Description: actionDescription,
+			Fields:      embedFields,
+			Timestamp:   time.Now().Format(time.RFC3339),
+		},
+	)
 }
 
 var KickCommand = &discordgo.ApplicationCommand{
