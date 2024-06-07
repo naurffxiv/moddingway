@@ -32,6 +32,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			PurgeCommand,
 			ExileCommand,
 			UnexileCommand,
+			SetModLogCommand,
 		)
 
 		fmt.Printf("Adding commands...\n")
@@ -279,6 +280,20 @@ var UnexileCommand = &discordgo.ApplicationCommand{
 	},
 }
 
+var SetModLogCommand = &discordgo.ApplicationCommand{
+	Name:                     "setmodlog",
+	DefaultMemberPermissions: &adminPermission,
+	Description:              "Set the log channel for moderation.",
+	Options: []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionChannel,
+			Name:        "channel",
+			Description: "Channel to log moderation actions in",
+			Required:    true,
+		},
+	},
+}
+
 // InteractionCreate executes the respective function based on what
 // slash command was used
 func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -305,5 +320,7 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.Exile(s, i)
 	case "unexile":
 		d.Unexile(s, i)
+	case "setmodlog":
+		d.SetModLog(s, i)
 	}
 }

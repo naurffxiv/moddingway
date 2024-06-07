@@ -7,8 +7,9 @@ import (
 )
 
 type Discord struct {
-	Token   string
-	Session *discordgo.Session
+	Token        string
+	Session      *discordgo.Session
+	LogChannelID string
 }
 
 // Start sets up the token and intents of the bot before it logs in
