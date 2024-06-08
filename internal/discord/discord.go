@@ -93,11 +93,17 @@ func ContinueInteraction(s *discordgo.Session, i *discordgo.Interaction, message
 func RespondToInteraction(s *discordgo.Session, i *discordgo.Interaction, message string, isFirstInteraction *bool) error {
 	if *isFirstInteraction {
 		err := StartInteraction(s, i, message)
-		if err == nil {
+		if err != nil {
+			fmt.Printf("Unable to send initial ephemeral message: %v\n", err)
+		} else {
 			*isFirstInteraction = false
 		}
 		return err
 	} else {
-		return ContinueInteraction(s, i, message)
+		err := ContinueInteraction(s, i, message)
+		if err != nil {
+			fmt.Printf("Unable to send follow-up ephemeral message: %v\n", err)
+		}
+		return err
 	}
 }
