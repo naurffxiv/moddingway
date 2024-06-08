@@ -20,6 +20,7 @@ var (
 func (d *Discord) DiscordReady(s *discordgo.Session, event *discordgo.Ready) {
 	defer d.Ready.Done()
 	d.AddCommands(s, event)
+	d.MapExistingRoles(s, event)
 }
 
 // AddCommands registers the slash commands with Discord
@@ -59,6 +60,27 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 		if err != nil {
 			fmt.Printf("Could not add some commands: %v \n", err)
 		}
+	}
+}
+
+// MapExistingRoles takes the existing roles from all guilds the bot is in
+// and populates the Roles map
+func (d *Discord) MapExistingRoles(s *discordgo.Session, event *discordgo.Ready) {
+	fmt.Printf("Mapping existing roles...\n")
+
+	d.Roles = make(map[string]map[string]*discordgo.Role)
+
+	fmt.Printf("Found the following roles:\n")
+	for _, discordGuild := range event.Guilds {
+		guildID := discordGuild.ID
+		existingRoles := discordGuild.Roles
+		d.Roles[guildID] = make(map[string]*discordgo.Role)
+		fmt.Printf("Guild %v:\n", guildID)
+		for _, role := range existingRoles {
+			d.Roles[guildID][role.Name] = role
+			fmt.Printf("%v, ", role.Name)
+		}
+		fmt.Printf("\n")
 	}
 }
 
