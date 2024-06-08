@@ -55,6 +55,15 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	}
 }
 
+// CheckUserInGuild checks if the user is in the specified server.
+func (d *Discord) CheckUserInGuild(guild_id string, user string) error {
+	_, err := d.Session.GuildMember(guild_id, user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // LogCommand logs the moderation command in the channel specified by LogChannelID
 // It sends an embed with all command arguments as separate fields
 // It additionally returns the sent message in case any edits need to be made
