@@ -103,7 +103,126 @@ func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	duration:	string
 //	reason:		string
 func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	isFirst := true
+	optionMap := mapOptions(i)
+	exileRole := d.Roles[i.GuildID]["Exiled"]
+	logMsg, err := d.LogCommand(i.Interaction)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+	}
+
+	// Calculate duration of exile
+	startTime := time.Now()
+	duration, err := parseDuration(optionMap["duration"].StringValue())
+	if err != nil {
+		fmt.Printf("Failed to parse duration: %v\n", err)
+		return
+	}
+
+	userToExile := optionMap["user"].UserValue(nil)
+
+	// Check if user exists in guild
+	memberToExile, err := d.CheckUserInGuild(i.GuildID, userToExile.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userToExile.ID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		return
+	}
+
+	// Check if user already has exile role
+	isExiled := false
+	for _, role := range memberToExile.Roles {
+		if role == exileRole.ID {
+			isExiled = true
+		}
+	}
+	if isExiled {
+		tempstr := fmt.Sprintf("User <@%v> is already exiled", userToExile.ID)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+		return
+	}
+
+	// Attempt to exile user
+	err = s.GuildMemberRoleAdd(i.GuildID, userToExile.ID, exileRole.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not give user <@%v> role %v", userToExile.ID, exileRole.Name)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		return
+	}
+
+	// Inform invoker and edit log message of successful exile
+	endTime := startTime.Add(duration)
+	tempstr := fmt.Sprintf(
+		"\nUser <@%v> has been exiled until <t:%v>.",
+		userToExile.ID,
+		endTime.Unix(),
+	)
+	logMsg.Embeds[0].Description += tempstr
+	RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+
+	// DM user regarding the exile
+	dmFailed := false
+	channel, err := s.UserChannelCreate(userToExile.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not create a DM with user %v", userToExile.ID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		dmFailed = true
+	} else {
+		tempstr := fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
+			GuildName,
+			endTime.Unix(),
+			optionMap["reason"].StringValue(),
+		)
+		_, err = s.ChannelMessageSend(channel.ID, tempstr)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userToExile.ID)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+			dmFailed = true
+		}
+	}
+
+	if dmFailed {
+		logMsg.Embeds[0].Description += "\nFailed to notify of the exile via DM"
+	}
+
+	// Edit embed with end result
+	_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+	if err != nil {
+		fmt.Printf("Unable to edit log message: %v\n", err)
+	}
+
+	time.Sleep(duration)
+
+	logMsg.Embeds[0].Description = fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID)
+
+	// Attempt to remove role from user
+	err = s.GuildMemberRoleRemove(i.GuildID, userToExile.ID, exileRole.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", exileRole.Name, userToExile.ID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+	} else {
+		logMsg.Embeds[0].Description += fmt.Sprintf("\nRole %v has been sucessfully removed from user <@%v>", exileRole.Name, userToExile.ID)
+	}
+
+	// Send follow-up log message
+	logMsg.Embeds[0].Timestamp = time.Now().Format(time.RFC3339)
+	_, err = d.Session.ChannelMessageSendEmbed(
+		d.ModLoggingChannelID,
+		logMsg.Embeds[0],
+	)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+	}
 }
 
 // Unexile attempts to remove the exile role from the user.
