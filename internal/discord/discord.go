@@ -2,6 +2,7 @@ package discord
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -9,7 +10,11 @@ import (
 type Discord struct {
 	Token               string
 	Session             *discordgo.Session
+	Ready               sync.WaitGroup
 	ModLoggingChannelID string
+
+	// Roles[guild_id][role_name]
+	Roles map[string]map[string]*discordgo.Role
 }
 
 // Start sets up the token and intents of the bot before it logs in

@@ -15,6 +15,13 @@ var (
 	adminPermission int64 = discordgo.PermissionAdministrator
 )
 
+// DiscordReady initializes the bot and blocks the bot from proceeding until
+// initialization finishes
+func (d *Discord) DiscordReady(s *discordgo.Session, event *discordgo.Ready) {
+	defer d.Ready.Done()
+	d.AddCommands(s, event)
+}
+
 // AddCommands registers the slash commands with Discord
 func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	fmt.Printf("Initializing Discord...\n")
