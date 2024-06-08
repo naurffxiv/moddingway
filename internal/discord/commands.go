@@ -231,7 +231,61 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	isFirst := true
+	optionMap := mapOptions(i)
+	exileRole := d.Roles[i.GuildID]["Exiled"]
+	logMsg, err := d.LogCommand(i.Interaction)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+	}
+
+	userToExile := optionMap["user"].UserValue(nil)
+
+	// Check if user exists in guild
+	memberToExile, err := d.CheckUserInGuild(i.GuildID, userToExile.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userToExile.ID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		return
+	}
+
+	// Check if user has exile role
+	isExiled := false
+	for _, role := range memberToExile.Roles {
+		if role == exileRole.ID {
+			isExiled = true
+		}
+	}
+	if !isExiled {
+		tempstr := fmt.Sprintf("User <@%v> is not currently exiled", userToExile.ID)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+		return
+	}
+
+	// Attempt to remove role from user
+	err = s.GuildMemberRoleRemove(i.GuildID, userToExile.ID, exileRole.ID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", exileRole.Name, userToExile.ID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+	} else {
+		tempstr := fmt.Sprintf("Role %v has been sucessfully removed from user <@%v>", exileRole.Name, userToExile.ID)
+		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+	}
+
+	// Update log message of status
+	_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+	if err != nil {
+		fmt.Printf("Unable to edit log message: %v\n", err)
+	}
+
 }
 
 // SetModLoggingChannel sets the specified channel to the moderation log channel
