@@ -87,3 +87,17 @@ func ContinueInteraction(s *discordgo.Session, i *discordgo.Interaction, message
 	})
 	return err
 }
+
+// RespondToInteraction is a helper function that decides whether StartInteraction
+// or ContinueInteraction should be used
+func RespondToInteraction(s *discordgo.Session, i *discordgo.Interaction, message string, isFirstInteraction *bool) error {
+	if *isFirstInteraction {
+		err := StartInteraction(s, i, message)
+		if err == nil {
+			*isFirstInteraction = false
+		}
+		return err
+	} else {
+		return ContinueInteraction(s, i, message)
+	}
+}
