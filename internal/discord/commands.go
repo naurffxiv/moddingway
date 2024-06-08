@@ -2,6 +2,9 @@ package discord
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -14,6 +17,61 @@ func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.Applicatio
 		optionMap[opt.Name] = opt
 	}
 	return optionMap
+}
+
+// parseDuration parses the string provided and returns the time.Duration equivalent
+// does not support negative durations
+func parseDuration(userInput string) (time.Duration, error) {
+	const maxDuration time.Duration = 1<<63 - 1
+	// matches any string that is a string of numbers followed by a single letter
+	r, _ := regexp.Compile(`^([\d]+)([a-zA-Z]{1})$`)
+
+	// groups[0] is the entire match, following elements are capture groups
+	groups := r.FindStringSubmatch(userInput)
+	if len(groups) < 2 {
+		err := fmt.Errorf("invalid format")
+		return 0, err
+	}
+	num, err := strconv.ParseInt(groups[1], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	// get duration based on unit
+	var factor time.Duration
+	switch groups[2] {
+	case "s":
+		factor = time.Second
+	case "m":
+		factor = time.Minute
+	case "h":
+		factor = time.Hour
+	case "d":
+		factor = time.Hour * 24
+	case "w":
+		factor = time.Hour * 24 * 7
+	// month overlaps with minutes, favoring using something like "30d" to specify a month
+	case "y":
+		factor = time.Hour * 24 * 365
+	default:
+		err = fmt.Errorf("invalid unit")
+		return 0, err
+	}
+
+	// check if input is larger than max supported duration (approx. 290y)
+	// if it is, set to max possible duration
+	var duration time.Duration
+	if num > int64(maxDuration/factor) {
+		duration = maxDuration
+	} else {
+		duration = time.Duration(num) * factor
+	}
+
+	if duration < 0 {
+		return 0, err
+	}
+
+	return duration, nil
 }
 
 // Kick attempts to kick the user specified user from the server the command was invoked in.
