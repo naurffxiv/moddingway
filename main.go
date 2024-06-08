@@ -18,8 +18,8 @@ func main() {
 	discordToken = strings.TrimSpace(discordToken)
 
 	d := &discord.Discord{
-		Token:           discordToken,
-		ModLogChannelID: "",
+		Token:               discordToken,
+		ModLoggingChannelID: "",
 	}
 
 	fmt.Printf("Starting Discord...\n")

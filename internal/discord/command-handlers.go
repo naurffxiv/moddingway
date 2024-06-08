@@ -36,7 +36,11 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			PurgeCommand,
 			ExileCommand,
 			UnexileCommand,
-			SetModLogCommand,
+			SetModLoggingCommand,
+			AddWarningCommand,
+			ClearWarningsCommand,
+			DeleteWarningCommand,
+			ShowAllWarningsCommand,
 		)
 
 		fmt.Printf("Adding commands...\n")
@@ -55,7 +59,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 // It sends an embed with all command arguments as separate fields
 // It additionally returns the sent message in case any edits need to be made
 func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, error) {
-	if len(d.ModLogChannelID) == 0 {
+	if len(d.ModLoggingChannelID) == 0 {
 		return nil, errors.New("log channel not set")
 	}
 	options := i.ApplicationCommandData().Options
@@ -100,7 +104,7 @@ func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, erro
 
 	// Send the embed
 	return d.Session.ChannelMessageSendEmbed(
-		d.ModLogChannelID,
+		d.ModLoggingChannelID,
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    i.Member.User.Username,
@@ -319,6 +323,12 @@ var ExileCommand = &discordgo.ApplicationCommand{
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
+			Name:        "duration",
+			Description: "Duration of exile (e.g \"1m, 1h, 1d\")",
+			Required:    true,
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "reason",
 			Description: "Reason for exile",
 			Required:    true,
@@ -346,15 +356,77 @@ var UnexileCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var SetModLogCommand = &discordgo.ApplicationCommand{
-	Name:                     "setmodlog",
+var SetModLoggingCommand = &discordgo.ApplicationCommand{
+	Name:                     "setmodloggingchannel",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Set the log channel for moderation.",
+	Description:              "Set the log channel for moderation commands.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionChannel,
 			Name:        "channel",
 			Description: "Channel to log moderation actions in",
+			Required:    true,
+		},
+	},
+}
+
+var AddWarningCommand = &discordgo.ApplicationCommand{
+	Name:                     "warn",
+	DefaultMemberPermissions: &adminPermission,
+	Description:              "Warn the specified user.",
+	Options: []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionUser,
+			Name:        "user",
+			Description: "User being warned",
+			Required:    true,
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionString,
+			Name:        "reason",
+			Description: "Reason for warning",
+			Required:    true,
+		},
+	},
+}
+
+var ClearWarningsCommand = &discordgo.ApplicationCommand{
+	Name:                     "clearwarnings",
+	DefaultMemberPermissions: &adminPermission,
+	Description:              "Clear all warnings for a specified user.",
+	Options: []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionUser,
+			Name:        "user",
+			Description: "User being cleared of warnings",
+			Required:    true,
+		},
+	},
+}
+
+var DeleteWarningCommand = &discordgo.ApplicationCommand{
+	Name:                     "deletewarning",
+	DefaultMemberPermissions: &adminPermission,
+	Description:              "Delete a warning.",
+	Options: []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionInteger,
+			Name:        "warning_id",
+			Description: "Warning to be deleted",
+			Required:    true,
+		},
+	},
+}
+
+var ShowAllWarningsCommand = &discordgo.ApplicationCommand{
+	Name:                     "warnings",
+	DefaultMemberPermissions: &adminPermission,
+	Description:              "Show all warnings for a specified user.",
+	Options: []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionUser,
+			Name:        "user",
+			Description: "Target user's warnings being shown",
 			Required:    true,
 		},
 	},
@@ -386,7 +458,15 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.Exile(s, i)
 	case "unexile":
 		d.Unexile(s, i)
-	case "setmodlog":
-		d.SetModLog(s, i)
+	case "setmodloggingchannel":
+		d.SetModLoggingChannel(s, i)
+	case "warn":
+		d.Warn(s, i)
+	case "clearwarnings":
+		d.ClearWarnings(s, i)
+	case "deletewarning":
+		d.DeleteWarning(s, i)
+	case "warnings":
+		d.ShowAllWarnings(s, i)
 	}
 }

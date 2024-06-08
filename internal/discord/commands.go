@@ -90,7 +90,7 @@ func (d *Discord) SlowmodeOff(s *discordgo.Session, i *discordgo.InteractionCrea
 // Fields:
 //
 //	channel:		Channel
-//	message-number:	integer
+//	message-number:		integer
 func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
@@ -99,6 +99,7 @@ func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 // Fields:
 //
 //	user:		User
+//	duration:	string
 //	reason:		string
 func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
@@ -113,21 +114,54 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	return
 }
 
-// SetModLog sets the specified channel to the moderation log channel
+// SetModLoggingChannel sets the specified channel to the moderation log channel
 // All logged commands will be logged to this channel.
 // Fields:
 //
 //	channel:	Channel
-func (d *Discord) SetModLog(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	options := i.ApplicationCommandData().Options
 	channelID := options[0].ChannelValue(nil).ID
-	d.ModLogChannelID = channelID
+	d.ModLoggingChannelID = channelID
 
-	tempstr := fmt.Sprintf("Mod log channel set to: <#%v>", channelID)
+	tempstr := fmt.Sprintf("Mod logging channel set to: <#%v>", channelID)
 
 	err := StartInteraction(s, i.Interaction, tempstr)
 	if err != nil {
 		fmt.Printf("Unable to send ephemeral message: %v\n", err)
 	}
-	fmt.Printf("Set the moderation log channel to channel: %v\n", channelID)
+	fmt.Printf("Set the moderation logging channel to: %v\n", channelID)
+}
+
+// Warn attempts to warn a user.
+// fields:
+//
+//	user:		User
+//	reason:		string
+func (d *Discord) Warn(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return
+}
+
+// ClearWarnings attempts to clear all warnings for a user.
+// fields:
+//
+//	user:		User
+func (d *Discord) ClearWarnings(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return
+}
+
+// DeleteWarning attempts to delete a warning a user.
+// fields:
+//
+//	warning_id:	integer
+func (d *Discord) DeleteWarning(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return
+}
+
+// ShowAllWarnings attempts to show all warnings for a user.
+// fields:
+//
+//	user:		User
+func (d *Discord) ShowAllWarnings(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return
 }
