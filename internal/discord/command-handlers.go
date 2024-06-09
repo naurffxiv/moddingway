@@ -566,15 +566,15 @@ var ExileCommand = &discordgo.ApplicationCommand{
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "duration",
-			Description: "Duration of exile (e.g \"1m, 1h, 1d\")",
+			Name:        "reason",
+			Description: "Reason for exile",
 			Required:    true,
 		},
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for exile",
-			Required:    true,
+			Name:        "duration",
+			Description: "Duration of exile (e.g \"1m, 1h, 1d\")",
+			Required:    false,
 		},
 	},
 }
@@ -582,7 +582,7 @@ var ExileCommand = &discordgo.ApplicationCommand{
 var UnexileCommand = &discordgo.ApplicationCommand{
 	Name:                     "unexile",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "unexile the specified user.",
+	Description:              "Unexile the specified user.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
