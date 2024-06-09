@@ -739,11 +739,8 @@ func (d *Discord) ExileCheckUserHelper(state *InteractionState, userIDToExile st
 	if isExiled {
 		tempstr := fmt.Sprintf("User <@%v> is already exiled", userIDToExile)
 		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		state.logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, state.logMsg.ID, state.logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+		AppendLogMsgDescription(state.logMsg, tempstr)
+		d.EditLogMsg(state.logMsg)
 		return nil
 	}
 

@@ -142,11 +142,8 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("%v: %v\n", tempstr, err)
 		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+		AppendLogMsgDescription(logMsg, tempstr)
+		d.EditLogMsg(logMsg)
 		return
 	}
 	// Add exiled role
@@ -156,22 +153,19 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("%v: %v\n", tempstr, err)
 		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+		AppendLogMsgDescription(logMsg, tempstr)
+		d.EditLogMsg(logMsg)
 		return
 	}
 
 	// Inform invoker and edit log message of successful exile
 	endTime := startTime.Add(duration)
 	tempstr := fmt.Sprintf(
-		"\nUser <@%v> has been exiled until <t:%v>",
+		"User <@%v> has been exiled until <t:%v>",
 		userToExile.ID,
 		endTime.Unix(),
 	)
-	logMsg.Embeds[0].Description += tempstr
+	AppendLogMsgDescription(logMsg, tempstr)
 	RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
 	// DM user regarding the exile
@@ -180,7 +174,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		tempstr := fmt.Sprintf("Could not create a DM with user %v", userToExile.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
 		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
-		logMsg.Embeds[0].Description += "\nFailed to notify of the exile via DM"
+		AppendLogMsgDescription(logMsg, "Failed to notify of the exile via DM")
 	} else {
 		tempstr := fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
 			GuildName,
@@ -192,19 +186,19 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userToExile.ID)
 			fmt.Printf("%v: %v\n", tempstr, err)
 			RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
-			logMsg.Embeds[0].Description += "\nFailed to notify of the exile via DM"
+			AppendLogMsgDescription(logMsg, "Failed to notify of the exile via DM")
 		}
 	}
 
-	// Edit embed with end-result
-	_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-	if err != nil {
-		fmt.Printf("Unable to edit log message: %v\n", err)
-	}
+	d.EditLogMsg(logMsg)
 
 	time.Sleep(duration)
 
-	logMsg.Embeds[0].Description = fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID)
+	// Reuse the original embed format but clear existing info
+	if logMsg != nil {
+		logMsg.Embeds[0].Description = ""
+	}
+	AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
 
 	// Unexile user
 	err = s.GuildMemberRoleRemove(i.GuildID, userToExile.ID, exileRole.ID)
@@ -212,28 +206,30 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", exileRole.Name, userToExile.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+		AppendLogMsgDescription(logMsg, tempstr)
 	} else {
 		// Re-add verified role to user
 		err = s.GuildMemberRoleAdd(i.GuildID, userToExile.ID, verifiedRole.ID)
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not give user <@%v> role %v", userToExile.ID, verifiedRole.ID)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			logMsg.Embeds[0].Description += tempstr
+			AppendLogMsgDescription(logMsg, tempstr)
 		} else {
-			tempstr := fmt.Sprintf("\nUser <@%v> has been successfully unexiled", userToExile.ID)
-			logMsg.Embeds[0].Description += tempstr
+			tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", userToExile.ID)
+			AppendLogMsgDescription(logMsg, tempstr)
 		}
 	}
 
-	// Send follow-up log message
-	logMsg.Embeds[0].Timestamp = time.Now().Format(time.RFC3339)
-	_, err = d.Session.ChannelMessageSendEmbed(
-		d.ModLoggingChannelID,
-		logMsg.Embeds[0],
-	)
-	if err != nil {
-		fmt.Printf("Failed to log: %v\n", err)
+	// send new follow-up log message
+	UpdateLogMsgTimestamp(logMsg)
+	if logMsg != nil {
+		_, err = d.Session.ChannelMessageSendEmbed(
+			d.ModLoggingChannelID,
+			logMsg.Embeds[0],
+		)
+		if err != nil {
+			fmt.Printf("Failed to log: %v\n", err)
+		}
 	}
 }
 
@@ -277,22 +273,16 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	if !isExiled {
 		tempstr := fmt.Sprintf("User <@%v> is not currently exiled, nothing has been done", exiledUser.ID)
 		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+		AppendLogMsgDescription(logMsg, tempstr)
+		d.EditLogMsg(logMsg)
 		return
 	}
 
 	if isVerified {
 		tempstr := fmt.Sprintf("User <@%v> is both exiled and verified, nothing has been done", exiledUser.ID)
 		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+		AppendLogMsgDescription(logMsg, tempstr)
+		d.EditLogMsg(logMsg)
 		return
 	}
 
@@ -302,7 +292,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", exileRole.Name, exiledUser.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+		AppendLogMsgDescription(logMsg, tempstr)
 	} else {
 		// Re-add verified role to user
 		err = s.GuildMemberRoleAdd(i.GuildID, exiledUser.ID, verifiedRole.ID)
@@ -310,20 +300,15 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 			tempstr := fmt.Sprintf("Could not give user <@%v> role %v", exiledUser.ID, verifiedRole.ID)
 			fmt.Printf("%v: %v\n", tempstr, err)
 			RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-			logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+			AppendLogMsgDescription(logMsg, tempstr)
 		} else {
 			tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", exiledUser.ID)
 			RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-			logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+			AppendLogMsgDescription(logMsg, tempstr)
 		}
 	}
 
-	// Update log message of status
-	_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-	if err != nil {
-		fmt.Printf("Unable to edit log message: %v\n", err)
-	}
-
+	d.EditLogMsg(logMsg)
 }
 
 // SetModLoggingChannel sets the specified channel to the moderation log channel
