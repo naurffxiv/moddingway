@@ -183,6 +183,16 @@ func parseDuration(userInput string) (time.Duration, error) {
 	return duration, nil
 }
 
+// mapOptions is a helper function that creates a map out of the arguments used in the slash command
+func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.ApplicationCommandInteractionDataOption {
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+	return optionMap
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &adminPermission,
