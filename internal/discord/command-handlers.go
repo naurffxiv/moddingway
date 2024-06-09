@@ -713,3 +713,39 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.ShowAllStrikes(s, i)
 	}
 }
+
+// ExileCheckUserHelper checks whether the user meets the requirements to be exiled
+// returns nil if the user does not and returns the member on success
+func (d *Discord) ExileCheckUserHelper(state *InteractionState, userIDToExile string) *discordgo.Member {
+	exileRoleID := d.Roles[state.interaction.GuildID]["Exiled"].ID
+
+	// Check if user exists in guild
+	memberToExile, err := d.GetUserInGuild(state.interaction.GuildID, userIDToExile)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userIDToExile)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		return nil
+	}
+
+	// Check if user already has exile role
+	isExiled := false
+	for _, role := range memberToExile.Roles {
+		if role == exileRoleID {
+			isExiled = true
+		}
+	}
+
+	if isExiled {
+		tempstr := fmt.Sprintf("User <@%v> is already exiled", userIDToExile)
+		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		state.logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
+		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, state.logMsg.ID, state.logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+		return nil
+	}
+
+	return memberToExile
+}

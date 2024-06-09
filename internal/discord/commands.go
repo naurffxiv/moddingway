@@ -103,13 +103,19 @@ func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	duration:	string
 //	reason:		string
 func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	isFirst := true
 	optionMap := mapOptions(i)
 	exileRole := d.Roles[i.GuildID]["Exiled"]
 	verifiedRole := d.Roles[i.GuildID]["Verified"]
 	logMsg, err := d.LogCommand(i.Interaction)
 	if err != nil {
 		fmt.Printf("Failed to log: %v\n", err)
+	}
+
+	state := &InteractionState{
+		session:     s,
+		interaction: i,
+		logMsg:      logMsg,
+		isFirst:     true,
 	}
 
 	// Calculate duration of exile
@@ -122,30 +128,9 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	userToExile := optionMap["user"].UserValue(nil)
 
-	// Check if user exists in guild
-	memberToExile, err := d.GetUserInGuild(i.GuildID, userToExile.ID)
-	if err != nil {
-		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userToExile.ID)
-		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-		return
-	}
-
-	// Check if user already has exile role
-	isExiled := false
-	for _, role := range memberToExile.Roles {
-		if role == exileRole.ID {
-			isExiled = true
-		}
-	}
-	if isExiled {
-		tempstr := fmt.Sprintf("User <@%v> is already exiled", userToExile.ID)
-		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
-		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
-		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
-		if err != nil {
-			fmt.Printf("Unable to edit log message: %v\n", err)
-		}
+	// Check if user meets the requirements for an exile
+	memberToExile := d.ExileCheckUserHelper(state, userToExile.ID)
+	if memberToExile == nil {
 		return
 	}
 
@@ -155,7 +140,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", verifiedRole.Name, userToExile.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
 		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
 		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
@@ -169,7 +154,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not give user <@%v> role %v", userToExile.ID, exileRole.Name)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
 		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", tempstr)
 		_, err = d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
@@ -187,14 +172,14 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		endTime.Unix(),
 	)
 	logMsg.Embeds[0].Description += tempstr
-	RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+	RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 
 	// DM user regarding the exile
 	channel, err := s.UserChannelCreate(userToExile.ID)
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not create a DM with user %v", userToExile.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 		logMsg.Embeds[0].Description += "\nFailed to notify of the exile via DM"
 	} else {
 		tempstr := fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
@@ -206,7 +191,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userToExile.ID)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			RespondToInteraction(s, i.Interaction, tempstr, &isFirst)
+			RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
 			logMsg.Embeds[0].Description += "\nFailed to notify of the exile via DM"
 		}
 	}
