@@ -772,3 +772,24 @@ func (d *Discord) ExileRoleHelper(state *InteractionState, userID string, roleID
 		}
 	}
 }
+
+func (d *Discord) UnexileHelper(state *InteractionState, userID string, reason string) {
+	exileRole := d.Roles[state.interaction.GuildID]["Exiled"]
+	verifiedRole := d.Roles[state.interaction.GuildID]["Verified"]
+	// Unexile user
+	err := d.ExileRoleHelper(state, userID, exileRole.ID, verifiedRole.ID)
+	if err != nil {
+		d.EditLogMsg(state.logMsg)
+		return
+	}
+	tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", userID)
+	AppendLogMsgDescription(state.logMsg, tempstr)
+
+	// DM user regarding the exile, doesn't matter if DM fails
+	tempstr = fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
+		GuildName,
+		reason,
+	)
+	d.SendDMToUser(state, userID, tempstr)
+	d.EditLogMsg(state.logMsg)
+}
