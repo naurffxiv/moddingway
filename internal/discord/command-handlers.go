@@ -195,6 +195,30 @@ func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.Applicatio
 	return optionMap
 }
 
+// AppendLogMsgDescription appends an existing logMsg with the specified text
+func AppendLogMsgDescription(logMsg *discordgo.Message, s string) {
+	if logMsg != nil {
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", s)
+	}
+}
+
+// EditLogMsg sends the updated logMsg to Discord and overwrites the message referred to by logMsg.ID
+func (d *Discord) EditLogMsg(logMsg *discordgo.Message) {
+	if logMsg != nil {
+		_, err := d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+	}
+}
+
+// UpdateLogMsgTimestamp updates the timestamp for the embed in a logMsg
+func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
+	if logMsg != nil {
+		logMsg.Embeds[0].Timestamp = time.Now().Format(time.RFC3339)
+	}
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &adminPermission,
