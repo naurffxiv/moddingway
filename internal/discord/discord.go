@@ -13,7 +13,7 @@ type Discord struct {
 	Ready               sync.WaitGroup
 	ModLoggingChannelID string
 
-	// Roles[guild_id][role_name]
+	// The structure of the following map is Roles[guild_id][role_name]
 	Roles map[string]map[string]*discordgo.Role
 }
 
