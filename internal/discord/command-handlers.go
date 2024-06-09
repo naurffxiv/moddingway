@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -142,47 +143,61 @@ func parseDuration(userInput string) (time.Duration, error) {
 	// matches any string that is a string of numbers followed by a single letter
 	r, _ := regexp.Compile(`^([\d]+)([a-zA-Z]{1})$`)
 
-	// groups[0] is the entire match, following elements are capture groups
-	groups := r.FindStringSubmatch(userInput)
-	if len(groups) < 2 {
-		err := fmt.Errorf("invalid format")
-		return 0, err
-	}
-	num, err := strconv.ParseInt(groups[1], 10, 64)
-	if err != nil {
-		return 0, err
+	// clean user input
+	trimmed := strings.ReplaceAll(userInput, " ", "")
+	durationStrings := strings.Split(trimmed, ",")
+
+	// for each substring of format [num][letter] (e.g "24h")
+	var totalDuration time.Duration = 0
+	for _, durationString := range durationStrings {
+		// groups[0] is the entire match, following elements are capture groups
+		groups := r.FindStringSubmatch(durationString)
+		if len(groups) < 2 {
+			err := fmt.Errorf("invalid format")
+			return 0, err
+		}
+		num, err := strconv.ParseInt(groups[1], 10, 64)
+		if err != nil {
+			return 0, err
+		}
+
+		// get duration based on unit
+		var factor time.Duration
+		switch groups[2] {
+		case "s":
+			factor = time.Second
+		case "m":
+			factor = time.Minute
+		case "h":
+			factor = time.Hour
+		case "d":
+			factor = time.Hour * 24
+		default:
+			err = fmt.Errorf("invalid unit")
+			return 0, err
+		}
+
+		// check if input is larger than max supported duration (approx. 290y)
+		// if it is, set to max possible duration
+		var duration time.Duration
+		if num > int64(maxDuration/factor) {
+			duration = maxDuration
+		} else {
+			duration = time.Duration(num) * factor
+		}
+		if duration < 0 {
+			err = fmt.Errorf("negative duration")
+			return 0, err
+		}
+
+		// likewise, check if the sum is larger than max supported duration
+		if duration > (maxDuration - totalDuration) {
+			return maxDuration, nil
+		}
+		totalDuration += duration
 	}
 
-	// get duration based on unit
-	var factor time.Duration
-	switch groups[2] {
-	case "s":
-		factor = time.Second
-	case "m":
-		factor = time.Minute
-	case "h":
-		factor = time.Hour
-	case "d":
-		factor = time.Hour * 24
-	default:
-		err = fmt.Errorf("invalid unit")
-		return 0, err
-	}
-
-	// check if input is larger than max supported duration (approx. 290y)
-	// if it is, set to max possible duration
-	var duration time.Duration
-	if num > int64(maxDuration/factor) {
-		duration = maxDuration
-	} else {
-		duration = time.Duration(num) * factor
-	}
-
-	if duration < 0 {
-		return 0, err
-	}
-
-	return duration, nil
+	return totalDuration, nil
 }
 
 // mapOptions is a helper function that creates a map out of the arguments used in the slash command
