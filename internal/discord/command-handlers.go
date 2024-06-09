@@ -157,11 +157,6 @@ func parseDuration(userInput string) (time.Duration, error) {
 		factor = time.Hour
 	case "d":
 		factor = time.Hour * 24
-	case "w":
-		factor = time.Hour * 24 * 7
-	// month overlaps with minutes, favoring using something like "30d" to specify a month
-	case "y":
-		factor = time.Hour * 24 * 365
 	default:
 		err = fmt.Errorf("invalid unit")
 		return 0, err
