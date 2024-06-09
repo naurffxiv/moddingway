@@ -123,7 +123,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userToExile := optionMap["user"].UserValue(nil)
 
 	// Check if user exists in guild
-	memberToExile, err := d.CheckUserInGuild(i.GuildID, userToExile.ID)
+	memberToExile, err := d.GetUserInGuild(i.GuildID, userToExile.ID)
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userToExile.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
@@ -270,7 +270,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	exiledUser := optionMap["user"].UserValue(nil)
 
 	// Check if user exists in guild
-	exiledMember, err := d.CheckUserInGuild(i.GuildID, exiledUser.ID)
+	exiledMember, err := d.GetUserInGuild(i.GuildID, exiledUser.ID)
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", exiledUser.ID)
 		fmt.Printf("%v: %v\n", tempstr, err)
