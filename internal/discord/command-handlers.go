@@ -746,3 +746,29 @@ func (d *Discord) ExileCheckUserHelper(state *InteractionState, userIDToExile st
 
 	return memberToExile
 }
+
+// ExileRoleHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
+func (d *Discord) ExileRoleHelper(state *InteractionState, userID string, roleIDToRemove string, roleIDToAdd string) error {
+	// Attempt to remove role first
+	err := state.session.GuildMemberRoleRemove(state.interaction.GuildID, userID, roleIDToRemove)
+	// Abort entire process if role removal fails
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", roleIDToAdd, userID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		AppendLogMsgDescription(state.logMsg, tempstr)
+		return err
+	} else {
+		// Add role
+		err = state.session.GuildMemberRoleAdd(state.interaction.GuildID, userID, roleIDToAdd)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not give user <@%v> role %v", userID, roleIDToAdd)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, tempstr)
+			return err
+		} else {
+			return nil
+		}
+	}
+}
