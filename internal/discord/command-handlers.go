@@ -219,6 +219,29 @@ func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
 	}
 }
 
+// SendDMToUser sends a DM to the user specified in `userID` with `message` as its contents
+func (d *Discord) SendDMToUser(state *InteractionState, userID string, message string) error {
+	// Open DM channel with user
+	channel, err := state.session.UserChannelCreate(userID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not create a DM with user %v", userID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+		return err
+	} else {
+		_, err = state.session.ChannelMessageSend(channel.ID, message)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userID)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+			return err
+		}
+		return nil
+	}
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &adminPermission,
