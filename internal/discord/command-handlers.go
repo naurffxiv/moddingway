@@ -12,6 +12,13 @@ import (
 	"golang.org/x/text/language"
 )
 
+type InteractionState struct {
+	session     *discordgo.Session
+	interaction *discordgo.InteractionCreate
+	logMsg      *discordgo.Message
+	isFirst     bool
+}
+
 // Set up vars for the DefaultMemberPermissions field in each command definition
 var (
 	adminPermission int64 = discordgo.PermissionAdministrator
