@@ -55,8 +55,8 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	}
 }
 
-// CheckUserInGuild checks if the user is in the specified server.
-func (d *Discord) CheckUserInGuild(guild_id string, user string) (*discordgo.Member, error) {
+// GetUserInGuild returns the user in the server
+func (d *Discord) GetUserInGuild(guild_id string, user string) (*discordgo.Member, error) {
 	member, err := d.Session.GuildMember(guild_id, user)
 	if err != nil {
 		return nil, err
