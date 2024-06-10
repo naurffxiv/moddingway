@@ -776,7 +776,7 @@ func (d *Discord) UnexileUser(state *InteractionState, member *discordgo.Member,
 	verifiedRole := d.Roles[state.interaction.GuildID]["Verified"]
 	presentRoles := CheckUserForRoles(member, []string{exileRole.ID, verifiedRole.ID})
 
-	// Check user for roles
+	// Check user for specified roles
 	if !presentRoles[exileRole.ID] {
 		tempstr := fmt.Sprintf("User <@%v> is not currently exiled, nothing has been done", member.User.ID)
 		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
@@ -804,13 +804,5 @@ func (d *Discord) UnexileUser(state *InteractionState, member *discordgo.Member,
 	tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", member.User.ID)
 	RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
 	AppendLogMsgDescription(state.logMsg, tempstr)
-
-	// DM user regarding the exile, doesn't matter if DM fails
-	tempstr = fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
-		GuildName,
-		reason,
-	)
-	d.SendDMToUser(state, member.User.ID, tempstr)
-	d.EditLogMsg(state.logMsg)
 	return nil
 }
