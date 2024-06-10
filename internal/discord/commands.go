@@ -129,8 +129,8 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userToExile := optionMap["user"].UserValue(nil)
 
 	// Check if user meets the requirements for an exile
-	memberToExile := d.ExileCheckUserHelper(state, userToExile.ID)
-	if memberToExile == nil {
+	err = d.ExileCheckUserHelper(state, userToExile.ID, true)
+	if err != nil {
 		return
 	}
 
@@ -189,8 +189,6 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	reason:		string
 func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
-	exileRole := d.Roles[i.GuildID]["Exiled"]
-	verifiedRole := d.Roles[i.GuildID]["Verified"]
 	logMsg, err := d.LogCommand(i.Interaction)
 	if err != nil {
 		fmt.Printf("Failed to log: %v\n", err)
@@ -205,39 +203,9 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 
 	exiledUser := optionMap["user"].UserValue(nil)
 
-	// Check if user exists in guild
-	exiledMember, err := d.GetUserInGuild(i.GuildID, exiledUser.ID)
+	// Check if user meets the requirements for unexile
+	err = d.ExileCheckUserHelper(state, exiledUser.ID, false)
 	if err != nil {
-		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", exiledUser.ID)
-		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
-		return
-	}
-
-	// Check if user has specified roles
-	isExiled := false
-	isVerified := false
-	for _, role := range exiledMember.Roles {
-		if role == exileRole.ID {
-			isExiled = true
-		} else if role == verifiedRole.ID {
-			isVerified = true
-		}
-	}
-
-	if !isExiled {
-		tempstr := fmt.Sprintf("User <@%v> is not currently exiled, nothing has been done", exiledUser.ID)
-		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(logMsg, tempstr)
-		d.EditLogMsg(logMsg)
-		return
-	}
-
-	if isVerified {
-		tempstr := fmt.Sprintf("User <@%v> is both exiled and verified, nothing has been done", exiledUser.ID)
-		RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(logMsg, tempstr)
-		d.EditLogMsg(logMsg)
 		return
 	}
 

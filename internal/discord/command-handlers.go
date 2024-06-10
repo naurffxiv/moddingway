@@ -716,35 +716,60 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 
 // ExileCheckUserHelper checks whether the user meets the requirements to be exiled
 // returns nil if the user does not and returns the member on success
-func (d *Discord) ExileCheckUserHelper(state *InteractionState, userIDToExile string) *discordgo.Member {
+func (d *Discord) ExileCheckUserHelper(state *InteractionState, userID string, toExile bool) error {
 	exileRoleID := d.Roles[state.interaction.GuildID]["Exiled"].ID
-
+	verifiedRoleID := d.Roles[state.interaction.GuildID]["Exiled"].ID
 	// Check if user exists in guild
-	memberToExile, err := d.GetUserInGuild(state.interaction.GuildID, userIDToExile)
+	member, err := d.GetUserInGuild(state.interaction.GuildID, userID)
 	if err != nil {
-		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userIDToExile)
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userID)
 		fmt.Printf("%v: %v\n", tempstr, err)
 		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		return nil
+		return err
 	}
 
-	// Check if user already has exile role
+	// Check if user has specified roles
 	isExiled := false
-	for _, role := range memberToExile.Roles {
+	isVerified := false
+	for _, role := range member.Roles {
 		if role == exileRoleID {
 			isExiled = true
+		} else if role == verifiedRoleID {
+			isVerified = true
 		}
 	}
 
-	if isExiled {
-		tempstr := fmt.Sprintf("User <@%v> is already exiled", userIDToExile)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, tempstr)
-		d.EditLogMsg(state.logMsg)
-		return nil
-	}
+	if toExile {
+		// If called by exile function
+		if isExiled {
+			tempstr := fmt.Sprintf("User <@%v> is already exiled", userID)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, tempstr)
+			d.EditLogMsg(state.logMsg)
+			err := fmt.Errorf("already exiled")
+			return err
+		}
+	} else {
+		// If called by unexile function
+		if !isExiled {
+			tempstr := fmt.Sprintf("User <@%v> is not currently exiled, nothing has been done", userID)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, tempstr)
+			d.EditLogMsg(state.logMsg)
+			err := fmt.Errorf("not currently exiled")
+			return err
+		}
 
-	return memberToExile
+		if isVerified {
+			tempstr := fmt.Sprintf("User <@%v> is both exiled and verified, nothing has been done", userID)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, tempstr)
+			d.EditLogMsg(state.logMsg)
+			err := fmt.Errorf("both exiled and verified")
+			return err
+		}
+	}
+	return nil
 }
 
 // ExileRoleHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
