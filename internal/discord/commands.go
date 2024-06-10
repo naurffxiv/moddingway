@@ -104,8 +104,6 @@ func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	reason:		string
 func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
-	exileRole := d.Roles[i.GuildID]["Exiled"]
-	verifiedRole := d.Roles[i.GuildID]["Verified"]
 	logMsg, err := d.LogCommand(i.Interaction)
 	if err != nil {
 		fmt.Printf("Failed to log: %v\n", err)
@@ -129,15 +127,14 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userToExile := optionMap["user"].UserValue(nil)
 
 	// Check if user meets the requirements for an exile
-	err = d.ExileCheckUserHelper(state, userToExile.ID, true)
+	member, err := d.ExileCheckUserHelper(state, userToExile.ID)
 	if err != nil {
 		return
 	}
 
-	// Exile the user
-	err = d.ExileRoleHelper(state, userToExile.ID, verifiedRole.ID, exileRole.ID)
+	err = d.ExileUser(state, member, optionMap["reason"].StringValue())
 	if err != nil {
-		d.EditLogMsg(logMsg)
+		fmt.Printf("Unable to exile user <@%v>: %v", userToExile.ID, err)
 		return
 	}
 
@@ -178,8 +175,17 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 	}
 
+	// Check if user meets the requirements
+	member, err = d.ExileCheckUserHelper(state, userToExile.ID)
+	if err != nil {
+		return
+	}
+
 	// Unexile user
-	d.UnexileHelper(state, userToExile.ID, "Exile duration has finished.")
+	err = d.UnexileUser(state, member, "Exile duration has finished.")
+	if err != nil {
+		fmt.Printf("Unable to unexile user <@%v>: %v", userToExile.ID, err)
+	}
 }
 
 // Unexile attempts to remove the exile role from the user.
@@ -204,13 +210,16 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	exiledUser := optionMap["user"].UserValue(nil)
 
 	// Check if user meets the requirements for unexile
-	err = d.ExileCheckUserHelper(state, exiledUser.ID, false)
+	member, err := d.ExileCheckUserHelper(state, exiledUser.ID)
 	if err != nil {
 		return
 	}
 
 	// Unexile user
-	d.UnexileHelper(state, exiledUser.ID, optionMap["reason"].StringValue())
+	d.UnexileUser(state, member, optionMap["reason"].StringValue())
+	if err != nil {
+		fmt.Printf("Unable to unexile user <@%v>: %v", exiledUser.ID, err)
+	}
 }
 
 // SetModLoggingChannel sets the specified channel to the moderation log channel
