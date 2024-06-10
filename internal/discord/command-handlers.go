@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -255,6 +256,24 @@ func (d *Discord) SendDMToUser(state *InteractionState, userID string, message s
 		}
 		return nil
 	}
+}
+
+// CheckUserForRoles takes a member and a slice of rolesToCheck (role IDs) and returns
+// a map of bools indicating whether or not the role is present
+func CheckUserForRoles(member *discordgo.Member, rolesToCheck []string) map[string]bool {
+	// initialize map
+	presentRoles := make(map[string]bool)
+	for _, roleToCheck := range rolesToCheck {
+		presentRoles[roleToCheck] = false
+	}
+
+	// check whether user has role
+	for _, role := range member.Roles {
+		if slices.Contains(rolesToCheck, role) {
+			presentRoles[role] = true
+		}
+	}
+	return presentRoles
 }
 
 var KickCommand = &discordgo.ApplicationCommand{
