@@ -37,10 +37,10 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			ExileCommand,
 			UnexileCommand,
 			SetModLoggingCommand,
-			AddWarningCommand,
-			ClearWarningsCommand,
-			DeleteWarningCommand,
-			ShowAllWarningsCommand,
+			AddStrikeCommand,
+			ClearStrikesCommand,
+			DeleteStrikeCommand,
+			ShowAllStrikesCommand,
 		)
 
 		fmt.Printf("Adding commands...\n")
@@ -379,10 +379,10 @@ var SetModLoggingCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var AddWarningCommand = &discordgo.ApplicationCommand{
-	Name:                     "warn",
+var AddStrikeCommand = &discordgo.ApplicationCommand{
+	Name:                     "strike",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Warn the specified user.",
+	Description:              "Notify the specified user of the strike being issued.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
@@ -399,10 +399,10 @@ var AddWarningCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var ClearWarningsCommand = &discordgo.ApplicationCommand{
-	Name:                     "clearwarnings",
+var ClearStrikesCommand = &discordgo.ApplicationCommand{
+	Name:                     "clearstrikes",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Clear all warnings for a specified user.",
+	Description:              "Clear all strikes for a specified user.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
@@ -413,29 +413,29 @@ var ClearWarningsCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var DeleteWarningCommand = &discordgo.ApplicationCommand{
-	Name:                     "deletewarning",
+var DeleteStrikeCommand = &discordgo.ApplicationCommand{
+	Name:                     "deletestrike",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Delete a warning.",
+	Description:              "Delete a strike.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionInteger,
-			Name:        "warning_id",
-			Description: "Warning to be deleted",
+			Name:        "strike_id",
+			Description: "Strike to be deleted",
 			Required:    true,
 		},
 	},
 }
 
-var ShowAllWarningsCommand = &discordgo.ApplicationCommand{
-	Name:                     "warnings",
+var ShowAllStrikesCommand = &discordgo.ApplicationCommand{
+	Name:                     "strikes",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Show all warnings for a specified user.",
+	Description:              "Show all strikes for a specified user.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
 			Name:        "user",
-			Description: "Target user's warnings being shown",
+			Description: "Specified user's strikes being shown",
 			Required:    true,
 		},
 	},
@@ -469,13 +469,13 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.Unexile(s, i)
 	case "setmodloggingchannel":
 		d.SetModLoggingChannel(s, i)
-	case "warn":
-		d.Warn(s, i)
-	case "clearwarnings":
-		d.ClearWarnings(s, i)
-	case "deletewarning":
-		d.DeleteWarning(s, i)
-	case "warnings":
-		d.ShowAllWarnings(s, i)
+	case "strike":
+		d.Strike(s, i)
+	case "clearstrikes":
+		d.ClearStrikes(s, i)
+	case "deletestrike":
+		d.DeleteStrike(s, i)
+	case "strikes":
+		d.ShowAllStrikes(s, i)
 	}
 }
