@@ -714,20 +714,6 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 	}
 }
 
-// ExileCheckUserHelper checks whether the user is still in the guild or not
-// returns nil if the user does not and returns the member on success
-func (d *Discord) ExileCheckUserHelper(state *InteractionState, userID string) (*discordgo.Member, error) {
-	// Check if user exists in guild
-	member, err := d.GetUserInGuild(state.interaction.GuildID, userID)
-	if err != nil {
-		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userID)
-		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondAndAppendLog(state, tempstr)
-		return nil, err
-	}
-	return member, nil
-}
-
 // RoleRemoveAddHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
 func (d *Discord) RoleRemoveAddHelper(state *InteractionState, userID string, roleToRemove string, roleToAdd string) error {
 	roleIDToRemove := d.Roles[state.interaction.GuildID][roleToRemove].ID
