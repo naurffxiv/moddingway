@@ -306,7 +306,7 @@ func (d *Discord) checkRoleHelper(state *InteractionState, userID string, presen
 // returns an error if any specified role fails the check
 func (d *Discord) CheckUserForRoles(state *InteractionState, userID string, shouldHave []string, shouldNotHave []string) error {
 	// check if user is present in guild
-	member, err := d.ExileCheckUserHelper(state, userID)
+	member, err := d.GetUserHelper(state, userID)
 	if err != nil {
 		return err
 	}
@@ -330,6 +330,20 @@ func (d *Discord) CheckUserForRoles(state *InteractionState, userID string, shou
 		}
 	}
 	return nil
+}
+
+// GetUserHelper checks whether the user is still in the guild or not
+// returns nil if the user does not and returns the member on success
+func (d *Discord) GetUserHelper(state *InteractionState, userID string) (*discordgo.Member, error) {
+	// Check if user exists in guild
+	member, err := d.GetUserInGuild(state.interaction.GuildID, userID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondAndAppendLog(state, tempstr)
+		return nil, err
+	}
+	return member, nil
 }
 
 var KickCommand = &discordgo.ApplicationCommand{
