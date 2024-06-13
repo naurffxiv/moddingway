@@ -126,15 +126,9 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	userToExile := optionMap["user"].UserValue(nil)
 
-	// Check if user meets the requirements for an exile
-	member, err := d.ExileCheckUserHelper(state, userToExile.ID)
+	err = d.ExileUser(state, userToExile.ID, optionMap["reason"].StringValue())
 	if err != nil {
-		return
-	}
-
-	err = d.ExileUser(state, member, optionMap["reason"].StringValue())
-	if err != nil {
-		fmt.Printf("Unable to exile user <@%v>: %v", userToExile.ID, err)
+		fmt.Printf("Unable to exile user <@%v>: %v\n", userToExile.ID, err)
 		return
 	}
 
@@ -175,17 +169,11 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 	}
 
-	// Check if user meets the requirements
-	member, err = d.ExileCheckUserHelper(state, userToExile.ID)
-	if err != nil {
-		return
-	}
-
 	// Unexile user
 	reason := "Exile duration has finished."
-	err = d.UnexileUser(state, member, reason)
+	err = d.UnexileUser(state, userToExile.ID, reason)
 	if err != nil {
-		fmt.Printf("Unable to unexile user <@%v>: %v", userToExile.ID, err)
+		fmt.Printf("Unable to unexile user <@%v>: %v\n", userToExile.ID, err)
 		return
 	}
 	// DM user regarding the unexile, doesn't matter if DM fails
@@ -193,7 +181,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		GuildName,
 		reason,
 	)
-	d.SendDMToUser(state, member.User.ID, tempstr)
+	d.SendDMToUser(state, userToExile.ID, tempstr)
 	d.EditLogMsg(state.logMsg)
 }
 
@@ -218,16 +206,10 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 
 	exiledUser := optionMap["user"].UserValue(nil)
 
-	// Check if user meets the requirements for unexile
-	member, err := d.ExileCheckUserHelper(state, exiledUser.ID)
-	if err != nil {
-		return
-	}
-
 	// Unexile user
-	err = d.UnexileUser(state, member, optionMap["reason"].StringValue())
+	err = d.UnexileUser(state, exiledUser.ID, optionMap["reason"].StringValue())
 	if err != nil {
-		fmt.Printf("Unable to unexile user <@%v>: %v", exiledUser.ID, err)
+		fmt.Printf("Unable to unexile user <@%v>: %v\n", exiledUser.ID, err)
 		return
 	}
 	// DM user regarding the unexile, doesn't matter if DM fails
@@ -235,7 +217,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 		GuildName,
 		optionMap["reason"].StringValue(),
 	)
-	d.SendDMToUser(state, member.User.ID, tempstr)
+	d.SendDMToUser(state, exiledUser.ID, tempstr)
 	d.EditLogMsg(state.logMsg)
 }
 

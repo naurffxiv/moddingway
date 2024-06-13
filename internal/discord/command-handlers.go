@@ -714,7 +714,7 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 	}
 }
 
-// ExileCheckUserHelper checks whether the user meets the requirements to be exiled
+// ExileCheckUserHelper checks whether the user is still in the guild or not
 // returns nil if the user does not and returns the member on success
 func (d *Discord) ExileCheckUserHelper(state *InteractionState, userID string) (*discordgo.Member, error) {
 	// Check if user exists in guild
@@ -722,31 +722,32 @@ func (d *Discord) ExileCheckUserHelper(state *InteractionState, userID string) (
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		RespondAndAppendLog(state, tempstr)
 		return nil, err
 	}
 	return member, nil
 }
 
 // RoleRemoveAddHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
-func (d *Discord) RoleRemoveAddHelper(state *InteractionState, userID string, roleIDToRemove string, roleIDToAdd string) error {
+func (d *Discord) RoleRemoveAddHelper(state *InteractionState, userID string, roleToRemove string, roleToAdd string) error {
+	roleIDToRemove := d.Roles[state.interaction.GuildID][roleToRemove].ID
+	roleIDToAdd := d.Roles[state.interaction.GuildID][roleToAdd].ID
+
 	// Attempt to remove role first
 	err := state.session.GuildMemberRoleRemove(state.interaction.GuildID, userID, roleIDToRemove)
-	// Abort entire process if role removal fails
 	if err != nil {
-		tempstr := fmt.Sprintf("Could not remove role %v from user <@%v>", roleIDToAdd, userID)
+		// Abort entire process if role removal fails
+		tempstr := fmt.Sprintf("Could not remove the role <@&%v> from user <@%v>", roleIDToAdd, userID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, tempstr)
+		RespondAndAppendLog(state, tempstr)
 		return err
 	} else {
-		// Add role
+		// Otherwise add role
 		err = state.session.GuildMemberRoleAdd(state.interaction.GuildID, userID, roleIDToAdd)
 		if err != nil {
-			tempstr := fmt.Sprintf("Could not give user <@%v> role %v", userID, roleIDToAdd)
+			tempstr := fmt.Sprintf("Could not give user <@%v> role <@&%v>", userID, roleIDToAdd)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-			AppendLogMsgDescription(state.logMsg, tempstr)
+			RespondAndAppendLog(state, tempstr)
 			return err
 		} else {
 			return nil
@@ -754,55 +755,39 @@ func (d *Discord) RoleRemoveAddHelper(state *InteractionState, userID string, ro
 	}
 }
 
-func (d *Discord) ExileUser(state *InteractionState, member *discordgo.Member, reason string) error {
-	exileRole := d.Roles[state.interaction.GuildID]["Exiled"]
-	verifiedRole := d.Roles[state.interaction.GuildID]["Verified"]
-	presentRoles := CheckUserForRoles(member, []string{exileRole.ID})
-
-	if presentRoles[exileRole.ID] {
-		tempstr := fmt.Sprintf("User <@%v> is already exiled", member.User.ID)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, tempstr)
-		d.EditLogMsg(state.logMsg)
-		err := fmt.Errorf("already exiled")
-		return err
-	}
-
-	return d.RoleRemoveAddHelper(state, member.User.ID, verifiedRole.ID, exileRole.ID)
-}
-
-func (d *Discord) UnexileUser(state *InteractionState, member *discordgo.Member, reason string) error {
-	exileRole := d.Roles[state.interaction.GuildID]["Exiled"]
-	verifiedRole := d.Roles[state.interaction.GuildID]["Verified"]
-	presentRoles := CheckUserForRoles(member, []string{exileRole.ID, verifiedRole.ID})
-
+func (d *Discord) ExileUser(state *InteractionState, userID string, reason string) error {
 	// Check user for specified roles
-	if !presentRoles[exileRole.ID] {
-		tempstr := fmt.Sprintf("User <@%v> is not currently exiled, nothing has been done", member.User.ID)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, tempstr)
-		d.EditLogMsg(state.logMsg)
-		err := fmt.Errorf("not currently exiled")
-		return err
-	}
-
-	if presentRoles[verifiedRole.ID] {
-		tempstr := fmt.Sprintf("User <@%v> is both exiled and verified, nothing has been done", member.User.ID)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, tempstr)
-		d.EditLogMsg(state.logMsg)
-		err := fmt.Errorf("both exiled and verified")
-		return err
-	}
-
-	// Remove exile role and add verified role
-	err := d.RoleRemoveAddHelper(state, member.User.ID, exileRole.ID, verifiedRole.ID)
+	roleToRemove := "Verified"
+	roleToAdd := "Exiled"
+	err := d.CheckUserForRoles(state, userID, []string{roleToRemove}, []string{roleToAdd})
 	if err != nil {
 		d.EditLogMsg(state.logMsg)
 		return err
 	}
-	tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", member.User.ID)
-	RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-	AppendLogMsgDescription(state.logMsg, tempstr)
+
+	// Remove verified role and add exiled role
+	return d.RoleRemoveAddHelper(state, userID, roleToRemove, roleToAdd)
+}
+
+func (d *Discord) UnexileUser(state *InteractionState, userID string, reason string) error {
+
+	// Check user for specified roles
+	roleToRemove := "Exiled"
+	roleToAdd := "Verified"
+	err := d.CheckUserForRoles(state, userID, []string{roleToRemove}, []string{roleToAdd})
+	if err != nil {
+		d.EditLogMsg(state.logMsg)
+		return err
+	}
+
+	// Remove exile role and add verified role
+	err = d.RoleRemoveAddHelper(state, userID, roleToRemove, roleToAdd)
+	if err != nil {
+		d.EditLogMsg(state.logMsg)
+		return err
+	}
+
+	tempstr := fmt.Sprintf("User <@%v> has been successfully unexiled", userID)
+	RespondAndAppendLog(state, tempstr)
 	return nil
 }
