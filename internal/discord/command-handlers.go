@@ -264,15 +264,14 @@ func CheckUserForRoles(member *discordgo.Member, rolesToCheck []string) map[stri
 	// initialize map
 	presentRoles := make(map[string]bool)
 	for _, roleToCheck := range rolesToCheck {
-		presentRoles[roleToCheck] = false
+		if slices.Contains(member.Roles, roleToCheck) {
+			presentRoles[roleToCheck] = true
+		} else {
+			presentRoles[roleToCheck] = false
+		}
+
 	}
 
-	// check whether user has role
-	for _, role := range member.Roles {
-		if slices.Contains(rolesToCheck, role) {
-			presentRoles[role] = true
-		}
-	}
 	return presentRoles
 }
 
