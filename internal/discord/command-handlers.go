@@ -728,8 +728,8 @@ func (d *Discord) ExileCheckUserHelper(state *InteractionState, userID string) (
 	return member, nil
 }
 
-// ExileRoleHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
-func (d *Discord) ExileRoleHelper(state *InteractionState, userID string, roleIDToRemove string, roleIDToAdd string) error {
+// RoleRemoveAddHelper removes a role `roleIDToRemove` and then adds a role `roleIDToAdd` to the user `userID`
+func (d *Discord) RoleRemoveAddHelper(state *InteractionState, userID string, roleIDToRemove string, roleIDToAdd string) error {
 	// Attempt to remove role first
 	err := state.session.GuildMemberRoleRemove(state.interaction.GuildID, userID, roleIDToRemove)
 	// Abort entire process if role removal fails
@@ -768,7 +768,7 @@ func (d *Discord) ExileUser(state *InteractionState, member *discordgo.Member, r
 		return err
 	}
 
-	return d.ExileRoleHelper(state, member.User.ID, verifiedRole.ID, exileRole.ID)
+	return d.RoleRemoveAddHelper(state, member.User.ID, verifiedRole.ID, exileRole.ID)
 }
 
 func (d *Discord) UnexileUser(state *InteractionState, member *discordgo.Member, reason string) error {
@@ -796,7 +796,7 @@ func (d *Discord) UnexileUser(state *InteractionState, member *discordgo.Member,
 	}
 
 	// Remove exile role and add verified role
-	err := d.ExileRoleHelper(state, member.User.ID, exileRole.ID, verifiedRole.ID)
+	err := d.RoleRemoveAddHelper(state, member.User.ID, exileRole.ID, verifiedRole.ID)
 	if err != nil {
 		d.EditLogMsg(state.logMsg)
 		return err
