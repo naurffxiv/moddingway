@@ -235,6 +235,12 @@ func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
 	}
 }
 
+// RespondAndAppendLog combines both a response and a log message update into one function
+func RespondAndAppendLog(state *InteractionState, message string) {
+	RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	AppendLogMsgDescription(state.logMsg, message)
+}
+
 // SendDMToUser sends a DM to the user specified in `userID` with `message` as its contents
 func (d *Discord) SendDMToUser(state *InteractionState, userID string, message string) error {
 	// Open DM channel with user
