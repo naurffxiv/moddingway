@@ -1,7 +1,6 @@
 package discord
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"slices"
@@ -75,12 +74,23 @@ func (d *Discord) GetUserInGuild(guild_id string, user string) (*discordgo.Membe
 	return member, nil
 }
 
+func (d *Discord) SendEmbed(channelID string, embed *discordgo.MessageEmbed) (*discordgo.Message, error) {
+	msg, err := d.Session.ChannelMessageSendEmbed(channelID, embed)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+		return nil, err
+	}
+	return msg, nil
+}
+
 // LogCommand logs the moderation command in the channel specified by LogChannelID
 // It sends an embed with all command arguments as separate fields
 // It additionally returns the sent message in case any edits need to be made
 func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, error) {
 	if len(d.ModLoggingChannelID) == 0 {
-		return nil, errors.New("log channel not set")
+		err := fmt.Errorf("log channel not set")
+		fmt.Printf("Failed to log: %v\n", err)
+		return nil, err
 	}
 	options := i.ApplicationCommandData().Options
 
@@ -123,7 +133,7 @@ func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, erro
 	)
 
 	// Send the embed
-	return d.Session.ChannelMessageSendEmbed(
+	return d.SendEmbed(
 		d.ModLoggingChannelID,
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -155,10 +165,12 @@ func parseDuration(userInput string) (time.Duration, error) {
 		groups := r.FindStringSubmatch(durationString)
 		if len(groups) < 2 {
 			err := fmt.Errorf("invalid format")
+			fmt.Printf("Failed to parse duration: %v\n", err)
 			return 0, err
 		}
 		num, err := strconv.ParseInt(groups[1], 10, 64)
 		if err != nil {
+			fmt.Printf("Failed to parse duration: %v\n", err)
 			return 0, err
 		}
 
@@ -175,6 +187,7 @@ func parseDuration(userInput string) (time.Duration, error) {
 			factor = time.Hour * 24
 		default:
 			err = fmt.Errorf("invalid unit")
+			fmt.Printf("Failed to parse duration: %v\n", err)
 			return 0, err
 		}
 
@@ -188,6 +201,7 @@ func parseDuration(userInput string) (time.Duration, error) {
 		}
 		if duration < 0 {
 			err = fmt.Errorf("negative duration")
+			fmt.Printf("Failed to parse duration: %v\n", err)
 			return 0, err
 		}
 
