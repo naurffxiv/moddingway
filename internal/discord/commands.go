@@ -104,10 +104,7 @@ func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	reason:		string
 func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
-	logMsg, err := d.LogCommand(i.Interaction)
-	if err != nil {
-		fmt.Printf("Failed to log: %v\n", err)
-	}
+	logMsg, _ := d.LogCommand(i.Interaction)
 
 	state := &InteractionState{
 		session:     s,
@@ -120,7 +117,6 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	startTime := time.Now()
 	duration, err := parseDuration(optionMap["duration"].StringValue())
 	if err != nil {
-		fmt.Printf("Failed to parse duration: %v\n", err)
 		return
 	}
 
@@ -128,7 +124,6 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	err = d.ExileUser(state, userToExile.ID, optionMap["reason"].StringValue())
 	if err != nil {
-		fmt.Printf("Unable to exile user <@%v>: %v\n", userToExile.ID, err)
 		return
 	}
 
@@ -139,8 +134,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		userToExile.ID,
 		endTime.Unix(),
 	)
-	AppendLogMsgDescription(logMsg, tempstr)
-	RespondToInteraction(s, i.Interaction, tempstr, &state.isFirst)
+	RespondAndAppendLog(state, tempstr)
 
 	// DM user regarding the exile, doesn't matter if DM fails
 	tempstr = fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
@@ -160,20 +154,13 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
 	UpdateLogMsgTimestamp(logMsg)
 	if logMsg != nil {
-		state.logMsg, err = d.Session.ChannelMessageSendEmbed(
-			d.ModLoggingChannelID,
-			logMsg.Embeds[0],
-		)
-		if err != nil {
-			fmt.Printf("Failed to log: %v\n", err)
-		}
+		d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
 	}
 
 	// Unexile user
 	reason := "Exile duration has finished."
 	err = d.UnexileUser(state, userToExile.ID, reason)
 	if err != nil {
-		fmt.Printf("Unable to unexile user <@%v>: %v\n", userToExile.ID, err)
 		return
 	}
 	// DM user regarding the unexile, doesn't matter if DM fails
@@ -192,10 +179,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	reason:		string
 func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	optionMap := mapOptions(i)
-	logMsg, err := d.LogCommand(i.Interaction)
-	if err != nil {
-		fmt.Printf("Failed to log: %v\n", err)
-	}
+	logMsg, _ := d.LogCommand(i.Interaction)
 
 	state := &InteractionState{
 		session:     s,
@@ -207,9 +191,8 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	exiledUser := optionMap["user"].UserValue(nil)
 
 	// Unexile user
-	err = d.UnexileUser(state, exiledUser.ID, optionMap["reason"].StringValue())
+	err := d.UnexileUser(state, exiledUser.ID, optionMap["reason"].StringValue())
 	if err != nil {
-		fmt.Printf("Unable to unexile user <@%v>: %v\n", exiledUser.ID, err)
 		return
 	}
 	// DM user regarding the unexile, doesn't matter if DM fails

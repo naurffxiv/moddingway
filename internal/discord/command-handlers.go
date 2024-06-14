@@ -748,6 +748,7 @@ func (d *Discord) ExileUser(state *InteractionState, userID string, reason strin
 	err := d.CheckUserForRoles(state, userID, []string{roleToRemove}, []string{roleToAdd})
 	if err != nil {
 		d.EditLogMsg(state.logMsg)
+		fmt.Printf("Unable to unexile user <@%v>: %v\n", userID, err)
 		return err
 	}
 
@@ -763,6 +764,7 @@ func (d *Discord) UnexileUser(state *InteractionState, userID string, reason str
 	err := d.CheckUserForRoles(state, userID, []string{roleToRemove}, []string{roleToAdd})
 	if err != nil {
 		d.EditLogMsg(state.logMsg)
+		fmt.Printf("Unable to exile user <@%v>: %v\n", userID, err)
 		return err
 	}
 
@@ -770,6 +772,7 @@ func (d *Discord) UnexileUser(state *InteractionState, userID string, reason str
 	err = d.RoleRemoveAddHelper(state, userID, roleToRemove, roleToAdd)
 	if err != nil {
 		d.EditLogMsg(state.logMsg)
+		fmt.Printf("Unable to unexile user <@%v>: %v\n", userID, err)
 		return err
 	}
 
