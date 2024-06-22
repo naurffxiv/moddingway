@@ -1,14 +1,24 @@
 package discord
 
 import (
-	"errors"
 	"fmt"
+	"regexp"
+	"slices"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
+
+type InteractionState struct {
+	session     *discordgo.Session
+	interaction *discordgo.InteractionCreate
+	logMsg      *discordgo.Message
+	isFirst     bool
+}
 
 // Set up vars for the DefaultMemberPermissions field in each command definition
 var (
@@ -24,23 +34,23 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 		// Adding commands to a list to prepare in bulk
 		var commands []*discordgo.ApplicationCommand
 		commands = append(commands,
-			KickCommand,
-			MuteCommand,
-			UnmuteCommand,
-			BanCommand,
-			UnbanCommand,
-			RemoveNicknameCommand,
-			SetNicknameCommand,
-			SlowmodeCommand,
-			SlowmodeOffCommand,
-			PurgeCommand,
+			// KickCommand,
+			// MuteCommand,
+			// UnmuteCommand,
+			// BanCommand,
+			// UnbanCommand,
+			// RemoveNicknameCommand,
+			// SetNicknameCommand,
+			// SlowmodeCommand,
+			// SlowmodeOffCommand,
+			// PurgeCommand,
 			ExileCommand,
 			UnexileCommand,
 			SetModLoggingCommand,
-			AddWarningCommand,
-			ClearWarningsCommand,
-			DeleteWarningCommand,
-			ShowAllWarningsCommand,
+			// AddStrikeCommand,
+			// ClearStrikesCommand,
+			// DeleteStrikeCommand,
+			// ShowAllStrikesCommand,
 		)
 
 		fmt.Printf("Adding commands...\n")
@@ -55,13 +65,22 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	}
 }
 
-// CheckUserInGuild checks if the user is in the specified server.
-func (d *Discord) CheckUserInGuild(guild_id string, user string) error {
-	_, err := d.Session.GuildMember(guild_id, user)
+// GetUserInGuild returns the user in the server
+func (d *Discord) GetUserInGuild(guild_id string, user string) (*discordgo.Member, error) {
+	member, err := d.Session.GuildMember(guild_id, user)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return member, nil
+}
+
+func (d *Discord) SendEmbed(channelID string, embed *discordgo.MessageEmbed) (*discordgo.Message, error) {
+	msg, err := d.Session.ChannelMessageSendEmbed(channelID, embed)
+	if err != nil {
+		fmt.Printf("Failed to log: %v\n", err)
+		return nil, err
+	}
+	return msg, nil
 }
 
 // LogCommand logs the moderation command in the channel specified by LogChannelID
@@ -69,7 +88,9 @@ func (d *Discord) CheckUserInGuild(guild_id string, user string) error {
 // It additionally returns the sent message in case any edits need to be made
 func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, error) {
 	if len(d.ModLoggingChannelID) == 0 {
-		return nil, errors.New("log channel not set")
+		err := fmt.Errorf("log channel not set")
+		fmt.Printf("Failed to log: %v\n", err)
+		return nil, err
 	}
 	options := i.ApplicationCommandData().Options
 
@@ -112,7 +133,7 @@ func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, erro
 	)
 
 	// Send the embed
-	return d.Session.ChannelMessageSendEmbed(
+	return d.SendEmbed(
 		d.ModLoggingChannelID,
 		&discordgo.MessageEmbed{
 			Author: &discordgo.MessageEmbedAuthor{
@@ -124,6 +145,219 @@ func (d *Discord) LogCommand(i *discordgo.Interaction) (*discordgo.Message, erro
 			Timestamp:   time.Now().Format(time.RFC3339),
 		},
 	)
+}
+
+// parseDuration parses the string provided and returns the time.Duration equivalent
+// does not support negative durations
+func parseDuration(userInput string) (time.Duration, error) {
+	const maxDuration time.Duration = 1<<63 - 1
+	// matches any string that is a string of numbers followed by a single letter
+	r, _ := regexp.Compile(`^([\d]+)([a-zA-Z]{1})$`)
+
+	// clean user input
+	trimmed := strings.ReplaceAll(userInput, " ", "")
+	durationStrings := strings.Split(trimmed, ",")
+
+	// for each substring of format [num][letter] (e.g "24h")
+	var totalDuration time.Duration = 0
+	for _, durationString := range durationStrings {
+		// groups[0] is the entire match, following elements are capture groups
+		groups := r.FindStringSubmatch(durationString)
+		if len(groups) < 2 {
+			err := fmt.Errorf("invalid format")
+			fmt.Printf("Failed to parse duration: %v\n", err)
+			return 0, err
+		}
+		num, err := strconv.ParseInt(groups[1], 10, 64)
+		if err != nil {
+			fmt.Printf("Failed to parse duration: %v\n", err)
+			return 0, err
+		}
+
+		// get duration based on unit
+		var factor time.Duration
+		switch groups[2] {
+		case "s":
+			factor = time.Second
+		case "m":
+			factor = time.Minute
+		case "h":
+			factor = time.Hour
+		case "d":
+			factor = time.Hour * 24
+		default:
+			err = fmt.Errorf("invalid unit")
+			fmt.Printf("Failed to parse duration: %v\n", err)
+			return 0, err
+		}
+
+		// check if input is larger than max supported duration (approx. 290y)
+		// if it is, set to max possible duration
+		var duration time.Duration
+		if num > int64(maxDuration/factor) {
+			duration = maxDuration
+		} else {
+			duration = time.Duration(num) * factor
+		}
+		if duration < 0 {
+			err = fmt.Errorf("negative duration")
+			fmt.Printf("Failed to parse duration: %v\n", err)
+			return 0, err
+		}
+
+		// likewise, check if the sum is larger than max supported duration
+		if duration > (maxDuration - totalDuration) {
+			return maxDuration, nil
+		}
+		totalDuration += duration
+	}
+
+	return totalDuration, nil
+}
+
+// mapOptions is a helper function that creates a map out of the arguments used in the slash command
+func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.ApplicationCommandInteractionDataOption {
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+	return optionMap
+}
+
+// AppendLogMsgDescription appends an existing logMsg with the specified text
+func AppendLogMsgDescription(logMsg *discordgo.Message, s string) {
+	if logMsg != nil {
+		logMsg.Embeds[0].Description += fmt.Sprintf("\n%v", s)
+	}
+}
+
+// EditLogMsg sends the updated logMsg to Discord and overwrites the message referred to by logMsg.ID
+func (d *Discord) EditLogMsg(logMsg *discordgo.Message) {
+	if logMsg != nil {
+		_, err := d.Session.ChannelMessageEditEmbed(d.ModLoggingChannelID, logMsg.ID, logMsg.Embeds[0])
+		if err != nil {
+			fmt.Printf("Unable to edit log message: %v\n", err)
+		}
+	}
+}
+
+// UpdateLogMsgTimestamp updates the timestamp for the embed in a logMsg
+func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
+	if logMsg != nil {
+		logMsg.Embeds[0].Timestamp = time.Now().Format(time.RFC3339)
+	}
+}
+
+// RespondAndAppendLog combines both a response and a log message update into one function
+func RespondAndAppendLog(state *InteractionState, message string) {
+	RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	AppendLogMsgDescription(state.logMsg, message)
+}
+
+// SendDMToUser sends a DM to the user specified in `userID` with `message` as its contents
+func (d *Discord) SendDMToUser(state *InteractionState, userID string, message string) error {
+	// Open DM channel with user
+	channel, err := state.session.UserChannelCreate(userID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not create a DM with user %v", userID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+		return err
+	} else {
+		_, err = state.session.ChannelMessageSend(channel.ID, message)
+		if err != nil {
+			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userID)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+			AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+			return err
+		}
+		return nil
+	}
+}
+
+// checkRoleMapHelper takes a member and a slice of rolesToCheck (role names) and returns
+// a map of bools (map[roleName] bool) indicating whether or not the role is present
+func (d *Discord) checkRoleMapHelper(member *discordgo.Member, rolesToCheck []string) map[string]bool {
+	// initialize map
+	presentRoles := make(map[string]bool)
+	for _, roleToCheck := range rolesToCheck {
+		roleID := d.Roles[member.GuildID][roleToCheck].ID
+		if slices.Contains(member.Roles, roleID) {
+			presentRoles[roleToCheck] = true
+		} else {
+			presentRoles[roleToCheck] = false
+		}
+
+	}
+
+	return presentRoles
+}
+
+// checkRoleHelper checks whether a specific role `roleName` is present/not present
+// from the map generated by checkRoleMapHelper()
+// returns an error if the role's presence is not as expected based on `shouldHaveRole`
+func (d *Discord) checkRoleHelper(state *InteractionState, userID string, presentRoles map[string]bool, roleName string, shouldHaveRole bool) error {
+	var err error = nil
+	roleID := d.Roles[state.interaction.GuildID][roleName].ID
+	if presentRoles[roleName] != shouldHaveRole {
+		var tempstr string
+		if shouldHaveRole {
+			tempstr = fmt.Sprintf("User <@%v> does not have role <@&%v>", userID, roleID)
+			err = fmt.Errorf("role not present: %v", roleID)
+		} else {
+			tempstr = fmt.Sprintf("User <@%v> has role <@&%v>", userID, roleID)
+			err = fmt.Errorf("role present: %v", roleID)
+		}
+		RespondAndAppendLog(state, tempstr)
+	}
+	return err
+}
+
+// CheckUserForRoles checks the user for a slice of roles they should or should not have
+// returns an error if any specified role fails the check
+func (d *Discord) CheckUserForRoles(state *InteractionState, userID string, shouldHave []string, shouldNotHave []string) error {
+	// check if user is present in guild
+	member, err := d.GetUserHelper(state, userID)
+	if err != nil {
+		return err
+	}
+	presentRoles := d.checkRoleMapHelper(member, slices.Concat(shouldHave, shouldNotHave))
+
+	// check for roles which user should have
+	for _, roleName := range shouldHave {
+		err = d.checkRoleHelper(state, userID, presentRoles, roleName, true)
+		if err != nil {
+			AppendLogMsgDescription(state.logMsg, "Nothing has been done")
+			return err
+		}
+	}
+
+	// check for roles which user should not have
+	for _, roleName := range shouldNotHave {
+		err = d.checkRoleHelper(state, userID, presentRoles, roleName, false)
+		if err != nil {
+			AppendLogMsgDescription(state.logMsg, "Nothing has been done")
+			return err
+		}
+	}
+	return nil
+}
+
+// GetUserHelper checks whether the user is still in the guild or not
+// returns nil if the user does not and returns the member on success
+func (d *Discord) GetUserHelper(state *InteractionState, userID string) (*discordgo.Member, error) {
+	// Check if user exists in guild
+	member, err := d.GetUserInGuild(state.interaction.GuildID, userID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not find user <@%v> in guild", userID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondAndAppendLog(state, tempstr)
+		return nil, err
+	}
+	return member, nil
 }
 
 var KickCommand = &discordgo.ApplicationCommand{
@@ -379,10 +613,10 @@ var SetModLoggingCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var AddWarningCommand = &discordgo.ApplicationCommand{
-	Name:                     "warn",
+var AddStrikeCommand = &discordgo.ApplicationCommand{
+	Name:                     "strike",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Warn the specified user.",
+	Description:              "Notify the specified user of the strike being issued.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
@@ -399,10 +633,10 @@ var AddWarningCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var ClearWarningsCommand = &discordgo.ApplicationCommand{
-	Name:                     "clearwarnings",
+var ClearStrikesCommand = &discordgo.ApplicationCommand{
+	Name:                     "clearstrikes",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Clear all warnings for a specified user.",
+	Description:              "Clear all strikes for a specified user.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
@@ -413,29 +647,29 @@ var ClearWarningsCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var DeleteWarningCommand = &discordgo.ApplicationCommand{
-	Name:                     "deletewarning",
+var DeleteStrikeCommand = &discordgo.ApplicationCommand{
+	Name:                     "deletestrike",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Delete a warning.",
+	Description:              "Delete a strike.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionInteger,
-			Name:        "warning_id",
-			Description: "Warning to be deleted",
+			Name:        "strike_id",
+			Description: "Strike to be deleted",
 			Required:    true,
 		},
 	},
 }
 
-var ShowAllWarningsCommand = &discordgo.ApplicationCommand{
-	Name:                     "warnings",
+var ShowAllStrikesCommand = &discordgo.ApplicationCommand{
+	Name:                     "strikes",
 	DefaultMemberPermissions: &adminPermission,
-	Description:              "Show all warnings for a specified user.",
+	Description:              "Show all strikes for a specified user.",
 	Options: []*discordgo.ApplicationCommandOption{
 		{
 			Type:        discordgo.ApplicationCommandOptionUser,
 			Name:        "user",
-			Description: "Target user's warnings being shown",
+			Description: "Specified user's strikes being shown",
 			Required:    true,
 		},
 	},
@@ -469,13 +703,13 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.Unexile(s, i)
 	case "setmodloggingchannel":
 		d.SetModLoggingChannel(s, i)
-	case "warn":
-		d.Warn(s, i)
-	case "clearwarnings":
-		d.ClearWarnings(s, i)
-	case "deletewarning":
-		d.DeleteWarning(s, i)
-	case "warnings":
-		d.ShowAllWarnings(s, i)
+	case "strike":
+		d.Strike(s, i)
+	case "clearstrikes":
+		d.ClearStrikes(s, i)
+	case "deletestrike":
+		d.DeleteStrike(s, i)
+	case "strikes":
+		d.ShowAllStrikes(s, i)
 	}
 }

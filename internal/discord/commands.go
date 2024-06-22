@@ -2,19 +2,10 @@ package discord
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
-
-// mapOptions is a helper function that creates a map out of the arguments used in the slash command
-func mapOptions(i *discordgo.InteractionCreate) map[string]*discordgo.ApplicationCommandInteractionDataOption {
-	options := i.ApplicationCommandData().Options
-	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-	for _, opt := range options {
-		optionMap[opt.Name] = opt
-	}
-	return optionMap
-}
 
 // Kick attempts to kick the user specified user from the server the command was invoked in.
 // Fields:
@@ -143,35 +134,35 @@ func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.Intera
 	fmt.Printf("Set the moderation logging channel to: %v\n", channelID)
 }
 
-// Warn attempts to warn a user.
+// Strike attempts to give a user a strike.
 // fields:
 //
 //	user:		User
 //	reason:		string
-func (d *Discord) Warn(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) Strike(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
 
-// ClearWarnings attempts to clear all warnings for a user.
+// ClearStrikes attempts to clear all strikes for a user.
 // fields:
 //
 //	user:		User
-func (d *Discord) ClearWarnings(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) ClearStrikes(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
 
-// DeleteWarning attempts to delete a warning a user.
+// DeleteStrike attempts to delete a strike from a user.
 // fields:
 //
 //	warning_id:	integer
-func (d *Discord) DeleteWarning(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) DeleteStrike(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }
 
-// ShowAllWarnings attempts to show all warnings for a user.
+// ShowAllStrikes attempts to show all strikes for a user.
 // fields:
 //
 //	user:		User
-func (d *Discord) ShowAllWarnings(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (d *Discord) ShowAllStrikes(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return
 }

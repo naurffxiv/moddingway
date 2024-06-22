@@ -2,6 +2,8 @@ package discord
 
 import (
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -9,7 +11,11 @@ import (
 type Discord struct {
 	Token               string
 	Session             *discordgo.Session
+	Ready               sync.WaitGroup
 	ModLoggingChannelID string
+
+	// The structure of the following map is Roles[guild_id][role_name]
+	Roles map[string]map[string]*discordgo.Role
 }
 
 // Start sets up the token and intents of the bot before it logs in
@@ -32,6 +38,35 @@ func (d *Discord) Start() error {
 	return nil
 }
 
+// DiscordReady initializes the bot and blocks the bot from proceeding until
+// initialization finishes
+func (d *Discord) DiscordReady(s *discordgo.Session, event *discordgo.Ready) {
+	defer d.Ready.Done()
+	d.AddCommands(s, event)
+	d.MapExistingRoles(s, event)
+}
+
+// MapExistingRoles takes the existing roles from all guilds the bot is in
+// and populates the Roles map
+func (d *Discord) MapExistingRoles(s *discordgo.Session, event *discordgo.Ready) {
+	fmt.Printf("Mapping existing roles...\n")
+
+	d.Roles = make(map[string]map[string]*discordgo.Role)
+
+	fmt.Printf("Found the following roles:\n")
+	for _, discordGuild := range event.Guilds {
+		guildID := discordGuild.ID
+		existingRoles := discordGuild.Roles
+		d.Roles[guildID] = make(map[string]*discordgo.Role)
+		fmt.Printf("Guild %v:\n", guildID)
+		for _, role := range existingRoles {
+			d.Roles[guildID][role.Name] = role
+			fmt.Printf("%v, ", role.Name)
+		}
+		fmt.Printf("\n")
+	}
+}
+
 // StartInteraction is a helper function that responds to the user who invoked
 // the slash command ephemerally with the string message
 func StartInteraction(s *discordgo.Session, i *discordgo.Interaction, message string) error {
@@ -52,4 +87,34 @@ func ContinueInteraction(s *discordgo.Session, i *discordgo.Interaction, message
 		Flags:   discordgo.MessageFlagsEphemeral,
 	})
 	return err
+}
+
+// RespondToInteraction is a helper function that decides whether StartInteraction
+// or ContinueInteraction should be used
+func RespondToInteraction(s *discordgo.Session, i *discordgo.Interaction, message string, isFirstInteraction *bool) error {
+	interactionTimestamp, err := discordgo.SnowflakeTimestamp(i.ID)
+	if err != nil {
+		return err
+	}
+	if *isFirstInteraction {
+		if (3 * time.Second) <= time.Now().Sub(interactionTimestamp) {
+			return fmt.Errorf("initial interaction timeout")
+		}
+		err := StartInteraction(s, i, message)
+		if err != nil {
+			fmt.Printf("Unable to send initial ephemeral message: %v\n", err)
+		} else {
+			*isFirstInteraction = false
+		}
+		return err
+	} else {
+		if (15 * time.Minute) <= time.Now().Sub(interactionTimestamp) {
+			return fmt.Errorf("followup interaction timeout")
+		}
+		err := ContinueInteraction(s, i, message)
+		if err != nil {
+			fmt.Printf("Unable to send follow-up ephemeral message: %v\n", err)
+		}
+		return err
+	}
 }
