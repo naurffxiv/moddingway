@@ -370,6 +370,12 @@ func CalculateDuration(state *InteractionState, startTime time.Time, stringDurat
 	return duration, nil
 }
 
+func ClearEmbedDescription(logMsg *discordgo.Message) {
+	if logMsg != nil {
+		logMsg.Embeds[0].Description = ""
+	}
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &adminPermission,

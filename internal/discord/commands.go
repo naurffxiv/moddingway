@@ -155,9 +155,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		time.Sleep(duration)
 
 		// Reuse the original embed format but clear existing info
-		if logMsg != nil {
-			logMsg.Embeds[0].Description = ""
-		}
+		ClearEmbedDescription(logMsg)
 		AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
 		UpdateLogMsgTimestamp(logMsg)
 		if logMsg != nil {
