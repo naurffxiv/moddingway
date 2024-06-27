@@ -360,6 +360,16 @@ func (d *Discord) GetUserHelper(state *InteractionState, userID string) (*discor
 	return member, nil
 }
 
+func CalculateDuration(state *InteractionState, startTime time.Time, stringDuration string) (time.Duration, error) {
+	duration, err := parseDuration(stringDuration)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not parse duration: %v\nNothing has been done", err)
+		RespondAndAppendLog(state, tempstr)
+		return 0, err
+	}
+	return duration, nil
+}
+
 var KickCommand = &discordgo.ApplicationCommand{
 	Name:                     "kick",
 	DefaultMemberPermissions: &adminPermission,

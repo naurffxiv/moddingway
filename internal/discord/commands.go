@@ -113,11 +113,17 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		isFirst:     true,
 	}
 
-	// Calculate duration of exile
+	var duration time.Duration
+	var err error
+
+	// Calculate duration of exile if argument is not empty
 	startTime := time.Now()
-	duration, err := parseDuration(optionMap["duration"].StringValue())
-	if err != nil {
-		return
+	durationArg, hasDuration := optionMap["duration"]
+	if hasDuration {
+		duration, err = CalculateDuration(state, startTime, durationArg.StringValue())
+		if err != nil {
+			return
+		}
 	}
 
 	userToExile := optionMap["user"].UserValue(nil)
@@ -127,49 +133,65 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	// Inform invoker and edit log message of successful exile
-	endTime := startTime.Add(duration)
-	tempstr := fmt.Sprintf(
-		"User <@%v> has been exiled until <t:%v>",
-		userToExile.ID,
-		endTime.Unix(),
-	)
-	RespondAndAppendLog(state, tempstr)
+	if hasDuration {
+		// Inform invoker and edit log message of successful exile
+		endTime := startTime.Add(duration)
+		tempstr := fmt.Sprintf(
+			"User <@%v> has been exiled until <t:%v>",
+			userToExile.ID,
+			endTime.Unix(),
+		)
+		RespondAndAppendLog(state, tempstr)
 
-	// DM user regarding the exile, doesn't matter if DM fails
-	tempstr = fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
-		GuildName,
-		endTime.Unix(),
-		optionMap["reason"].StringValue(),
-	)
-	d.SendDMToUser(state, userToExile.ID, tempstr)
-	d.EditLogMsg(logMsg)
+		// DM user regarding the exile, doesn't matter if DM fails
+		tempstr = fmt.Sprintf("You are being exiled from `%v` until <t:%v> for the following reason:\n> %v",
+			GuildName,
+			endTime.Unix(),
+			optionMap["reason"].StringValue(),
+		)
+		d.SendDMToUser(state, userToExile.ID, tempstr)
+		d.EditLogMsg(logMsg)
 
-	time.Sleep(duration)
+		time.Sleep(duration)
 
-	// Reuse the original embed format but clear existing info
-	if logMsg != nil {
-		logMsg.Embeds[0].Description = ""
+		// Reuse the original embed format but clear existing info
+		if logMsg != nil {
+			logMsg.Embeds[0].Description = ""
+		}
+		AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
+		UpdateLogMsgTimestamp(logMsg)
+		if logMsg != nil {
+			d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
+		}
+
+		// Unexile user
+		reason := "Exile duration has finished."
+		err = d.UnexileUser(state, userToExile.ID, reason)
+		if err != nil {
+			return
+		}
+		// DM user regarding the unexile, doesn't matter if DM fails
+		tempstr = fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
+			GuildName,
+			reason,
+		)
+		d.SendDMToUser(state, userToExile.ID, tempstr)
+		d.EditLogMsg(state.logMsg)
+	} else {
+		tempstr := fmt.Sprintf(
+			"User <@%v> has been exiled indefinitely",
+			userToExile.ID,
+		)
+		RespondAndAppendLog(state, tempstr)
+
+		// DM user regarding the exile, doesn't matter if DM fails
+		tempstr = fmt.Sprintf("You are being exiled from `%v` indefinitely for the following reason:\n> %v",
+			GuildName,
+			optionMap["reason"].StringValue(),
+		)
+		d.SendDMToUser(state, userToExile.ID, tempstr)
+		d.EditLogMsg(logMsg)
 	}
-	AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
-	UpdateLogMsgTimestamp(logMsg)
-	if logMsg != nil {
-		d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
-	}
-
-	// Unexile user
-	reason := "Exile duration has finished."
-	err = d.UnexileUser(state, userToExile.ID, reason)
-	if err != nil {
-		return
-	}
-	// DM user regarding the unexile, doesn't matter if DM fails
-	tempstr = fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
-		GuildName,
-		reason,
-	)
-	d.SendDMToUser(state, userToExile.ID, tempstr)
-	d.EditLogMsg(state.logMsg)
 }
 
 // Unexile attempts to remove the exile role from the user.
