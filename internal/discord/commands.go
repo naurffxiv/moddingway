@@ -234,7 +234,17 @@ func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.Intera
 	channelID := options[0].ChannelValue(nil).ID
 	d.ModLoggingChannelID = channelID
 
+	logMsg, _ := d.LogCommand(i.Interaction)
+	state := &InteractionState{
+		session:     s,
+		interaction: i,
+		logMsg:      logMsg,
+		isFirst:     true,
+	}
+
 	tempstr := fmt.Sprintf("Mod logging channel set to: <#%v>", channelID)
+	RespondAndAppendLog(state, tempstr)
+	d.EditLogMsg(logMsg)
 
 	err := StartInteraction(s, i.Interaction, tempstr)
 	if err != nil {
