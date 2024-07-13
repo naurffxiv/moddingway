@@ -12,6 +12,7 @@ type Discord struct {
 	Token               string
 	Session             *discordgo.Session
 	Ready               sync.WaitGroup
+	GuildID             string
 	ModLoggingChannelID string
 
 	// The structure of the following map is Roles[guild_id][role_name]
@@ -20,6 +21,7 @@ type Discord struct {
 
 func (d *Discord) Init(token string) {
 	d.Token = token
+	d.GuildID = DefaultGuildID
 	d.ModLoggingChannelID = DefaultModLoggingChannel
 }
 

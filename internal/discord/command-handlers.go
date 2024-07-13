@@ -30,37 +30,39 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 	fmt.Printf("Initializing Discord...\n")
 
 	for _, discordGuild := range event.Guilds {
+		if discordGuild.ID == d.GuildID {
 
-		// Adding commands to a list to prepare in bulk
-		var commands []*discordgo.ApplicationCommand
-		commands = append(commands,
-			// KickCommand,
-			// MuteCommand,
-			// UnmuteCommand,
-			// BanCommand,
-			// UnbanCommand,
-			// RemoveNicknameCommand,
-			// SetNicknameCommand,
-			// SlowmodeCommand,
-			// SlowmodeOffCommand,
-			// PurgeCommand,
-			ExileCommand,
-			UnexileCommand,
-			SetModLoggingCommand,
-			// AddStrikeCommand,
-			// ClearStrikesCommand,
-			// DeleteStrikeCommand,
-			// ShowAllStrikesCommand,
-		)
+			// Adding commands to a list to prepare in bulk
+			var commands []*discordgo.ApplicationCommand
+			commands = append(commands,
+				// KickCommand,
+				// MuteCommand,
+				// UnmuteCommand,
+				// BanCommand,
+				// UnbanCommand,
+				// RemoveNicknameCommand,
+				// SetNicknameCommand,
+				// SlowmodeCommand,
+				// SlowmodeOffCommand,
+				// PurgeCommand,
+				ExileCommand,
+				UnexileCommand,
+				SetModLoggingCommand,
+				// AddStrikeCommand,
+				// ClearStrikesCommand,
+				// DeleteStrikeCommand,
+				// ShowAllStrikesCommand,
+			)
 
-		fmt.Printf("Adding commands...\n")
-		commandList, err := s.ApplicationCommandBulkOverwrite(event.User.ID, discordGuild.ID, commands)
-		fmt.Printf("List of successfully created commands:\n")
-		for _, command := range commandList {
-			fmt.Printf("\t%v\n", command.Name)
-		}
-		if err != nil {
-			fmt.Printf("Could not add some commands: %v \n", err)
+			fmt.Printf("Adding commands...\n")
+			commandList, err := s.ApplicationCommandBulkOverwrite(event.User.ID, discordGuild.ID, commands)
+			fmt.Printf("List of successfully created commands:\n")
+			for _, command := range commandList {
+				fmt.Printf("\t%v\n", command.Name)
+			}
+			if err != nil {
+				fmt.Printf("Could not add some commands: %v \n", err)
+			}
 		}
 	}
 }
