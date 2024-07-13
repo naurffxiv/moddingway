@@ -1,5 +1,6 @@
 package discord
 
 const (
-	GuildName = "NA Ultimate Raiding - FF XIV"
+	GuildName                = "NA Ultimate Raiding - FF XIV"
+	DefaultModLoggingChannel = "1172324840947056681"
 )

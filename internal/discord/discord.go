@@ -18,6 +18,11 @@ type Discord struct {
 	Roles map[string]map[string]*discordgo.Role
 }
 
+func (d *Discord) Init(token string) {
+	d.Token = token
+	d.ModLoggingChannelID = DefaultModLoggingChannel
+}
+
 // Start sets up the token and intents of the bot before it logs in
 // Intents are what events the bot is subscribed to, so it will
 // be notified of any events within the selected categories
