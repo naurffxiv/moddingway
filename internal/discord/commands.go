@@ -41,7 +41,55 @@ func (d *Discord) Unmute(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	optionMap := mapOptions(i)
+	logMsg, _ := d.LogCommand(i.Interaction)
+
+	state := &InteractionState{
+		session:     s,
+		interaction: i,
+		logMsg:      logMsg,
+		isFirst:     true,
+	}
+
+	userToBan := optionMap["user"].UserValue(nil).ID
+
+	// Check if user exists in guild
+	_, err := d.GetUserInGuild(state.interaction.GuildID, userToBan)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not ban user <@%v>", userToBan)
+		fmt.Printf("%v: %v\n", tempstr, err)
+
+		err = RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+		
+		return
+	}
+
+	// DM the user regarding the ban
+	banstr := fmt.Sprintf(
+		"You are being banned from `%v` for the following reason:\n> %v\nYou are able to appeal this ban through the link provided: https://dyno.gg/form/33b5a650",
+		GuildName,
+		optionMap["reason"].StringValue(),
+	)
+	d.SendDMToUser(state, userToBan, banstr)
+
+	tempstr := fmt.Sprintf("<@%v> has been banned", userToBan)
+	RespondAndAppendLog(state, tempstr)
+	d.EditLogMsg(logMsg)
+
+	// Attempt to ban user
+	if len(optionMap["reason"].StringValue()) > 0 {
+		err = d.Session.GuildBanCreateWithReason(i.GuildID, userToBan, optionMap["reason"].StringValue(), 0)
+	} else {
+		err = StartInteraction(s, i.Interaction, "Please provide a reason for the ban.")
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+		
+		return
+	}
 }
 
 // Unban attempts to unban the user specified user from the server the command was invoked in.
