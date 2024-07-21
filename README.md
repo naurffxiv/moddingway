@@ -5,14 +5,14 @@ Discord moderation bot for NAUR.
 ## How To Run
 Run `docker compose up --build` after providing the appropriate environment variables listed below in the `.env` file.
 
-### Release
-#### Environment variables:
+### Environment variables
+Postgres-related information is configured in the environment variables instead of a pre-created user/password.
+#### Release
 - DISCORD_TOKEN
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 
-### Testing
-#### Environment variables:
+#### Testing
 - DISCORD_TOKEN
 - POSTGRES_USER
 - POSTGRES_PASSWORD
@@ -20,5 +20,4 @@ Run `docker compose up --build` after providing the appropriate environment vari
 - GUILD_ID
 - MOD_LOGGING_CHANNEL_ID
 
-`DEBUG` must be set to true
-
+`DEBUG` must be set to true for testing.
