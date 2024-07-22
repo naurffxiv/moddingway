@@ -18,7 +18,27 @@ func main() {
 	discordToken = strings.TrimSpace(discordToken)
 
 	d := &discord.Discord{}
-	d.Init(discordToken)
+
+	debug, _ := os.LookupEnv("DEBUG")
+	debug = strings.ToLower(debug)
+
+	if debug == "true" {
+		guildID, ok := os.LookupEnv("GUILD_ID")
+		if !ok {
+			panic("You must supply a GUILD_ID to start!")
+		}
+
+		modLoggingChannelID, ok := os.LookupEnv("MOD_LOGGING_CHANNEL_ID")
+		if !ok {
+			panic("You must supply a MOD_LOGGING_CHANNEL_ID to start!")
+		}
+
+		d.Token = discordToken
+		d.GuildID = guildID
+		d.ModLoggingChannelID = modLoggingChannelID
+	} else {
+		d.Init(discordToken)
+	}
 
 	fmt.Printf("Starting Discord...\n")
 	err := d.Start()

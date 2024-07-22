@@ -17,3 +17,6 @@ services:
       dockerfile: ./docker/App.Dockerfile
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DEBUG: ${DEBUG:-false}
+      GUILD_ID: ${GUILD_ID}
+      MOD_LOGGING_CHANNEL_ID: ${MOD_LOGGING_CHANNEL_ID}
