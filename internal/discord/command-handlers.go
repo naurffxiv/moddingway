@@ -38,7 +38,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 				// KickCommand,
 				// MuteCommand,
 				// UnmuteCommand,
-				// BanCommand,
+				BanCommand,
 				// UnbanCommand,
 				// RemoveNicknameCommand,
 				// SetNicknameCommand,
