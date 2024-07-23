@@ -8,36 +8,35 @@ import (
 	"syscall"
 
 	"github.com/naurffxiv/moddingway/internal/discord"
+	"github.com/naurffxiv/moddingway/internal/util"
 )
 
 func main() {
-	discordToken, ok := os.LookupEnv("DISCORD_TOKEN")
-	if !ok {
-		panic("You must supply a DISCORD_TOKEN to start!")
+	env := util.EnvGetter{
+		Ok: true,
 	}
-	discordToken = strings.TrimSpace(discordToken)
 
 	d := &discord.Discord{}
 
-	debug, _ := os.LookupEnv("DEBUG")
+	discordToken := env.GetEnv("DISCORD_TOKEN")
+	discordToken = strings.TrimSpace(discordToken)
+
+	debug := env.GetEnv("DEBUG")
 	debug = strings.ToLower(debug)
 
 	if debug == "true" {
-		guildID, ok := os.LookupEnv("GUILD_ID")
-		if !ok {
-			panic("You must supply a GUILD_ID to start!")
-		}
-
-		modLoggingChannelID, ok := os.LookupEnv("MOD_LOGGING_CHANNEL_ID")
-		if !ok {
-			panic("You must supply a MOD_LOGGING_CHANNEL_ID to start!")
-		}
+		guildID := env.GetEnv("GUILD_ID")
+		modLoggingChannelID := env.GetEnv("MOD_LOGGING_CHANNEL_ID")
 
 		d.Token = discordToken
 		d.GuildID = guildID
 		d.ModLoggingChannelID = modLoggingChannelID
 	} else {
 		d.Init(discordToken)
+	}
+
+	if !env.Ok { 
+		panic(fmt.Errorf("You must supply a %s to start!", env.EnvName))
 	}
 
 	fmt.Printf("Starting Discord...\n")
