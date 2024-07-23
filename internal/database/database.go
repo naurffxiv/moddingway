@@ -15,7 +15,7 @@ type DbInfo struct {
 }
 
 func ConnectToDatabase(p DbInfo) *pgxpool.Pool {
-	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", p.Host, p.Password, p.Host, p.Port, p.DbName)
+	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", p.User, p.Password, p.Host, p.Port, p.DbName)
 
 	fmt.Printf("Connecting to database...\n")
 	conn, err := pgxpool.New(context.Background(), dbUrl)
