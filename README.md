@@ -20,4 +20,4 @@ Postgres-related information is configured in the environment variables instead 
 - GUILD_ID
 - MOD_LOGGING_CHANNEL_ID
 
-`DEBUG` must be set to true for testing.
+`DEBUG` must be set to `true` for testing.
