@@ -19,7 +19,6 @@ func main() {
 	d := &discord.Discord{}
 
 	discordToken := env.GetEnv("DISCORD_TOKEN")
-	discordToken = strings.TrimSpace(discordToken)
 
 	debug := env.GetEnv("DEBUG")
 	debug = strings.ToLower(debug)

@@ -2,6 +2,7 @@ package util
 
 import (
 	"os"
+	"strings"
 )
 
 // EnvGetter is a helper that removes the need for error checking
@@ -20,5 +21,6 @@ func (eg *EnvGetter) GetEnv(envName string) string {
 	eg.EnvName = envName
 	var ret string
 	ret, eg.Ok = os.LookupEnv(envName)
+	ret = strings.TrimSpace(ret)
 	return ret
 }
