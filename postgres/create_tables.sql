@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS users (
 	PRIMARY KEY(userID)
 );
 
-CREATE INDEX IF NOT exists index_discordUserID ON users(discordUserID);
+CREATE INDEX IF NOT EXISTS index_discordUserID ON users(discordUserID);
 
 
-create table if not exists strikes (
+CREATE TABLE IF NOT EXISTS strikes (
 	strikeID INT GENERATED ALWAYS AS IDENTITY,
-	userID INT NOT null,
-	reason text,
+	userID INT NOT NULL,
+	reason TEXT,
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
