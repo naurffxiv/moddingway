@@ -39,7 +39,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 				// MuteCommand,
 				// UnmuteCommand,
 				BanCommand,
-				// UnbanCommand,
+				UnbanCommand,
 				// RemoveNicknameCommand,
 				// SetNicknameCommand,
 				// SlowmodeCommand,
@@ -53,7 +53,7 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 				// DeleteStrikeCommand,
 				// ShowAllStrikesCommand,
 			)
-	
+
 			fmt.Printf("Adding commands...\n")
 			commandList, err := s.ApplicationCommandBulkOverwrite(event.User.ID, discordGuild.ID, commands)
 			fmt.Printf("List of successfully created commands:\n")
