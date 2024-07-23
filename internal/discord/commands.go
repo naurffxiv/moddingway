@@ -63,7 +63,7 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
-		
+
 		return
 	}
 
@@ -83,11 +83,11 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildBanCreateWithReason(i.GuildID, userToBan, optionMap["reason"].StringValue(), 0)
 	} else {
-		err = StartInteraction(s, i.Interaction, "Please provide a reason for the ban.")
+		err = RespondToInteraction(state.session, state.interaction.Interaction, "Please provide a reason for the ban.", &state.isFirst)
 		if err != nil {
 			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
-		
+
 		return
 	}
 }
@@ -98,7 +98,52 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) Unban(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	optionMap := mapOptions(i)
+	logMsg, _ := d.LogCommand(i.Interaction)
+
+	state := &InteractionState{
+		session:     s,
+		interaction: i,
+		logMsg:      logMsg,
+		isFirst:     true,
+	}
+
+	userToUnban := optionMap["user"].UserValue(nil).ID
+
+	// Check if user exists in ban list
+	member, err := d.Session.GuildBan(state.interaction.GuildID, userToUnban)
+	if err != nil {
+		tempstr := fmt.Sprintf("Could not unban user <@%v>", userToUnban)
+		fmt.Printf("%v: %v\n", tempstr, err)
+
+		err = RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+
+		return
+	}
+
+	// Dm the user regarding the unban
+	// unbanstr := fmt.Sprintf("You are being unbanned from `%v` for the following reason:\n> %v", GuildName)
+	// d.SendDMToUser(state, userToUnban, unbanstr)
+	//
+	// tempstr := fmt.Sprintf("<@%v> has been unbanned", userToUnban)
+	// RespondAndAppendLog(state, tempstr)
+	// d.EditLogMsg(logMsg)
+
+	// Attempt to unban user
+	if len(optionMap["reason"].StringValue()) > 0 {
+		err = d.Session.GuildBanDelete(i.GuildID, userToUnban)
+	} else {
+		err = RespondToInteraction(state.session, state.interaction.Interaction, "Please provide a reason for the unban.", &state.isFirst)
+		if err != nil {
+			fmt.Printf("Unable to send ephemeral message: %v\n", err)
+		}
+
+		return
+	}
+
 }
 
 // RemoveNickname attempts to remove the currently set nickname on the specified user
