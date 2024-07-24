@@ -32,3 +32,16 @@ func AddOrGetExistingUser(conn *pgxpool.Pool, discordUserID string, discordGuild
 	}
 	return dbUserID, nil
 }
+
+func GetExistingUser(conn *pgxpool.Pool, discordUserID string, discordGuildID string) (int, error) {
+	query := `SELECT userID FROM users
+	WHERE discordUserId = $1 AND discordGuildID = $2`
+
+	var dbUserID int
+	err := conn.QueryRow(context.Background(), query, discordUserID, discordGuildID).Scan(&dbUserID)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Database query failed: %v\n", err)
+		return -1, err
+	}
+	return dbUserID, nil
+}
