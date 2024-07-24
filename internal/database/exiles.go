@@ -73,9 +73,9 @@ func GetPendingUnexiles(conn *pgxpool.Pool) ([]PendingUnexile, error) {
 	query := `SELECT e.exileID, e.userID, e.exileStatus, u.discordUserID, u.discordGuildID
 	FROM exiles e
 	JOIN users u ON e.userID = u.userID
-	WHERE e.exileStatus = 2 AND e.endTimestamp < $1;`
+	WHERE e.exileStatus = $1 AND e.endTimestamp < $2;`
 
-	rows, err := conn.Query(context.Background(), query, time.Now().UTC().Format(time.RFC3339))
+	rows, err := conn.Query(context.Background(), query, enum.TimedExile, time.Now().UTC().Format(time.RFC3339))
 	if err != nil {
 		return nil, err
 	}
