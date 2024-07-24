@@ -258,7 +258,10 @@ func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
 
 // RespondAndAppendLog combines both a response and a log message update into one function
 func RespondAndAppendLog(state *InteractionState, message string) {
-	RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	err := RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	if err != nil {
+		fmt.Printf("Unable to respond to interaction: %v\n", err)
+	}
 	AppendLogMsgDescription(state.logMsg, message)
 }
 
