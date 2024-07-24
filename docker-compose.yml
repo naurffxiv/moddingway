@@ -21,7 +21,16 @@ services:
       context: .
       dockerfile: ./docker/App.Dockerfile
     environment:
+      POSTGRES_HOST: postgres_local
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: moddingway
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       DEBUG: ${DEBUG:-false}
       GUILD_ID: ${GUILD_ID}
       MOD_LOGGING_CHANNEL_ID: ${MOD_LOGGING_CHANNEL_ID}
+    depends_on:
+      postgres_local:
+        condition:
+          service_healthy
