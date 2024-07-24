@@ -258,7 +258,10 @@ func UpdateLogMsgTimestamp(logMsg *discordgo.Message) {
 
 // RespondAndAppendLog combines both a response and a log message update into one function
 func RespondAndAppendLog(state *InteractionState, message string) {
-	RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	err := RespondToInteraction(state.session, state.interaction.Interaction, message, &state.isFirst)
+	if err != nil {
+		fmt.Printf("Unable to respond to interaction: %v\n", err)
+	}
 	AppendLogMsgDescription(state.logMsg, message)
 }
 
@@ -269,16 +272,14 @@ func (d *Discord) SendDMToUser(state *InteractionState, userID string, message s
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not create a DM with user %v", userID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+		RespondAndAppendLog(state, tempstr)
 		return err
 	} else {
 		_, err = state.session.ChannelMessageSend(channel.ID, message)
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userID)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-			AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+			RespondAndAppendLog(state, tempstr)
 			return err
 		}
 		return nil
