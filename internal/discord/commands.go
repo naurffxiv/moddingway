@@ -13,7 +13,7 @@ import (
 //	user: 	User
 //	reason: string
 func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+
 }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
@@ -23,7 +23,7 @@ func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	duration:	string
 //	reason:		string
 func (d *Discord) Mute(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+
 }
 
 // Unmute attempts to unmute the user specified user from the server the command was invoked in.
@@ -32,7 +32,7 @@ func (d *Discord) Mute(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user: 		User
 //	reason:		string
 func (d *Discord) Unmute(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+
 }
 
 // Ban attempts to ban the user specified user from the server the command was invoked in.
@@ -98,7 +98,7 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) Unban(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // RemoveNickname attempts to remove the currently set nickname on the specified user
@@ -108,7 +108,7 @@ func (d *Discord) Unban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) RemoveNickname(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // SetNickname attempts to set the nickname of the specified user in the server
@@ -119,7 +119,7 @@ func (d *Discord) RemoveNickname(s *discordgo.Session, i *discordgo.InteractionC
 //	nickname:	string
 //	reason:		string
 func (d *Discord) SetNickname(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // Slowmode attempts to set the current channel to slowmode.
@@ -127,12 +127,12 @@ func (d *Discord) SetNickname(s *discordgo.Session, i *discordgo.InteractionCrea
 //
 //	duration:	string
 func (d *Discord) Slowmode(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // SlowmodeOff attempts to remove slowmode from the current channel.
 func (d *Discord) SlowmodeOff(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // Purge attempts to remove the last message-number messages from the specified channel.
@@ -141,7 +141,7 @@ func (d *Discord) SlowmodeOff(s *discordgo.Session, i *discordgo.InteractionCrea
 //	channel:		Channel
 //	message-number:		integer
 func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // Exile attempts to add the exile role to the user, effectively soft-banning them.
@@ -307,7 +307,7 @@ func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.Intera
 //	user:		User
 //	reason:		string
 func (d *Discord) Strike(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // ClearStrikes attempts to clear all strikes for a user.
@@ -315,7 +315,7 @@ func (d *Discord) Strike(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //
 //	user:		User
 func (d *Discord) ClearStrikes(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // DeleteStrike attempts to delete a strike from a user.
@@ -323,7 +323,7 @@ func (d *Discord) ClearStrikes(s *discordgo.Session, i *discordgo.InteractionCre
 //
 //	warning_id:	integer
 func (d *Discord) DeleteStrike(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
 
 // ShowAllStrikes attempts to show all strikes for a user.
@@ -331,5 +331,5 @@ func (d *Discord) DeleteStrike(s *discordgo.Session, i *discordgo.InteractionCre
 //
 //	user:		User
 func (d *Discord) ShowAllStrikes(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return
+	
 }
