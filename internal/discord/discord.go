@@ -104,24 +104,18 @@ func RespondToInteraction(s *discordgo.Session, i *discordgo.Interaction, messag
 		return err
 	}
 	if *isFirstInteraction {
-		if (3 * time.Second) <= time.Now().Sub(interactionTimestamp) {
+		if (3 * time.Second) <= time.Since(interactionTimestamp) {
 			return fmt.Errorf("initial interaction timeout")
 		}
 		err := StartInteraction(s, i, message)
-		if err != nil {
-			fmt.Printf("Unable to send initial ephemeral message: %v\n", err)
-		} else {
+		if err == nil {
 			*isFirstInteraction = false
 		}
 		return err
 	} else {
-		if (15 * time.Minute) <= time.Now().Sub(interactionTimestamp) {
+		if (15 * time.Minute) <= time.Since(interactionTimestamp) {
 			return fmt.Errorf("followup interaction timeout")
 		}
-		err := ContinueInteraction(s, i, message)
-		if err != nil {
-			fmt.Printf("Unable to send follow-up ephemeral message: %v\n", err)
-		}
-		return err
+		return ContinueInteraction(s, i, message)
 	}
 }
