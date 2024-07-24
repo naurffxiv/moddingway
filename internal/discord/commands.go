@@ -73,17 +73,23 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		GuildName,
 		optionMap["reason"].StringValue(),
 	)
-	d.SendDMToUser(state, userToBan, banstr)
-
-	tempstr := fmt.Sprintf("<@%v> has been banned", userToBan)
-	RespondAndAppendLog(state, tempstr)
-	d.EditLogMsg(logMsg)
+	_ = d.SendDMToUser(state, userToBan, banstr)
 
 	// Attempt to ban user
 	if len(optionMap["reason"].StringValue()) > 0 {
 		err = d.Session.GuildBanCreateWithReason(i.GuildID, userToBan, optionMap["reason"].StringValue(), 0)
+		if err != nil {
+			tempstr := fmt.Sprintf("Unable to ban user <@%v>", userToBan)
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondAndAppendLog(state, tempstr)
+			d.EditLogMsg(logMsg)
+			return
+		}
+		tempstr := fmt.Sprintf("<@%v> has been banned", userToBan)
+		RespondAndAppendLog(state, tempstr)
+		d.EditLogMsg(logMsg)
 	} else {
-		err = StartInteraction(s, i.Interaction, "Please provide a reason for the ban.")
+		err = RespondToInteraction(s, i.Interaction, "Please provide a reason for the ban.", &state.isFirst)
 		if err != nil {
 			fmt.Printf("Unable to send ephemeral message: %v\n", err)
 		}
