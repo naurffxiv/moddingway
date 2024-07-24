@@ -197,7 +197,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			endTime.Unix(),
 			optionMap["reason"].StringValue(),
 		)
-		d.SendDMToUser(state, userToExile.ID, tempstr)
+		_ = d.SendDMToUser(state, userToExile.ID, tempstr)
 		d.EditLogMsg(logMsg)
 
 		time.Sleep(duration)
@@ -207,7 +207,10 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
 		UpdateLogMsgTimestamp(logMsg)
 		if logMsg != nil {
-			d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
+			_, err = d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
+			if err != nil {
+				fmt.Printf("Unable to send embed: %v", err)
+			}
 		}
 
 		// Unexile user
@@ -221,7 +224,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			GuildName,
 			reason,
 		)
-		d.SendDMToUser(state, userToExile.ID, tempstr)
+		_ = d.SendDMToUser(state, userToExile.ID, tempstr)
 		d.EditLogMsg(state.logMsg)
 	} else {
 		tempstr := fmt.Sprintf(
@@ -235,7 +238,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			GuildName,
 			optionMap["reason"].StringValue(),
 		)
-		d.SendDMToUser(state, userToExile.ID, tempstr)
+		_ = d.SendDMToUser(state, userToExile.ID, tempstr)
 		d.EditLogMsg(logMsg)
 	}
 }
@@ -268,7 +271,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 		GuildName,
 		optionMap["reason"].StringValue(),
 	)
-	d.SendDMToUser(state, exiledUser.ID, tempstr)
+	_ = d.SendDMToUser(state, exiledUser.ID, tempstr)
 	d.EditLogMsg(state.logMsg)
 }
 
