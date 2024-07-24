@@ -3,9 +3,7 @@ package enum
 type ExileStatus int
 
 const (
-	Unexiled = iota
-	IndefiniteExile
+	IndefiniteExile = iota
 	TimedExile
-	Runaway
 	Unknown
 )
