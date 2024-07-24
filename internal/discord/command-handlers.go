@@ -272,16 +272,14 @@ func (d *Discord) SendDMToUser(state *InteractionState, userID string, message s
 	if err != nil {
 		tempstr := fmt.Sprintf("Could not create a DM with user %v", userID)
 		fmt.Printf("%v: %v\n", tempstr, err)
-		RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-		AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+		RespondAndAppendLog(state, tempstr)
 		return err
 	} else {
 		_, err = state.session.ChannelMessageSend(channel.ID, message)
 		if err != nil {
 			tempstr := fmt.Sprintf("Could not send a DM to user <@%v>", userID)
 			fmt.Printf("%v: %v\n", tempstr, err)
-			RespondToInteraction(state.session, state.interaction.Interaction, tempstr, &state.isFirst)
-			AppendLogMsgDescription(state.logMsg, "Failed to notify user via DM")
+			RespondAndAppendLog(state, tempstr)
 			return err
 		}
 		return nil
