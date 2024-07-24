@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/naurffxiv/moddingway/internal/database"
+	"github.com/naurffxiv/moddingway/internal/enum"
 )
 
 // Kick attempts to kick the user specified user from the server the command was invoked in.
@@ -198,31 +200,34 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			optionMap["reason"].StringValue(),
 		)
 		d.SendDMToUser(state, userToExile.ID, tempstr)
-		d.EditLogMsg(logMsg)
 
-		time.Sleep(duration)
+		defer d.EditLogMsg(logMsg)
 
-		// Reuse the original embed format but clear existing info
-		ClearEmbedDescription(logMsg)
-		AppendLogMsgDescription(logMsg, fmt.Sprintf("Exile duration for <@%v> is over", userToExile.ID))
-		UpdateLogMsgTimestamp(logMsg)
-		if logMsg != nil {
-			d.SendEmbed(d.ModLoggingChannelID, logMsg.Embeds[0])
-		}
-
-		// Unexile user
-		reason := "Exile duration has finished."
-		err = d.UnexileUser(state, userToExile.ID, reason)
+		dbUserID, err := database.AddOrGetExistingUser(d.Conn, userToExile.ID, i.GuildID)
 		if err != nil {
+			tempstr = "Unable to add or get user from the database"
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondAndAppendLog(state, tempstr)
 			return
 		}
-		// DM user regarding the unexile, doesn't matter if DM fails
-		tempstr = fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
-			GuildName,
-			reason,
-		)
-		d.SendDMToUser(state, userToExile.ID, tempstr)
-		d.EditLogMsg(state.logMsg)
+
+		exileEntryArgs := database.AddExileEntryArgs{
+			DbUserID: dbUserID,
+			Reason: optionMap["reason"].StringValue(),
+			ExileStatus: enum.TimedExile,
+			StartTime: startTime.UTC().Format(time.RFC3339),
+			EndTime: endTime.UTC().Format(time.RFC3339),
+		}
+		exileID, err := database.AddExileEntryTimed(d.Conn, exileEntryArgs)
+		if err != nil {
+			tempstr = "Unable to add entry to the database"
+			fmt.Printf("%v: %v\n", tempstr, err)
+			RespondAndAppendLog(state, tempstr)
+			return
+		}
+
+		logMsg.Embeds[0].Footer = &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("Exile ID: %v", exileID)}
+
 	} else {
 		tempstr := fmt.Sprintf(
 			"User <@%v> has been exiled indefinitely",
@@ -236,7 +241,28 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			optionMap["reason"].StringValue(),
 		)
 		d.SendDMToUser(state, userToExile.ID, tempstr)
-		d.EditLogMsg(logMsg)
+
+		defer d.EditLogMsg(logMsg)
+
+		dbUserID, err := database.AddOrGetExistingUser(d.Conn, userToExile.ID, i.GuildID)
+		if err != nil {
+			RespondAndAppendLog(state, "Unable to add entry to the database")
+			return
+		}
+
+		exileEntryArgs := database.AddExileEntryArgs{
+			DbUserID: dbUserID,
+			Reason: optionMap["reason"].StringValue(),
+			ExileStatus: enum.TimedExile,
+			StartTime: startTime.UTC().Format(time.RFC3339),
+		}
+		exileID, err := database.AddExileEntryIndefinite(d.Conn, exileEntryArgs)
+		if err != nil {
+			RespondAndAppendLog(state, "Unable to add entry to the database")
+			return
+		}
+		logMsg.Embeds[0].Footer = &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("Exile ID: %v", exileID)}
+
 	}
 }
 
@@ -269,7 +295,29 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 		optionMap["reason"].StringValue(),
 	)
 	d.SendDMToUser(state, exiledUser.ID, tempstr)
-	d.EditLogMsg(state.logMsg)
+
+	defer d.EditLogMsg(state.logMsg)
+
+	dbUserID, err := database.GetExistingUser(d.Conn, exiledUser.ID, i.GuildID)
+	if err != nil {
+		RespondAndAppendLog(state, "Unable to get user from database")
+		return
+	}
+
+	exileID, err := database.GetUserMostRecentExile(d.Conn, dbUserID)
+	if err != nil {
+		RespondAndAppendLog(state, "Unable to get user's most recent exile")
+		return
+	}
+	logMsg.Embeds[0].Footer = &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("Exile ID: %v", exileID)}
+	
+	err = database.RemoveExileEntry(d.Conn, exileID)
+	if err != nil {
+		tempstr := fmt.Sprintf("Unable to remove exile ID %v", exileID)
+		fmt.Printf("%v: %v\n", tempstr, err)
+		RespondAndAppendLog(state, tempstr)
+		return
+	}
 }
 
 // SetModLoggingChannel sets the specified channel to the moderation log channel
