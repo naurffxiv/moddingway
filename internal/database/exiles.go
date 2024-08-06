@@ -62,11 +62,11 @@ func AddExileEntryIndefinite(conn *pgxpool.Pool, p AddExileEntryArgs) (int, erro
 }
 
 type PendingUnexile struct {
-	ExileID	int
-	DbUserID string
-	ExileStatus enum.ExileStatus
-	DiscordUserID string
-	DiscordGuildID string
+	ExileID         int
+	DbUserID        string
+	ExileStatus     enum.ExileStatus
+	DiscordUserID   string
+	DiscordGuildID  string
 }
 
 func GetPendingUnexiles(conn *pgxpool.Pool) ([]PendingUnexile, error) {
