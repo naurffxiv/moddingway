@@ -61,6 +61,8 @@ func AddExileEntryIndefinite(conn *pgxpool.Pool, p AddExileEntryArgs) (int, erro
 	return exileID, nil
 }
 
+// PendingUnexile is the information returned for each exile from GetPendingUnexiles
+// this information is used in unexiling a user
 type PendingUnexile struct {
 	ExileID         int
 	DbUserID        string
@@ -69,6 +71,8 @@ type PendingUnexile struct {
 	DiscordGuildID  string
 }
 
+// Gets all exiles where the exileStatus is timedExile end timestamp is larger than the current time
+// returns it as a slice of PendingExiles.
 func GetPendingUnexiles(conn *pgxpool.Pool) ([]PendingUnexile, error) {
 	query := `SELECT e.exileID, e.userID, e.exileStatus, u.discordUserID, u.discordGuildID
 	FROM exiles e
