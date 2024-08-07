@@ -321,7 +321,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 		return
 	}
 
-	exileID, err := database.GetUserMostRecentExile(d.Conn, dbUserID)
+	exileID, err := database.GetUserExile(d.Conn, dbUserID)
 	if err != nil {
 		RespondAndAppendLog(state, "Unable to get user's most recent exile")
 		return
