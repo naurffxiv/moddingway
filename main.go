@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/naurffxiv/moddingway/internal/database"
 	"github.com/naurffxiv/moddingway/internal/discord"
 	"github.com/naurffxiv/moddingway/internal/util"
 )
@@ -34,10 +35,19 @@ func main() {
 		d.Init(discordToken)
 	}
 
+	dbArgs := database.DbInfo{
+		Host: env.GetEnv("POSTGRES_HOST"),
+		Port: env.GetEnv("POSTGRES_PORT"),
+		User: env.GetEnv("POSTGRES_USER"),
+		Password: env.GetEnv("POSTGRES_PASSWORD"),
+		DbName: env.GetEnv("POSTGRES_DB"),
+	}
+	
 	if !env.Ok { 
 		panic(fmt.Errorf("You must supply a %s to start!", env.EnvName))
 	}
 
+	d.Conn = database.ConnectToDatabase(dbArgs)
 	fmt.Printf("Starting Discord...\n")
 	err := d.Start()
 	if err != nil {
