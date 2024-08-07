@@ -104,10 +104,9 @@ func GetPendingUnexiles(conn *pgxpool.Pool) ([]PendingUnexile, error) {
 	return pendingUnexiles, nil
 }
 
-func GetUserMostRecentExile(conn *pgxpool.Pool, dbUserID int) (int, error) {
+func GetUserExile(conn *pgxpool.Pool, dbUserID int) (int, error) {
 	query := `SELECT exileID FROM exiles
 	WHERE userID = $1
-	ORDER BY exileID DESC
 	LIMIT 1`
 
 	var exileID int
