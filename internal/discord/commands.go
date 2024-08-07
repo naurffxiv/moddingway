@@ -210,12 +210,16 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		defer d.EditLogMsg(logMsg)
 
-		dbUserID, err := database.AddOrGetExistingUser(d.Conn, userToExile.ID, i.GuildID)
+		dbUserID, err := database.GetUser(d.Conn, userToExile.ID, i.GuildID)
 		if err != nil {
-			tempstr = "Unable to add or get user from the database"
-			fmt.Printf("%v: %v\n", tempstr, err)
-			RespondAndAppendLog(state, tempstr)
-			return
+			fmt.Println("User not found in database, adding user...")
+			dbUserID, err = database.AddUser(d.Conn, userToExile.ID, i.GuildID)
+			if err != nil {
+				tempstr = fmt.Sprintf("Unable to add user <@%v> to the database", userToExile.ID)
+				fmt.Printf("%v: %v\n", tempstr, err)
+				RespondAndAppendLog(state, tempstr)
+				return
+			}
 		}
 
 		exileEntryArgs := database.AddExileEntryArgs{
@@ -251,10 +255,16 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		defer d.EditLogMsg(logMsg)
 
-		dbUserID, err := database.AddOrGetExistingUser(d.Conn, userToExile.ID, i.GuildID)
+		dbUserID, err := database.GetUser(d.Conn, userToExile.ID, i.GuildID)
 		if err != nil {
-			RespondAndAppendLog(state, "Unable to add entry to the database")
-			return
+			fmt.Println("User not found in database, adding user...")
+			dbUserID, err = database.AddUser(d.Conn, userToExile.ID, i.GuildID)
+			if err != nil {
+				tempstr = fmt.Sprintf("Unable to add user <@%v> to the database", userToExile.ID)
+				fmt.Printf("%v: %v\n", tempstr, err)
+				RespondAndAppendLog(state, tempstr)
+				return
+			}
 		}
 
 		exileEntryArgs := database.AddExileEntryArgs{
@@ -305,7 +315,7 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 
 	defer d.EditLogMsg(state.logMsg)
 
-	dbUserID, err := database.GetExistingUser(d.Conn, exiledUser.ID, i.GuildID)
+	dbUserID, err := database.GetUser(d.Conn, exiledUser.ID, i.GuildID)
 	if err != nil {
 		RespondAndAppendLog(state, "Unable to get user from database")
 		return
