@@ -270,7 +270,7 @@ func (d *Discord) Exile(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		exileEntryArgs := database.AddExileEntryArgs{
 			DbUserID: dbUserID,
 			Reason: optionMap["reason"].StringValue(),
-			ExileStatus: enum.TimedExile,
+			ExileStatus: enum.IndefiniteExile,
 			StartTime: startTime.UTC().Format(time.RFC3339),
 		}
 		exileID, err := database.AddExileEntryIndefinite(d.Conn, exileEntryArgs)
