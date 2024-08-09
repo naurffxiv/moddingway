@@ -29,7 +29,12 @@ func processPendingUnexile(d *discord.Discord, pending database.PendingUnexile) 
 	description := fmt.Sprintf("<@%v>'s exile has timed out\n", pending.DiscordUserID)
 	footer := fmt.Sprintf("Exile ID: %v", pending.ExileID)
 	logMsg := discord.CreateMemberEmbed(nil, description, footer)
-	defer d.SendEmbed(d.ModLoggingChannelID, logMsg)
+
+	// send the embed before returning in any branch of code
+	// return value and error not needed
+	defer func() {
+		_, _ = d.SendEmbed(d.ModLoggingChannelID, logMsg)
+	}()
 
 	// Check if user is in guild
 	member, err := d.Session.GuildMember(pending.DiscordGuildID, pending.DiscordUserID)
@@ -40,11 +45,13 @@ func processPendingUnexile(d *discord.Discord, pending database.PendingUnexile) 
 		return
 	}
 
+	// make log message look pretty
 	logMsg.Author = &discordgo.MessageEmbedAuthor{
 		Name: member.User.Username,
 		IconURL: member.AvatarURL(""), 
 	}
 
+	// unexile the user
 	err = d.TempUnexileUser(pending.DiscordUserID, pending.DiscordGuildID)
 	if err != nil {
 		tempstr := fmt.Sprintf("Unable to unexile user <@%v>", pending.DiscordUserID)
