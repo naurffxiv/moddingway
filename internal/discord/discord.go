@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Discord struct {
@@ -14,6 +15,7 @@ type Discord struct {
 	Ready               sync.WaitGroup
 	GuildID             string
 	ModLoggingChannelID string
+	Conn				*pgxpool.Pool
 
 	// The structure of the following map is Roles[guild_id][role_name]
 	Roles map[string]map[string]*discordgo.Role
