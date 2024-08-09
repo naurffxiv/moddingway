@@ -4,4 +4,15 @@ format:
 	@echo "Formatting Go code..."
 	@gofmt -s -w .
 
-.PHONY: format
+start:
+	docker compose down
+	if [ "${DEBUG}" = true ]; then \
+		docker compose up --build; \
+	else \
+		docker compose up --build --detach; \
+	fi
+
+stop:
+	docker compose down
+
+.PHONY: format start stop
