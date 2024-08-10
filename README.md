@@ -3,7 +3,7 @@
 Discord moderation bot for NAUR.
 
 ## How To Run
-Run `docker compose up --build` after providing the appropriate environment variables listed below in the `.env` file.
+Run `make start` after providing the appropriate environment variables listed below in the `.env` file.
 
 ### Environment variables
 Postgres-related information is configured in the environment variables instead of a pre-created user/password.
