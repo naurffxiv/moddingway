@@ -48,6 +48,8 @@ func main() {
 	}
 
 	d.Conn = database.ConnectToDatabase(dbArgs)
+	database.PopulateDatabase(d.Conn)
+	
 	fmt.Printf("Starting Discord...\n")
 	err := d.Start()
 	if err != nil {
