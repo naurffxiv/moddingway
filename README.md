@@ -9,15 +9,22 @@ Run `docker compose up --build` after providing the appropriate environment vari
 Postgres-related information is configured in the environment variables instead of a pre-created user/password.
 #### Release
 - DISCORD_TOKEN
+- POSTGRES_HOST
+- POSTGRES_PORT
+- POSTGRES_DB
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 
 #### Testing
 - DISCORD_TOKEN
+- POSTGRES_HOST
+- POSTGRES_PORT
+- POSTGRES_DB
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 - DEBUG
 - GUILD_ID
 - MOD_LOGGING_CHANNEL_ID
 
-`DEBUG` must be set to `true` for testing.
+`DEBUG` must be set to `true` for testing.  
+Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
