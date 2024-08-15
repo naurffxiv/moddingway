@@ -54,7 +54,7 @@ func main() {
 	startDiscord(d)
 
 	// scheduler
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 	done := make(chan bool)
 	go func() {
 		for {
