@@ -1,0 +1,15 @@
+services:
+  app:
+    environment:
+      POSTGRES_HOST: postgres_local
+    depends_on:
+      postgres_local:
+        condition:
+          service_healthy
+  worker:
+    environment:
+      POSTGRES_HOST: postgres_local
+    depends_on:
+      postgres_local:
+        condition:
+          service_healthy

@@ -15,4 +15,8 @@ start:
 stop:
 	docker compose down
 
+test-build:
+	docker compose -f postgres.yml down
+	docker compose -f postgres.yml up --build
+
 .PHONY: format start stop
