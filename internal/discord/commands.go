@@ -9,14 +9,7 @@ import (
 	"github.com/naurffxiv/moddingway/internal/enum"
 )
 
-// Kick attempts to kick the user specified user from the server the command was invoked in.
-// Fields:
-//
-//	user: 	User
-//	reason: string
-// func (d *Discord) Kick(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-// }
 
 // Mute attempts to mute the user specified user from the server the command was invoked in.
 // Fields:
@@ -130,18 +123,6 @@ func (d *Discord) SetNickname(s *discordgo.Session, i *discordgo.InteractionCrea
 	
 }
 
-// Slowmode attempts to set the current channel to slowmode.
-// Fields:
-//
-//	duration:	string
-// func (d *Discord) Slowmode(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	
-// }
-
-// SlowmodeOff attempts to remove slowmode from the current channel.
-// func (d *Discord) SlowmodeOff(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	
-// }
 
 // Purge attempts to remove the last message-number messages from the specified channel.
 // Fields:
