@@ -703,8 +703,8 @@ var ShowAllStrikesCommand = &discordgo.ApplicationCommand{
 // slash command was used
 func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.ApplicationCommandData().Name {
-	case "kick":
-		d.Kick(s, i)
+	// case "kick":
+	// 	d.Kick(s, i)
 	case "mute":
 		d.Mute(s, i)
 	case "ban":
@@ -715,10 +715,10 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.RemoveNickname(s, i)
 	case "setnickname":
 		d.SetNickname(s, i)
-	case "slowmode":
-		d.Slowmode(s, i)
-	case "slowmodeoff":
-		d.SlowmodeOff(s, i)
+	// case "slowmode":
+	// 	d.Slowmode(s, i)
+	// case "slowmodeoff":
+	// 	d.SlowmodeOff(s, i)
 	case "purge":
 		d.Purge(s, i)
 	case "exile":
