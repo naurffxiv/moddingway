@@ -384,25 +384,25 @@ func ClearEmbedDescription(logMsg *discordgo.Message) {
 	}
 }
 
-var KickCommand = &discordgo.ApplicationCommand{
-	Name:                     "kick",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Kick the specified user and notify the user why via DMs.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionUser,
-			Name:        "user",
-			Description: "User being kicked",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for kick",
-			Required:    true,
-		},
-	},
-}
+// var KickCommand = &discordgo.ApplicationCommand{
+// 	Name:                     "kick",
+// 	DefaultMemberPermissions: &adminPermission,
+// 	Description:              "Kick the specified user and notify the user why via DMs.",
+// 	Options: []*discordgo.ApplicationCommandOption{
+// 		{
+// 			Type:        discordgo.ApplicationCommandOptionUser,
+// 			Name:        "user",
+// 			Description: "User being kicked",
+// 			Required:    true,
+// 		},
+// 		{
+// 			Type:        discordgo.ApplicationCommandOptionString,
+// 			Name:        "reason",
+// 			Description: "Reason for kick",
+// 			Required:    true,
+// 		},
+// 	},
+// }
 
 var MuteCommand = &discordgo.ApplicationCommand{
 	Name:                     "mute",
@@ -536,25 +536,25 @@ var SetNicknameCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var SlowmodeCommand = &discordgo.ApplicationCommand{
-	Name:                     "slowmode",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Add slowmode to current channel.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "duration",
-			Description: "Duration of slowmode (e.g \"1m, 1h, 1d\")",
-			Required:    true,
-		},
-	},
-}
+// var SlowmodeCommand = &discordgo.ApplicationCommand{
+// 	Name:                     "slowmode",
+// 	DefaultMemberPermissions: &adminPermission,
+// 	Description:              "Add slowmode to current channel.",
+// 	Options: []*discordgo.ApplicationCommandOption{
+// 		{
+// 			Type:        discordgo.ApplicationCommandOptionString,
+// 			Name:        "duration",
+// 			Description: "Duration of slowmode (e.g \"1m, 1h, 1d\")",
+// 			Required:    true,
+// 		},
+// 	},
+// }
 
-var SlowmodeOffCommand = &discordgo.ApplicationCommand{
-	Name:                     "slowmodeoff",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Remove slowmode from current channel.",
-}
+// var SlowmodeOffCommand = &discordgo.ApplicationCommand{
+// 	Name:                     "slowmodeoff",
+// 	DefaultMemberPermissions: &adminPermission,
+// 	Description:              "Remove slowmode from current channel.",
+// }
 
 var PurgeCommand = &discordgo.ApplicationCommand{
 	Name:                     "purge",
