@@ -35,15 +35,12 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			// Adding commands to a list to prepare in bulk
 			var commands []*discordgo.ApplicationCommand
 			commands = append(commands,
-				// KickCommand,
 				// MuteCommand,
 				// UnmuteCommand,
 				BanCommand,
 				// UnbanCommand,
 				// RemoveNicknameCommand,
 				// SetNicknameCommand,
-				// SlowmodeCommand,
-				// SlowmodeOffCommand,
 				// PurgeCommand,
 				ExileCommand,
 				UnexileCommand,
@@ -384,25 +381,7 @@ func ClearEmbedDescription(logMsg *discordgo.Message) {
 	}
 }
 
-// var KickCommand = &discordgo.ApplicationCommand{
-// 	Name:                     "kick",
-// 	DefaultMemberPermissions: &adminPermission,
-// 	Description:              "Kick the specified user and notify the user why via DMs.",
-// 	Options: []*discordgo.ApplicationCommandOption{
-// 		{
-// 			Type:        discordgo.ApplicationCommandOptionUser,
-// 			Name:        "user",
-// 			Description: "User being kicked",
-// 			Required:    true,
-// 		},
-// 		{
-// 			Type:        discordgo.ApplicationCommandOptionString,
-// 			Name:        "reason",
-// 			Description: "Reason for kick",
-// 			Required:    true,
-// 		},
-// 	},
-// }
+
 
 var MuteCommand = &discordgo.ApplicationCommand{
 	Name:                     "mute",
@@ -536,25 +515,6 @@ var SetNicknameCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-// var SlowmodeCommand = &discordgo.ApplicationCommand{
-// 	Name:                     "slowmode",
-// 	DefaultMemberPermissions: &adminPermission,
-// 	Description:              "Add slowmode to current channel.",
-// 	Options: []*discordgo.ApplicationCommandOption{
-// 		{
-// 			Type:        discordgo.ApplicationCommandOptionString,
-// 			Name:        "duration",
-// 			Description: "Duration of slowmode (e.g \"1m, 1h, 1d\")",
-// 			Required:    true,
-// 		},
-// 	},
-// }
-
-// var SlowmodeOffCommand = &discordgo.ApplicationCommand{
-// 	Name:                     "slowmodeoff",
-// 	DefaultMemberPermissions: &adminPermission,
-// 	Description:              "Remove slowmode from current channel.",
-// }
 
 var PurgeCommand = &discordgo.ApplicationCommand{
 	Name:                     "purge",
@@ -703,8 +663,6 @@ var ShowAllStrikesCommand = &discordgo.ApplicationCommand{
 // slash command was used
 func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.ApplicationCommandData().Name {
-	// case "kick":
-	// 	d.Kick(s, i)
 	case "mute":
 		d.Mute(s, i)
 	case "ban":
@@ -715,10 +673,6 @@ func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.Interacti
 		d.RemoveNickname(s, i)
 	case "setnickname":
 		d.SetNickname(s, i)
-	// case "slowmode":
-	// 	d.Slowmode(s, i)
-	// case "slowmodeoff":
-	// 	d.SlowmodeOff(s, i)
 	case "purge":
 		d.Purge(s, i)
 	case "exile":
