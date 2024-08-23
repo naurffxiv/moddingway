@@ -283,14 +283,13 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	exiledUser := optionMap["user"].UserValue(nil)
 
 	// Unexile user
-	err := d.UnexileUser(state, exiledUser.ID, optionMap["reason"].StringValue())
+	err := d.UnexileUser(state, exiledUser.ID)
 	if err != nil {
 		return
 	}
 	// DM user regarding the unexile, doesn't matter if DM fails
-	tempstr := fmt.Sprintf("You have been unexiled from `%v` for the following reason:\n> %v",
+	tempstr := fmt.Sprintf("You have been unexiled from `%v`.",
 		GuildName,
-		optionMap["reason"].StringValue(),
 	)
 	_ = d.SendDMToUser(state, exiledUser.ID, tempstr)
 

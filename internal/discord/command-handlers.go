@@ -574,12 +574,6 @@ var UnexileCommand = &discordgo.ApplicationCommand{
 			Description: "User being unexiled",
 			Required:    true,
 		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for unexile",
-			Required:    true,
-		},
 	},
 }
 
@@ -734,7 +728,7 @@ func (d *Discord) ExileUser(state *InteractionState, userID string, reason strin
 	return d.RoleRemoveAddHelper(state, userID, roleToRemove, roleToAdd)
 }
 
-func (d *Discord) UnexileUser(state *InteractionState, userID string, reason string) error {
+func (d *Discord) UnexileUser(state *InteractionState, userID string) error {
 	// Check user for specified roles
 	roleToRemove := ExiledRole
 	roleToAdd := VerifiedRole
