@@ -23,7 +23,7 @@ const (
 )
 
 func ConnectToDatabase(p DbInfo) *pgxpool.Pool {
-	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", p.User, p.Password, p.Host, p.Port, p.DbName)
+	dbUrl := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", p.User, p.Password, p.Host, p.Port, p.DbName)
 
 	log.Printf("Connecting to database...\n")
 	conn, err := pgxpool.New(context.Background(), dbUrl)
