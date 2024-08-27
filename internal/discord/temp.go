@@ -100,3 +100,14 @@ func CreateMemberEmbed(member *discordgo.Member, description string, footer stri
 		}
 	}
 }
+
+func (d *Discord) TempSendDMToUser(userID string, message string) error {
+	// Open DM channel with user
+	channel, err := d.Session.UserChannelCreate(userID)
+	if err != nil {
+		return err
+	} else {
+		_, err = d.Session.ChannelMessageSend(channel.ID, message)
+		return err
+	}
+}

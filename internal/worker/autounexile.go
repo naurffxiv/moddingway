@@ -61,6 +61,14 @@ func processPendingUnexile(d *discord.Discord, pending database.PendingUnexile) 
 		return
 	}
 
+	// send DM to user regarding unexile
+	message := fmt.Sprintf("You have been unexiled from %v.", discord.GuildName)
+	err = d.TempSendDMToUser(pending.DiscordUserID, message)
+	if err != nil {
+		tempstr := fmt.Sprintf("Unable to send DM to user regarding unexile: %v", err)
+		printAndAppend(logMsg, tempstr, err)
+	}
+
 	logMsg.Description += "Successfully unexiled user\n"
 	removeExileEntryWrapper(d, logMsg, pending.ExileID)
 }
