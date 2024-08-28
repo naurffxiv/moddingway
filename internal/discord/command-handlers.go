@@ -36,16 +36,10 @@ func (d *Discord) AddCommands(s *discordgo.Session, event *discordgo.Ready) {
 			// Adding commands to a list to prepare in bulk
 			var commands []*discordgo.ApplicationCommand
 			commands = append(commands,
-				// MuteCommand,
-				// UnmuteCommand,
 				BanCommand,
 				// UnbanCommand,
-				// RemoveNicknameCommand,
-				// SetNicknameCommand,
-				// PurgeCommand,
 				ExileCommand,
 				UnexileCommand,
-				SetModLoggingCommand,
 				// AddStrikeCommand,
 				// ClearStrikesCommand,
 				// DeleteStrikeCommand,
@@ -382,54 +376,6 @@ func ClearEmbedDescription(logMsg *discordgo.Message) {
 	}
 }
 
-
-
-var MuteCommand = &discordgo.ApplicationCommand{
-	Name:                     "mute",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Mute the specified user.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionUser,
-			Name:        "user",
-			Description: "User being muted",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "duration",
-			Description: "Duration of mute (e.g \"1m, 1h, 1d\")",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for mute",
-			Required:    true,
-		},
-	},
-}
-
-var UnmuteCommand = &discordgo.ApplicationCommand{
-	Name:                     "unmute",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Unmute the specified user.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionUser,
-			Name:        "user",
-			Description: "User being unmuted",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for unmute",
-			Required:    true,
-		},
-	},
-}
-
 var BanCommand = &discordgo.ApplicationCommand{
 	Name:                     "ban",
 	DefaultMemberPermissions: &adminPermission,
@@ -470,74 +416,6 @@ var UnbanCommand = &discordgo.ApplicationCommand{
 	},
 }
 
-var RemoveNicknameCommand = &discordgo.ApplicationCommand{
-	Name:                     "removenickname",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Remove the nickname of the specified user.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionUser,
-			Name:        "user",
-			Description: "User whose nickname to remove",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for nickname removal",
-			Required:    true,
-		},
-	},
-}
-
-var SetNicknameCommand = &discordgo.ApplicationCommand{
-	Name:                     "setnickname",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Change the nickname of the specified user.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionUser,
-			Name:        "user",
-			Description: "User whose nickname to rename",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "nickname",
-			Description: "Nickname to rename user to",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionString,
-			Name:        "reason",
-			Description: "Reason for nickname change",
-			Required:    true,
-		},
-	},
-}
-
-
-var PurgeCommand = &discordgo.ApplicationCommand{
-	Name:                     "purge",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Delete a number of messages from a channel.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionChannel,
-			Name:        "channel",
-			Description: "Channel to purge",
-			Required:    true,
-		},
-		{
-			Type:        discordgo.ApplicationCommandOptionInteger,
-			Name:        "message-number",
-			Description: "Number of messages to purge (100 max)",
-			MaxValue:    100,
-			Required:    true,
-		},
-	},
-}
-
 var ExileCommand = &discordgo.ApplicationCommand{
 	Name:                     "exile",
 	DefaultMemberPermissions: &adminPermission,
@@ -573,20 +451,6 @@ var UnexileCommand = &discordgo.ApplicationCommand{
 			Type:        discordgo.ApplicationCommandOptionUser,
 			Name:        "user",
 			Description: "User being unexiled",
-			Required:    true,
-		},
-	},
-}
-
-var SetModLoggingCommand = &discordgo.ApplicationCommand{
-	Name:                     "setmodloggingchannel",
-	DefaultMemberPermissions: &adminPermission,
-	Description:              "Set the log channel for moderation commands.",
-	Options: []*discordgo.ApplicationCommandOption{
-		{
-			Type:        discordgo.ApplicationCommandOptionChannel,
-			Name:        "channel",
-			Description: "Channel to log moderation actions in",
 			Required:    true,
 		},
 	},
@@ -658,24 +522,14 @@ var ShowAllStrikesCommand = &discordgo.ApplicationCommand{
 // slash command was used
 func (d *Discord) InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.ApplicationCommandData().Name {
-	case "mute":
-		d.Mute(s, i)
 	case "ban":
 		d.Ban(s, i)
 	case "unban":
 		d.Unban(s, i)
-	case "removenickname":
-		d.RemoveNickname(s, i)
-	case "setnickname":
-		d.SetNickname(s, i)
-	case "purge":
-		d.Purge(s, i)
 	case "exile":
 		d.Exile(s, i)
 	case "unexile":
 		d.Unexile(s, i)
-	case "setmodloggingchannel":
-		d.SetModLoggingChannel(s, i)
 	case "strike":
 		d.Strike(s, i)
 	case "clearstrikes":
