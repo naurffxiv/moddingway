@@ -10,6 +10,27 @@ import (
 	"github.com/naurffxiv/moddingway/internal/enum"
 )
 
+
+
+// Mute attempts to mute the user specified user from the server the command was invoked in.
+// Fields:
+//
+//	user: 		User
+//	duration:	string
+//	reason:		string
+func (d *Discord) Mute(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+}
+
+// Unmute attempts to unmute the user specified user from the server the command was invoked in.
+// Fields:
+//
+//	user: 		User
+//	reason:		string
+func (d *Discord) Unmute(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+}
+
 // Ban attempts to ban the user specified user from the server the command was invoked in.
 // Fields:
 //
@@ -79,6 +100,36 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 //	user:		User
 //	reason:		string
 func (d *Discord) Unban(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+}
+
+// RemoveNickname attempts to remove the currently set nickname on the specified user
+// in the server the command was invoked in.
+// Fields:
+//
+//	user:		User
+//	reason:		string
+func (d *Discord) RemoveNickname(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+}
+
+// SetNickname attempts to set the nickname of the specified user in the server
+// the command was invoked in.
+// Fields:
+//
+//	user:		User
+//	nickname:	string
+//	reason:		string
+func (d *Discord) SetNickname(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+}
+
+// Purge attempts to remove the last message-number messages from the specified channel.
+// Fields:
+//
+//	channel:		Channel
+//	message-number:		integer
+func (d *Discord) Purge(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 }
 
@@ -264,6 +315,35 @@ func (d *Discord) Unexile(s *discordgo.Session, i *discordgo.InteractionCreate) 
 		RespondAndAppendLog(state, tempstr)
 		return
 	}
+}
+
+// SetModLoggingChannel sets the specified channel to the moderation log channel
+// All logged commands will be logged to this channel.
+// Fields:
+//
+//	channel:	Channel
+func (d *Discord) SetModLoggingChannel(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	options := i.ApplicationCommandData().Options
+	channelID := options[0].ChannelValue(nil).ID
+	d.ModLoggingChannelID = channelID
+
+	logMsg, _ := d.LogCommand(i.Interaction)
+	state := &InteractionState{
+		session:     s,
+		interaction: i,
+		logMsg:      logMsg,
+		isFirst:     true,
+	}
+
+	tempstr := fmt.Sprintf("Mod logging channel set to: <#%v>", channelID)
+	RespondAndAppendLog(state, tempstr)
+	d.EditLogMsg(logMsg)
+
+	err := StartInteraction(s, i.Interaction, tempstr)
+	if err != nil {
+		log.Printf("Unable to send ephemeral message: %v\n", err)
+	}
+	log.Printf("Set the moderation logging channel to: %v\n", channelID)
 }
 
 // Strike attempts to give a user a strike.
