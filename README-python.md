@@ -13,15 +13,10 @@ Postgres-related information is configured in the environment variables instead 
 - POSTGRES_PASSWORD
 
 #### Testing
-- DISCORD_TOKEN
-- POSTGRES_HOST
-- POSTGRES_PORT
-- POSTGRES_DB
-- POSTGRES_USER
-- POSTGRES_PASSWORD
-- DEBUG
 - GUILD_ID
+- DISCORD_TOKEN
 - MOD_LOGGING_CHANNEL_ID
+- POSTGRES_PASSWORD
 
 `DEBUG` must be set to `true` for testing.  
 Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
