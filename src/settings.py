@@ -16,7 +16,7 @@ class Settings(BaseModel):
 def prod() -> Settings:
     return Settings(
         guild_id=1172230157776466050,
-        logging_channel_id=int(os.environ["MOD_LOGGING_CHANNEL_ID"]),
+        logging_channel_id=1172324840947056681,
     )
 
 
