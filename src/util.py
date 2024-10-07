@@ -1,6 +1,7 @@
 import discord
 from settings import get_settings
 import enums
+from enums import Role
 
 settings = get_settings()
 
@@ -51,4 +52,10 @@ def user_has_role(user: discord.Member, role: enums.Role) -> bool:
         discord_role
         for discord_role in user.guild.roles
         if discord_role.name == role.value
+    )
+
+
+async def is_user_moderator(interaction: discord.Interaction):
+    return user_has_role(interaction.user, Role.ADMINISTRATION) or user_has_role(
+        interaction.user, Role.MANAGEMENT
     )

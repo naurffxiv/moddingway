@@ -14,7 +14,7 @@ async def exile_user(
         logging_embed, logger, f"going to exile {user.mention} for {duration}"
     )
 
-    # Look up 
+    # Look up
 
     log_info_and_embed(logging_embed, logger, f"because {reason}")
 

@@ -2,17 +2,10 @@ import discord
 from discord.ext.commands import Bot
 from settings import get_settings
 from services.exile_service import exile_user, unexile_user
-from util import user_has_role
-from enums import Role
+from util import is_user_moderator
 from .helper import create_logging_embed
 
 settings = get_settings()
-
-
-async def is_user_moderator(interaction: discord.Interaction):
-    return user_has_role(interaction.user, Role.ADMINISTRATION) or user_has_role(
-        interaction.user, Role.MANAGEMENT
-    )
 
 
 def create_exile_commands(bot: Bot) -> None:
