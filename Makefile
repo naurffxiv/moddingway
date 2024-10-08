@@ -15,8 +15,11 @@ start:
 stop:
 	docker compose down
 
+clean:
+	docker image prune -a
+
 test-build:
 	docker compose -f postgres.yml down
 	docker compose -f postgres.yml up --build
 
-.PHONY: format start stop
+.PHONY: format start stop clean test-build
