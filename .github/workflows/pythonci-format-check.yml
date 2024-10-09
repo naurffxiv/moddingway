@@ -1,0 +1,38 @@
+name: Python Formatting Check
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  black:
+    name: Run Black
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'  # Choose your Python version
+
+    # Step 3: Install black
+    - name: Install Black
+      run: |
+        python -m pip install --upgrade pip
+        pip install black
+
+    # Step 4: Run black in check mode (this will only check, not reformat)
+    - name: Run Black (Check Mode)
+      run: |
+        black --check .

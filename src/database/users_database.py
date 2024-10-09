@@ -5,6 +5,7 @@ from settings import get_settings
 
 settings = get_settings()
 
+
 def get_user(discord_user_id: int) -> Optional[User]:
     conn = DatabaseConnection()
 
@@ -22,6 +23,7 @@ def get_user(discord_user_id: int) -> Optional[User]:
 
         if res:
             return User(res[0], res[1], res[2], res[3])
+
 
 def add_user(discord_user_id: int) -> int:
     conn = DatabaseConnection()

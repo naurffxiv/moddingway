@@ -34,7 +34,7 @@ def local() -> Settings:
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         postgres_username=os.environ["POSTGRES_USER"],
-        postgres_password=os.environ["POSTGRES_PASSWORD"]
+        postgres_password=os.environ["POSTGRES_PASSWORD"],
     )
 
 

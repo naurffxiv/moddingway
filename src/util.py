@@ -51,9 +51,7 @@ async def add_and_remove_role(
 
 def user_has_role(user: discord.Member, role: Role) -> bool:
     return any(
-        discord_role
-        for discord_role in user.roles
-        if discord_role.name == role.value
+        discord_role for discord_role in user.roles if discord_role.name == role.value
     )
 
 
@@ -83,6 +81,8 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
         return delta
 
     return None
+
+
 async def is_user_moderator(interaction: discord.Interaction):
     return user_has_role(interaction.user, Role.ADMINISTRATION) or user_has_role(
         interaction.user, Role.MANAGEMENT

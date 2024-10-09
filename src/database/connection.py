@@ -43,11 +43,9 @@ class DatabaseConnection:
         """
         with self.get_cursor() as cursor:
             script_file_path = os.path.join("postgres", "create_tables.sql")
-            with open(script_file_path, 'r') as fd:
-                
+            with open(script_file_path, "r") as fd:
                 script = fd.read()
                 cursor.execute(script)
-
 
     # TODO: properly spin down DB connection on exit
 

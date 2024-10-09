@@ -1,5 +1,7 @@
 class Exile(object):
-    def __init__(self, exile_id, user_id, reason, exile_status, start_timestamp, end_timestamp):
+    def __init__(
+        self, exile_id, user_id, reason, exile_status, start_timestamp, end_timestamp
+    ):
         self.exile_id = exile_id
         self.user_id = user_id
         self.reason = reason

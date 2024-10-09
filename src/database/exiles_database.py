@@ -34,6 +34,6 @@ def remove_user_exiles(user_id):
         delete from exiles e where e.userId = %s
         """
 
-        params = (user_id, )
+        params = (user_id,)
 
         cursor.execute(query, params)
