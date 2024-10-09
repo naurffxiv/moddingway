@@ -7,7 +7,6 @@ from database import DatabaseConnection
 settings = get_settings()
 
 # TODO:
-# create requirements.txt
 # dockerize
 # error handling at the app level
 

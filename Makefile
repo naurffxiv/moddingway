@@ -15,8 +15,11 @@ start:
 stop:
 	docker compose down
 
+install:
+	pip3 install -r requirements.txt
+
 test-build:
 	docker compose -f postgres.yml down
 	docker compose -f postgres.yml up --build
 
-.PHONY: format start stop
+.PHONY: format start stop install
