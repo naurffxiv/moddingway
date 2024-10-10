@@ -1,5 +1,7 @@
 from . import DatabaseConnection
-from .models import Exile
+from .models import Exile, PendingExile
+from enums import ExileStatus
+from datetime import datetime, timezone
 
 
 def add_exile(exile: Exile) -> int:
@@ -37,3 +39,25 @@ def remove_user_exiles(user_id):
         params = (user_id,)
 
         cursor.execute(query, params)
+
+
+def get_pending_unexiles() -> list[PendingExile]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.discordUserID, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE e.exileStatus = %s AND e.endTimestamp < %s;
+        """
+
+        params = (
+            ExileStatus.TIMED_EXILED,
+            datetime.now(timezone.utc),
+        )
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        return [PendingExile(*x) for x in res]

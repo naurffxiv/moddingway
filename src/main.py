@@ -16,6 +16,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=settings.log_level)
 
     intents = discord.Intents.default()
+    intents.members = True
     bot = ModdingwayBot(command_prefix="/", intents=intents)
 
     database_connection = DatabaseConnection()
