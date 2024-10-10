@@ -17,14 +17,15 @@ class EmbedField(object):
         self.name = name
         self.value = value
 
+
 @asynccontextmanager
 async def create_embed(log_channel: discord.abc.GuildChannel, **kwargs):
     # optional args
-    user = kwargs.get('user', None)
-    description = kwargs.get('description', None)
-    timestamp = kwargs.get('timestamp', None)
-    footer = kwargs.get('footer', None)
-    fields = kwargs.get('fields', None)
+    user = kwargs.get("user", None)
+    description = kwargs.get("description", None)
+    timestamp = kwargs.get("timestamp", None)
+    footer = kwargs.get("footer", None)
+    fields = kwargs.get("fields", None)
 
     embed = discord.Embed()
     try:
@@ -41,11 +42,8 @@ async def create_embed(log_channel: discord.abc.GuildChannel, **kwargs):
             embed.set_footer(text=footer)
         if fields is not None:
             for field in fields:
-                embed.add_field(
-                    name=field.name,
-                    value=field.value
-                )
-        
+                embed.add_field(name=field.name, value=field.value)
+
         yield embed
     except Exception as e:
         embed.add_field(name="Error", value=e)

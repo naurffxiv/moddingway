@@ -11,5 +11,5 @@ def create_logging_embed(interaction: discord.Interaction):
         user=interaction.user,
         timestamp=interaction.created_at,
         description=f"Used `{interaction.command.name}` command in {interaction.channel.mention}",
-        fields=[EmbedField("Action", f"/{interaction.command.name}")]
+        fields=[EmbedField("Action", f"/{interaction.command.name}")],
     )
