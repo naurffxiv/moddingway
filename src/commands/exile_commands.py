@@ -4,7 +4,7 @@ from settings import get_settings
 from services.exile_service import exile_user, unexile_user
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
-from .helper import create_logging_embed
+from .helper import create_logging_embed, get_args
 
 settings = get_settings()
 
@@ -16,7 +16,7 @@ def create_exile_commands(bot: Bot) -> None:
     async def unexile(interaction: discord.Interaction, user: discord.Member):
         """Unexile the specified user."""
 
-        async with create_logging_embed(interaction) as logging_embed:
+        async with create_logging_embed(interaction, get_args()) as logging_embed:
             error_message = await unexile_user(logging_embed, user)
 
             await interaction.response.send_message(
@@ -37,8 +37,7 @@ def create_exile_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Exile the specified user."""
-
-        async with create_logging_embed(interaction) as logging_embed:
+        async with create_logging_embed(interaction, get_args()) as logging_embed:
             exile_duration = calculate_time_delta(duration)
             if duration and not exile_duration:
                 await interaction.response.send_message(

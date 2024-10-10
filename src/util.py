@@ -42,11 +42,11 @@ async def create_embed(log_channel: discord.abc.GuildChannel, **kwargs):
             embed.set_footer(text=footer)
         if fields is not None:
             for field in fields:
-                embed.add_field(name=field.name, value=field.value)
+                embed.add_field(name=field.name, value=field.value, inline=False)
 
         yield embed
     except Exception as e:
-        embed.add_field(name="Error", value=e)
+        embed.add_field(name="Error", value=e, inline=False)
         raise e
     finally:
         await log_channel.send(embed=embed)
