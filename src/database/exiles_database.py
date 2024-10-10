@@ -31,7 +31,7 @@ def remove_user_exiles(user_id):
 
     with conn.get_cursor() as cursor:
         query = """
-        delete from exiles e where e.userId = %s returning *
+        delete from exiles e where e.userId = %s returning e.exileId
         """
 
         params = (user_id,)
