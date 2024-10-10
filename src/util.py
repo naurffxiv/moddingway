@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import discord
 from settings import get_settings
 import re
@@ -6,6 +7,51 @@ from datetime import timedelta
 from enums import Role
 
 settings = get_settings()
+
+
+class EmbedField(object):
+    name: str
+    value: str
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+@asynccontextmanager
+async def create_embed(log_channel: discord.abc.GuildChannel, **kwargs):
+    # optional args
+    user = kwargs.get('user', None)
+    description = kwargs.get('description', None)
+    timestamp = kwargs.get('timestamp', None)
+    footer = kwargs.get('footer', None)
+    fields = kwargs.get('fields', None)
+
+    embed = discord.Embed()
+    try:
+        if user is not None:
+            embed.set_author(
+                name=user.display_name,
+                icon_url=user.display_avatar.url,
+            )
+        if description is not None:
+            embed.description = description
+        if timestamp is not None:
+            embed.timestamp = timestamp
+        if footer is not None:
+            embed.set_footer(text=footer)
+        if fields is not None:
+            for field in fields:
+                embed.add_field(
+                    name=field.name,
+                    value=field.value
+                )
+        
+        yield embed
+    except Exception as e:
+        embed.add_field(name="Error", value=e)
+        raise e
+    finally:
+        await log_channel.send(embed=embed)
 
 
 def log_info_and_embed(embed: discord.Embed, logger, message: str):
