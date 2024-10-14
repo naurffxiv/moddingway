@@ -39,4 +39,7 @@ def remove_user_exiles(user_id):
         cursor.execute(query, params)
         res = cursor.fetchone()
 
-        return res[0]
+        if res is not None:
+            return res[0]
+        else:
+            return None
