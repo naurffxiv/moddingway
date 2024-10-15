@@ -28,3 +28,5 @@ Postgres-related information is configured in the environment variables instead 
 
 `DEBUG` must be set to `true` for testing.  
 Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
+
+This is a test
