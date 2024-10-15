@@ -18,8 +18,11 @@ stop:
 install:
 	pip3 install -r requirements.txt
 
+clean:
+	docker image prune -a
+
 test-build:
 	docker compose -f postgres.yml down
 	docker compose -f postgres.yml up --build
 
-.PHONY: format start stop install
+.PHONY: format start stop install clean
