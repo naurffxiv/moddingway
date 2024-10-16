@@ -19,7 +19,9 @@ class EmbedField(object):
 
 
 @asynccontextmanager
-async def logging_embed_context(log_channel: discord.abc.GuildChannel, **kwargs):
+async def create_interaction_embed_context(
+    log_channel: discord.abc.GuildChannel, **kwargs
+):
     # optional args
     user = kwargs.get("user", None)
     description = kwargs.get("description", None)

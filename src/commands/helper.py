@@ -2,7 +2,7 @@ import sys
 from typing import Optional
 import discord
 from settings import get_settings
-from util import EmbedField, logging_embed_context
+from util import EmbedField, create_interaction_embed_context
 
 settings = get_settings()
 
@@ -19,7 +19,7 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case _:
                     fields.append(EmbedField(key.title(), value))
 
-    return logging_embed_context(
+    return create_interaction_embed_context(
         interaction.guild.get_channel(settings.logging_channel_id),
         user=interaction.user,
         timestamp=interaction.created_at,
