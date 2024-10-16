@@ -5,6 +5,7 @@ from services.exile_service import exile_user, unexile_user
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed
+from ui.exile_modal import ExileModal
 
 settings = get_settings()
 
@@ -54,3 +55,17 @@ def create_exile_commands(bot: Bot) -> None:
             await interaction.response.send_message(
                 error_message or f"Successfully exiled {user.mention}", ephemeral=True
             )
+
+    @bot.tree.context_menu(name="Exile User")
+    @discord.app_commands.check(is_user_moderator)
+    async def exile_user_action(interaction: discord.Interaction, user: discord.Member):
+        """Exile the selected user"""
+        await interaction.response.send_modal(ExileModal(user))
+
+    @bot.tree.context_menu(name="Exile Message Author")
+    @discord.app_commands.check(is_user_moderator)
+    async def exile_message_author_action(
+        interaction: discord.Interaction, message: discord.Message
+    ):
+        """Exile the user that sent this message"""
+        await interaction.response.send_modal(ExileModal(message.author))
