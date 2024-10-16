@@ -4,7 +4,7 @@ from settings import get_settings
 from services.ban_service import ban_user
 from util import is_user_moderator
 from .helper import create_logging_embed
-from ui.ban_modal import BanModal
+from ui import BanModal
 
 settings = get_settings()
 

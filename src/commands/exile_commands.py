@@ -5,7 +5,7 @@ from services.exile_service import exile_user, unexile_user
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed
-from ui.exile_modal import ExileModal
+from ui import ExileModal
 
 settings = get_settings()
 
