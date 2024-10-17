@@ -8,7 +8,7 @@ from .helper import create_autounexile_embed
 settings = get_settings()
 
 
-@tasks.loop(seconds=5.0)
+@tasks.loop(minutes=1.0)
 async def autounexile_users(self):
     exiles = exiles_database.get_pending_unexiles()
 
