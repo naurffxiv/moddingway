@@ -69,6 +69,7 @@ async def exile_user(
         user,
         f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
     )
+    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully exiled")
 
 
 async def unexile_user(
@@ -101,3 +102,5 @@ async def unexile_user(
 
     exile_id = exiles_database.remove_user_exiles(db_user.user_id)
     logging_embed.set_footer(text=f"Exile ID: {exile_id}")
+
+    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
