@@ -4,8 +4,10 @@ from database import exiles_database
 from services.exile_service import unexile_user
 from settings import get_settings
 from .helper import create_autounexile_embed
+import logging
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 @tasks.loop(minutes=1.0)
@@ -19,6 +21,9 @@ async def autounexile_users(self):
                 self, member, exile.exile_id, exile.end_timestamp
             ) as autounexile_embed:
                 await unexile_user(autounexile_embed, member)
+        else:
+            logger.info(f"User <@{exile.user_id}> not found in server")
+
         exiles_database.remove_user_exiles(
             exile.user_id
         )  # remove entry from database no matter what
