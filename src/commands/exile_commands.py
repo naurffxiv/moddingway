@@ -4,7 +4,7 @@ from settings import get_settings
 from services.exile_service import exile_user, unexile_user
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
-from .helper import create_logging_embed, get_args
+from .helper import create_logging_embed
 
 settings = get_settings()
 
