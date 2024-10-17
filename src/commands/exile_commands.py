@@ -93,18 +93,3 @@ def create_exile_commands(bot: Bot) -> None:
                     f"<@{interaction.user.id}> has tested their luck and lives another day...",
                     ephemeral=False,
                 )
-
-    @bot.tree.error
-    async def on_app_command_error(interaction: discord.Interaction, error):
-        # Check if the error is due to a cooldown
-        if isinstance(error, discord.app_commands.CommandOnCooldown):
-            hours_left = int(error.retry_after / 3600)
-            await interaction.response.send_message(
-                f"This command is on cooldown. Please try again in {hours_left} hour(s).",
-                ephemeral=True,
-            )
-        else:
-            # Handle other errors if necessary
-            await interaction.response.send_message(
-                "An error occurred while processing the command.", ephemeral=True
-            )
