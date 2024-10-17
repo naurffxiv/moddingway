@@ -30,7 +30,7 @@ python-build:
 
 python-run:
 	docker compose down
-	docker compose up python-app-local
+	docker compose up python-app-local --build
 
 database-run:
 	docker compose -f postgres.yml up -d
