@@ -1,26 +1,18 @@
 import discord
-from contextlib import asynccontextmanager
 from discord.ext.commands import Bot
 from settings import get_settings
+from util import create_interaction_embed_context
 
 settings = get_settings()
 
 
-@asynccontextmanager
-async def create_autounexile_embed(
+def create_autounexile_embed(
     self, user: discord.User, exile_id: str, end_timestamp: str
 ):
-    embed = discord.Embed()
-    log_channel = self.get_channel(settings.logging_channel_id)
-    try:
-        embed.set_author(name=user.display_name, icon_url=user.display_avatar.url)
-        embed.timestamp = end_timestamp
-        embed.description = f"<@{user.id}>'s exile has timed out"
-        embed.set_footer(text=f"Exile ID: {exile_id}")
-
-        yield embed
-    except Exception as e:
-        embed.add_field(name="Error", value=e)
-        raise e
-    finally:
-        await log_channel.send(embed=embed)
+    return create_interaction_embed_context(
+        self.get_channel(settings.logging_channel_id),
+        user=user,
+        timestamp=end_timestamp,
+        description=f"<@{user.id}>'s exile has timed out",
+        footer=f"Exile ID: {exile_id}",
+    )
