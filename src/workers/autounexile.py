@@ -22,7 +22,7 @@ async def autounexile_users(self):
             ) as autounexile_embed:
                 await unexile_user(autounexile_embed, member)
         else:
-            logger.info(f"User <@{exile.user_id}> not found in server")
+            logger.error(f"User {exile.user_id} not found in server")
 
         exiles_database.remove_user_exiles(
             exile.user_id
