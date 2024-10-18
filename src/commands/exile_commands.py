@@ -95,7 +95,7 @@ def create_exile_commands(bot: Bot) -> None:
                     ephemeral=False,
                 )
 
-    @bot.tree.context_menu(name="Exile User")
+    @bot.tree.context_menu(name="Exile User for custom duration")
     @discord.app_commands.check(is_user_moderator)
     async def exile_user_action(interaction: discord.Interaction, user: discord.Member):
         """Exile the selected user"""
