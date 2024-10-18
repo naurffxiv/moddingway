@@ -23,7 +23,9 @@ def create_ban_commands(bot: Bot) -> None:
     ):
         """Ban the specified user."""
 
-        async with create_logging_embed(interaction) as logging_embed:
+        async with create_logging_embed(
+            interaction, user=user, reason=reason
+        ) as logging_embed:
             await ban_user(logging_embed, user, reason)
 
             await interaction.response.send_message(

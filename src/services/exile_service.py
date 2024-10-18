@@ -57,6 +57,7 @@ async def exile_user(
     exile_id = exiles_database.add_exile(exile)
 
     logger.info(f"Created exile with ID {exile_id}")
+    logging_embed.set_footer(text=f"Exile ID: {exile_id}")
 
     # change user role
     await add_and_remove_role(
@@ -68,6 +69,7 @@ async def exile_user(
         user,
         f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
     )
+    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully exiled")
 
 
 async def unexile_user(
@@ -98,4 +100,7 @@ async def unexile_user(
 
         db_user = User(db_user_id, user.id, None, None)
 
-    exiles_database.remove_user_exiles(db_user.user_id)
+    exile_id = exiles_database.remove_user_exiles(db_user.user_id)
+    logging_embed.set_footer(text=f"Exile ID: {exile_id}")
+
+    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
