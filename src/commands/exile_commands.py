@@ -124,18 +124,3 @@ def create_exile_commands(bot: Bot) -> None:
     ):
         """Exile the user that sent this message"""
         await interaction.response.send_modal(ExileModal(message.author))
-
-    @bot.tree.error
-    async def on_app_command_error(interaction: discord.Interaction, error):
-        # Check if the error is due to a cooldown
-        if isinstance(error, discord.app_commands.CommandOnCooldown):
-            hours_left = int(error.retry_after / 3600)
-            await interaction.response.send_message(
-                f"This command is on cooldown. Please try again in {hours_left} hour(s).",
-                ephemeral=True,
-            )
-        else:
-            # Handle other errors if necessary
-            await interaction.response.send_message(
-                "An error occurred while processing the command.", ephemeral=True
-            )

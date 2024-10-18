@@ -3,6 +3,7 @@ from discord.ext.commands import Bot
 from settings import get_settings
 from commands.exile_commands import create_exile_commands
 from commands.ban_commands import create_ban_commands
+from commands.helper import create_bot_errors
 import logging
 
 settings = get_settings()
@@ -23,3 +24,4 @@ class ModdingwayBot(Bot):
     def _register_commands(self):
         create_exile_commands(self)
         create_ban_commands(self)
+        create_bot_errors(self)
