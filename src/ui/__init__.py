@@ -1,2 +1,2 @@
 from .ban_modal import BanModal
-from .exile_modal import ExileModal
+from .exile_modal import *

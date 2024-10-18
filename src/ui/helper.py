@@ -5,8 +5,8 @@ from util import EmbedField, create_interaction_embed_context
 settings = get_settings()
 
 
-def create_logging_embed(interaction: discord.Interaction, **kwargs):
-    fields = [EmbedField("Action", f"/{interaction.command.name}")]
+def create_modal_embed(interaction: discord.Interaction, modalTitle: str, **kwargs):
+    fields = [EmbedField("Action", f"{modalTitle} Modal")]
     if kwargs is not None:
         for key, value in kwargs.items():
             match (type(value)):
@@ -21,6 +21,6 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         interaction.guild.get_channel(settings.logging_channel_id),
         user=interaction.user,
         timestamp=interaction.created_at,
-        description=f"Used `{interaction.command.name}` command in {interaction.channel.mention}",
+        description=f"Used `{modalTitle}` action",
         fields=fields,
     )
