@@ -1,5 +1,6 @@
 import discord
 from services.ban_service import ban_user
+from .helper import create_modal_embed
 
 
 class BanModal(discord.ui.Modal):
@@ -17,10 +18,14 @@ class BanModal(discord.ui.Modal):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        # TODO set up corrext context management here
-        embed = discord.Embed()
-        await ban_user(embed, self.user, self.reason.value)
+        async with create_modal_embed(
+            interaction,
+            "Ban User",
+            user=self.user,
+            reason=self.reason.value,
+        ) as logging_embed:
+            await ban_user(logging_embed, self.user, self.reason.value)
 
-        await interaction.response.send_message(
-            f"Successfully banned {self.user.mention}", ephemeral=True
-        )
+            await interaction.response.send_message(
+                f"Successfully banned {self.user.mention}", ephemeral=True
+            )
