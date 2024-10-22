@@ -44,7 +44,7 @@ func (d *Discord) Ban(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// DM the user regarding the ban
 	banstr := fmt.Sprintf(
-		"You are being banned from `%v` for the following reason:\n> %v\nYou are able to appeal this ban through the link provided: https://dyno.gg/form/33b5a650",
+		"You are being banned from `%v` for the following reason:\n> %v\nYou are able to appeal this ban by contacting the staff team in 30 days.",
 		GuildName,
 		optionMap["reason"].StringValue(),
 	)
