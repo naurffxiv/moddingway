@@ -1,5 +1,3 @@
-import sys
-from typing import Optional
 import discord
 from discord.ext.commands import Bot
 from settings import get_settings
