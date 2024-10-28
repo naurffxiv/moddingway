@@ -46,7 +46,7 @@ def create_exile_commands(bot: Bot) -> None:
             exile_duration = calculate_time_delta(duration)
             if duration and not exile_duration:
                 await interaction.response.send_message(
-                    "Invalid exile duration given, duration should be in the form of [1 or 2 digits][s, d, m, h]",
+                    "Invalid exile duration given, duration should be in the form of [1 or 2 digits][s, d, m, h]. No action will be taken",
                     ephemeral=True,
                 )
                 return
