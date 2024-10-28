@@ -103,6 +103,4 @@ def create_exile_commands(bot: Bot) -> None:
         async with create_logging_embed(interaction, user=user) as logging_embed:
             msg = await get_user_exiles(logging_embed, user)
 
-            await interaction.response.send_message(
-                msg, ephemeral=True
-            )
+            await interaction.response.send_message(msg, ephemeral=True)
