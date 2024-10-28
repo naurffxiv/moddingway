@@ -68,6 +68,7 @@ def get_pending_unexiles() -> list[PendingExile]:
 
         return [PendingExile(*x) for x in res]
 
+
 def get_user_exiles(user_id) -> PendingExile:
     conn = DatabaseConnection()
 
@@ -79,9 +80,7 @@ def get_user_exiles(user_id) -> PendingExile:
         WHERE u.userID = %s;
         """
 
-        params = (
-            user_id,
-        )
+        params = (user_id,)
 
         cursor.execute(query, params)
         res = cursor.fetchall()

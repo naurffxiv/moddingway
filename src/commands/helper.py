@@ -8,6 +8,7 @@ settings = get_settings()
 
 logger = logging.getLogger(__name__)
 
+
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
     fields = [EmbedField("Action", f"/{interaction.command.name}")]
     if kwargs is not None:
