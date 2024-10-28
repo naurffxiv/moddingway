@@ -65,10 +65,16 @@ async def exile_user(
     )
 
     # message user
-    await send_dm(
-        user,
-        f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
-    )
+    try:
+        await send_dm(
+            user,
+            f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
+        )
+    except Exception as e:
+        log_info_and_embed(
+            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        )
+
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully exiled")
 
 
