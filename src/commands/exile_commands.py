@@ -2,7 +2,7 @@ import discord
 import logging
 from discord.ext.commands import Bot
 from settings import get_settings
-from services.exile_service import exile_user, unexile_user
+from services.exile_service import exile_user, unexile_user, get_user_exiles
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed
@@ -93,3 +93,16 @@ def create_exile_commands(bot: Bot) -> None:
                     f"<@{interaction.user.id}> has tested their luck and lives another day...",
                     ephemeral=False,
                 )
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(user="User whose exile is being checked")
+    async def check_exile(interaction: discord.Interaction, user: discord.Member):
+        """Check the exile status of a user."""
+
+        async with create_logging_embed(interaction, user=user) as logging_embed:
+            msg = await get_user_exiles(logging_embed, user)
+
+            await interaction.response.send_message(
+                msg, ephemeral=True
+            )

@@ -104,3 +104,25 @@ async def unexile_user(
     logging_embed.set_footer(text=f"Exile ID: {exile_id}")
 
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
+
+
+async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> str:
+    db_user = users_database.get_user(user.id)
+    if db_user is None:
+        return "User not found in database"
+
+    exile_list = exiles_database.get_user_exiles(db_user.user_id)
+
+    if len(exile_list) == 0:
+        return "No exiles found for user"
+
+    # TODO convert this to an object for better stringifying
+    res = "Exiles found for the given user:\n"
+
+    for exile in exile_list:
+        res = (
+            res
+            + f"ID: `{exile[0]}`| Reason: `{exile[1]}` | start date: `{exile[2]}` | end date: `{exile[3]}` | status: `{ExileStatus(exile[4]).name}`"
+        )
+
+    return res

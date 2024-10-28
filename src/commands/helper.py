@@ -1,5 +1,4 @@
-import sys
-from typing import Optional
+import logging
 import discord
 from discord.ext.commands import Bot
 from settings import get_settings
@@ -7,6 +6,7 @@ from util import EmbedField, create_interaction_embed_context
 
 settings = get_settings()
 
+logger = logging.getLogger(__name__)
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
     fields = [EmbedField("Action", f"/{interaction.command.name}")]
@@ -41,6 +41,7 @@ def create_bot_errors(bot: Bot) -> None:
             )
         else:
             # Handle other errors if necessary
+            logger.error(error)
             await interaction.response.send_message(
                 "An error occurred while processing the command.", ephemeral=True
             )

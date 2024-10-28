@@ -67,3 +67,23 @@ def get_pending_unexiles() -> list[PendingExile]:
         res = cursor.fetchall()
 
         return [PendingExile(*x) for x in res]
+
+def get_user_exiles(user_id) -> PendingExile:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, e.reason, e.startTimestamp, e.endTimestamp, e.exileStatus
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE u.userID = %s;
+        """
+
+        params = (
+            user_id,
+        )
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        return res
