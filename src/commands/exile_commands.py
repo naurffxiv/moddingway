@@ -3,7 +3,7 @@ import logging
 from discord.ext.commands import Bot
 from settings import get_settings
 from services.exile_service import exile_user, unexile_user, get_user_exiles
-from util import is_user_moderator, calculate_time_delta
+from util import is_user_moderator, calculate_time_delta, log_info_and_embed
 from typing import Optional
 from .helper import create_logging_embed
 from random import choice
@@ -45,6 +45,7 @@ def create_exile_commands(bot: Bot) -> None:
         ) as logging_embed:
             exile_duration = calculate_time_delta(duration)
             if duration and not exile_duration:
+                log_info_and_embed(logging_embed, logger, f"Parsing duration value failed, given value was {duration}")
                 await interaction.response.send_message(
                     "Invalid exile duration given, duration should be in the form of [1 or 2 digits][s, d, m, h]. No action will be taken",
                     ephemeral=True,
