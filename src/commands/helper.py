@@ -40,18 +40,12 @@ def create_bot_errors(bot: Bot) -> None:
                 f"This command is on cooldown. Please try again in {hours_left} hour(s).",
                 ephemeral=True,
             )
-        #  To be removed since create_response_context() will handle this case
-        # else:
-        #     # Handle other errors if necessary
-        #     await interaction.response.send_message(
-        #         "An error occurred while processing the command.", ephemeral=True
-        #     )
 
 
 @asynccontextmanager
 async def create_response_context(interaction: discord.Interaction):
     # Can't yield a string since it's immutable, so create a helper class
-    class responseHelper:
+    class ResponseHelper:
         def __init__(self):
             self.message = ""
 
@@ -62,7 +56,7 @@ async def create_response_context(interaction: discord.Interaction):
             self.message = f"{self.message}\n{message}"
 
     await interaction.response.send_message("Processing...", ephemeral=True)
-    helper = responseHelper()
+    helper = ResponseHelper()
     try:
         yield helper
     except Exception as e:
