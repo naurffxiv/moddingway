@@ -2,3 +2,4 @@ discord
 pydantic
 psycopg2
 black
+table2ascii

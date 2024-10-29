@@ -6,6 +6,7 @@ from database import users_database, exiles_database
 from typing import Optional
 import datetime
 from database.models import Exile, User
+from table2ascii import table2ascii
 
 logger = logging.getLogger(__name__)
 
@@ -122,13 +123,39 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
     if len(exile_list) == 0:
         return "No exiles found for user"
 
-    # TODO convert this to an object for better stringifying
-    res = "Exiles found for the given user:\n"
+    time_format = "%Y-%m-%d %H:%M:%S"
 
+    rows = []
     for exile in exile_list:
-        res = (
-            res
-            + f"ID: `{exile[0]}`| Reason: `{exile[1]}` | start date: `{exile[2]}` | end date: `{exile[3]}` | status: `{ExileStatus(exile[4]).name}`"
-        )
+        if len(exile[1]) < 56:
+            rows.append(
+                [
+                    exile[0],
+                    exile[1],
+                    exile[2].strftime(time_format),
+                    exile[3].strftime(time_format) if exile[3] else "Indefinite",
+                    ExileStatus(exile[4]).name,
+                ]
+            )
+        else:
+            rows.append(
+                [
+                    exile[0],
+                    exile[1][:56],
+                    exile[2].strftime(time_format),
+                    exile[3].strftime(time_format) if exile[3] else "Indefinite",
+                    ExileStatus(exile[4]).name,
+                ]
+            )
+            i = 56
+            while i < len(exile[1]):
+                rows.append(["", exile[1][i : i + 56], "", "", ""])
+                i = i + 56
 
-    return res
+    table_output = table2ascii(
+        header=["ID", "Reason", "Start Date", "End Date", "Status"],
+        body=rows,
+        column_widths=[6, 58, 21, 21, 18],
+    )
+
+    return f"Exiles found for the given <@{user.id}>:\n```{table_output}```"
