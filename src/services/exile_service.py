@@ -116,6 +116,7 @@ async def unexile_user(
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 MAX_REASON_WIDTH = 56
 
+
 async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> str:
     db_user = users_database.get_user(user.id)
     if db_user is None:
@@ -126,7 +127,6 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
     if len(exile_list) == 0:
         return "No exiles found for user"
 
-    
     exile = exile_list[0]
 
     exile_id = exile[0]
