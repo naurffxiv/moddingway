@@ -2,6 +2,7 @@ from . import DatabaseConnection
 from .models import Exile, PendingExile
 from enums import ExileStatus
 from datetime import datetime, timezone
+from typing import List
 
 
 def add_exile(exile: Exile) -> int:
@@ -69,7 +70,7 @@ def get_pending_unexiles() -> list[PendingExile]:
         return [PendingExile(*x) for x in res]
 
 
-def get_user_exiles(user_id) -> PendingExile:
+def get_user_exiles(user_id) -> List[tuple]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:

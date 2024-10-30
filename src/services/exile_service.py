@@ -112,7 +112,9 @@ async def unexile_user(
 
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
 
+
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+MAX_REASON_WIDTH = 56
 
 async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> str:
     db_user = users_database.get_user(user.id)
@@ -124,39 +126,42 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
     if len(exile_list) == 0:
         return "No exiles found for user"
 
+    
+    exile = exile_list[0]
+
+    exile_id = exile[0]
+    exile_reason = exile[1]
+    exile_start_date = exile[2].strftime(TIME_FORMAT)
+    exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
+    exile_type = ExileStatus(exile[4]).name
+
     rows = []
-    for exile in exile_list:
-        exile_id = exile[0]
-        exile_reason = exile[1]
-        exile_start_date = exile[2].strftime(TIME_FORMAT)
-        exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
-        exile_type = ExileStatus(exile[4]).name
-        # Break long exile messages into multiple rows so that formatting in discord message doesn't wrap
-        # These column sizes don't wrap when viewing discord on a 1080p monitor with sidebars opened
-        if len(exile_start_date) < 56:
-            rows.append(
-                [
-                    exile_id,
-                    exile_reason,
-                    exile_start_date,
-                    exile_end_date,
-                    exile_type,
-                ]
-            )
-        else:
-            rows.append(
-                [
-                    exile_id,
-                    exile_reason[:56],
-                    exile_start_date,
-                    exile_end_date,
-                    exile_type,
-                ]
-            )
-            i = 56
-            while i < len(exile_reason):
-                rows.append(["", exile_reason[i : i + 56], "", "", ""])
-                i = i + 56
+    # Break long exile messages into multiple rows so that formatting in discord message doesn't wrap
+    # These column sizes don't wrap when viewing discord on a 1080p monitor with sidebars opened
+    if len(exile_reason) < 56:
+        rows.append(
+            [
+                exile_id,
+                exile_reason,
+                exile_start_date,
+                exile_end_date,
+                exile_type,
+            ]
+        )
+    else:
+        rows.append(
+            [
+                exile_id,
+                exile_reason[:56],
+                exile_start_date,
+                exile_end_date,
+                exile_type,
+            ]
+        )
+        i = MAX_REASON_WIDTH
+        while i < len(exile_reason):
+            rows.append(["", exile_reason[i : i + MAX_REASON_WIDTH], "", "", ""])
+            i = i + MAX_REASON_WIDTH
 
     table_output = table2ascii(
         header=["ID", "Reason", "Start Date", "End Date", "Status"],
