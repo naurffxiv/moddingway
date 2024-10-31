@@ -41,7 +41,7 @@ def create_bot_errors(bot: Bot) -> None:
 
 
 @asynccontextmanager
-async def create_response_context(interaction: discord.Interaction):
+async def create_response_context(interaction: discord.Interaction, sendEphemeral=True):
     # Can't yield a string since it's immutable, so create a helper class
     class ResponseHelper:
         def __init__(self):
@@ -53,7 +53,7 @@ async def create_response_context(interaction: discord.Interaction):
         def append_string(self, message):
             self.message = f"{self.message}\n{message}"
 
-    await interaction.response.send_message("Processing...", ephemeral=True)
+    await interaction.response.send_message("Processing...", ephemeral=sendEphemeral)
     helper = ResponseHelper()
     try:
         yield helper

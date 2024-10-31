@@ -71,7 +71,7 @@ def create_exile_commands(bot: Bot) -> None:
         exile_duration_options = [0, 1, 6, 12, 18, 24]
         rand_choice = choice(exile_duration_options)
 
-        async with create_response_context(interaction) as response_message:
+        async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(interaction) as logging_embed:
                 if rand_choice != 0:
                     reason = "roulette"
