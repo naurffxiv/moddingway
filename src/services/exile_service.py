@@ -169,4 +169,4 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
         column_widths=[6, 58, 21, 21, 18],
     )
 
-    return f"Exiles found for the given <@{user.id}>:\n```{table_output}```"
+    return f"Exiles found for <@{user.id}>:\n```{table_output}```"
