@@ -5,6 +5,7 @@ from services.ban_service import ban_user
 from util import is_user_moderator
 from .helper import create_logging_embed
 from ui import BanModal
+from .helper import create_logging_embed, create_response_context
 
 settings = get_settings()
 
@@ -22,15 +23,15 @@ def create_ban_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Ban the specified user."""
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction, user=user, reason=reason
+            ) as logging_embed:
+                await ban_user(logging_embed, user, reason)
 
-        async with create_logging_embed(
-            interaction, user=user, reason=reason
-        ) as logging_embed:
-            await ban_user(logging_embed, user, reason)
-
-            await interaction.response.send_message(
-                f"Successfully banned {user.mention}", ephemeral=True
-            )
+                response_message.set_string(
+                    f"Successfully banned {user.mention}", ephemeral=True
+                )
 
     @bot.tree.context_menu(name="Ban User")
     @discord.app_commands.check(is_user_moderator)
