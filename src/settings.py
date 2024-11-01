@@ -15,6 +15,7 @@ class Settings(BaseModel):
     database_name: str = "moddingway"
     postgres_username: str = os.environ["POSTGRES_USER"]
     postgres_password: str = os.environ["POSTGRES_PASSWORD"]
+    automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
 
 
 def prod() -> Settings:
@@ -24,16 +25,30 @@ def prod() -> Settings:
         log_level=logging.INFO,
         postgres_host=os.environ.get("POSTGRES_HOST"),
         postgres_port=os.environ.get("POSTGRES_PORT"),
+        automod_inactivity={
+            1273263026744590468: 30,
+            1273261496968810598: 30,
+            1240356145311252615: 15,
+        },
     )
 
 
 def local() -> Settings:
+    inactive_forum_channel_id = os.environ.get("INACTIVE_FORUM_CHANNEL_ID")
+    inactive_forum_duration = os.environ.get("INACTIVE_FORUM_DURATION")
+
+    if inactive_forum_channel_id is not None and inactive_forum_duration is not None:
+        automod_inactivity = {inactive_forum_channel_id: inactive_forum_duration}
+    else:
+        automod_inactivity = {}
+
     return Settings(
         guild_id=int(os.environ["GUILD_ID"]),
         logging_channel_id=int(os.environ["MOD_LOGGING_CHANNEL_ID"]),
         log_level=logging.DEBUG,
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
+        automod_inactivity=automod_inactivity,
     )
 
 
