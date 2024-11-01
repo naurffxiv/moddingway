@@ -5,7 +5,6 @@ from settings import get_settings
 from services.exile_service import exile_user, unexile_user, get_user_exiles
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
-from .helper import create_logging_embed
 from ui import ExileModal, ExileModalOneHour, ExileModalOneDay
 from .helper import create_logging_embed, create_response_context
 from random import choice
@@ -109,7 +108,6 @@ def create_exile_commands(bot: Bot) -> None:
 
                 response_message.set_string(msg)
 
-    
     @bot.tree.context_menu(name="Exile User for custom duration")
     @discord.app_commands.check(is_user_moderator)
     async def exile_user_action(interaction: discord.Interaction, user: discord.Member):
