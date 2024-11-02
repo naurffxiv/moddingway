@@ -32,5 +32,7 @@ async def autounexile_users(self):
             if error_message is not None:
                 raise Exception(error_message)
         except Exception:
-            logger.info(f"Auto Unexile failed, removing exile entry {exile.exile_id}")
+            logger.info(
+                f"Auto Unexile failed, removing exile entry {exile.exile_id}: user {exile.discord_id}"
+            )
             exiles_database.remove_user_exiles(exile.user_id)
