@@ -25,8 +25,8 @@ async def autodelete_threads(self):
             continue
 
         for thread in channel.threads:
-            # skip the for loop if the thread is pinned
             if thread.flags.pinned:
+                # skip the for loop if the thread is pinned
                 continue
 
             # check if starter message was deleted
@@ -64,7 +64,7 @@ async def autodelete_threads(self):
                     #         f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
                     #     )
                     # else:
-                    #     log_info_and_embed(automod_embed, logger, "Unable to DM user.")
+                    #     log_info_and_embed(automod_embed, logger, "Unable to DM user, user is not in the server anymore.")
             except Exception as e:
                 logger.error(e)
             # await asyncio.sleep(300)
