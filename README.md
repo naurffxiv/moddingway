@@ -25,6 +25,9 @@ Postgres-related information is configured in the environment variables instead 
 - DEBUG
 - GUILD_ID
 - MOD_LOGGING_CHANNEL_ID
+- INACTIVE_FORUM_CHANNEL_ID
+- INACTIVE_FORUM_DURATION
 
 `DEBUG` must be set to `true` for testing.  
 Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
+`INACTIVE_FORUM_CHANNEL_ID` and `INACTIVE_FORUM_DURATION` are optional. The relevant task will not run if those environment variables are not defined.

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 async def autodelete_threads(self):
     guild = self.get_guild(settings.guild_id)
     if guild is None:
+        logger.error("Guild not found.")
         return
 
     for channel_id, duration in settings.automod_inactivity.items():
