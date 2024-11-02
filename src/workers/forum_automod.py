@@ -20,6 +20,8 @@ async def autodelete_threads(self):
         return
 
     for channel_id, duration in settings.automod_inactivity.items():
+        num_removed = 0
+        num_error = 0
         channel = guild.get_channel(channel_id)
         if channel is None:
             continue
@@ -47,35 +49,30 @@ async def autodelete_threads(self):
 
             # delete thread and try to send DM to user
             try:
-                async with create_automod_embed(
-                    self,
-                    thread,
-                    now,
-                ) as automod_embed:
-                    await thread.delete()
-                    log_info_and_embed(
-                        automod_embed, logger, "Thread has been deleted successfully."
-                    )
+                await thread.delete()
+                logger.info(f"Thread {thread.id} has been deleted successfully")
+                num_removed += 1
 
-                    # TODO: uncomment DM portion and sleep when backlog is dealt with
-                    # if thread.owner is not None:
-                    #     try:
-                    #         await send_dm(
-                    #             thread.owner,
-                    #             f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
-                    #         )
-                    #     except discord.Forbidden:
-                    #         log_info_and_embed(
-                    #             automod_embed,
-                    #             logger,
-                    #             "Unable to DM user, user has DMs disabled.",
-                    #         )
-                    # else:
-                    #     log_info_and_embed(
-                    #         automod_embed,
-                    #         logger,
-                    #         "Unable to DM user, user is not in the server anymore.",
-                    #     )
+                # TODO: uncomment DM portion and sleep when backlog is dealt with
+                # if thread.owner is not None:
+                #     try:
+                #         await send_dm(
+                #             thread.owner,
+                #             f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
+                #         )
+                #     except discord.Forbidden:
+                #         logger.info(
+                #             f"Unable to DM user {thread.owner_id}, user has DMs disabled."
+                #         )
+                # else:
+                #     logger.info(
+                #         f"Unable to DM user {thread.owner_id}, user is not in the server anymore."
+                #     )
             except Exception as e:
                 logger.error(e)
+                num_error += 1
             # await asyncio.sleep(300)
+        async with create_automod_embed(
+            self, channel_id, num_removed, num_error, datetime.now(timezone.utc)
+        ):
+            pass
