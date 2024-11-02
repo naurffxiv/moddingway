@@ -40,6 +40,8 @@ def create_bot_errors(bot: Bot) -> None:
                 f"This command is on cooldown. Please try again in {hours_left} hour(s).",
                 ephemeral=True,
             )
+        else:
+            logger.error(f"An unexpected error has occured {e}")
 
 
 @asynccontextmanager
