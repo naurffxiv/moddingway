@@ -16,15 +16,21 @@ async def autounexile_users(self):
 
     for exile in exiles:
         logger.info(f"Auto Unexile running on user id {exile.user_id}")
-        member = self.get_guild(settings.guild_id).get_member(exile.user_id)
-        if member is not None:
-            async with create_autounexile_embed(
-                self, member, exile.exile_id, exile.end_timestamp
-            ) as autounexile_embed:
-                await unexile_user(autounexile_embed, member)
-        else:
-            logger.error(f"User {exile.user_id} not found in server")
+        try:
+            error_message = None
+            member = self.get_guild(settings.guild_id).get_member(exile.discord_id)
 
-        exiles_database.remove_user_exiles(
-            exile.user_id
-        )  # remove entry from database no matter what
+            async with create_autounexile_embed(
+                self, member, exile.discord_id, exile.exile_id, exile.end_timestamp
+            ) as autounexile_embed:
+                if member is None:
+                    error_message = f"<@{exile.discord_id}> was not found in the server"
+                    logger.info(error_message)
+                    raise Exception(error_message)
+
+                error_message = await unexile_user(autounexile_embed, member)
+            if error_message is not None:
+                raise Exception(error_message)
+        except Exception:
+            logger.info(f"Auto Unexile failed, removing exile entry {exile.exile_id}")
+            exiles_database.remove_user_exiles(exile.user_id)

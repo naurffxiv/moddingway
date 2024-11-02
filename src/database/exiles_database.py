@@ -53,7 +53,7 @@ def get_pending_unexiles() -> list[PendingExile]:
 
     with conn.get_cursor() as cursor:
         query = """
-        SELECT e.exileID, u.discordUserID, e.endTimestamp
+        SELECT e.exileID, u.userID, u.discordUserID, e.endTimestamp
         FROM exiles e
         JOIN users u ON e.userID = u.userID
         WHERE e.exileStatus = %s AND e.endTimestamp < %s;
