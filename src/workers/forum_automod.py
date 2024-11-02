@@ -59,12 +59,23 @@ async def autodelete_threads(self):
 
                     # TODO: uncomment DM portion and sleep when backlog is dealt with
                     # if thread.owner is not None:
-                    #     await send_dm(
-                    #         thread.owner,
-                    #         f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
-                    #     )
+                    #     try:
+                    #         await send_dm(
+                    #             thread.owner,
+                    #             f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
+                    #         )
+                    #     except discord.Forbidden:
+                    #         log_info_and_embed(
+                    #             automod_embed,
+                    #             logger,
+                    #             "Unable to DM user, user has DMs disabled.",
+                    #         )
                     # else:
-                    #     log_info_and_embed(automod_embed, logger, "Unable to DM user, user is not in the server anymore.")
+                    #     log_info_and_embed(
+                    #         automod_embed,
+                    #         logger,
+                    #         "Unable to DM user, user is not in the server anymore.",
+                    #     )
             except Exception as e:
                 logger.error(e)
             # await asyncio.sleep(300)
