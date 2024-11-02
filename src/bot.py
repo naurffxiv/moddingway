@@ -5,6 +5,7 @@ from commands.exile_commands import create_exile_commands
 from commands.ban_commands import create_ban_commands
 from commands.helper import create_bot_errors
 import logging
+import workers
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ class ModdingwayBot(Bot):
 
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        workers.start_tasks(self)
 
     def _register_commands(self):
         logger.info("Starting registering commands")

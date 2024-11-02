@@ -10,7 +10,7 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-# @tasks.loop(minutes=1.0)
+@tasks.loop(minutes=1.0)
 async def autounexile_users(self):
     exiles = exiles_database.get_pending_unexiles()
 
