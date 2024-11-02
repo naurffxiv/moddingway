@@ -3,8 +3,10 @@ import discord
 from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
+import logging
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
@@ -60,7 +62,12 @@ async def create_response_context(interaction: discord.Interaction, sendEphemera
     except Exception as e:
         helper.append_string(e)
     finally:
-        msg = await interaction.original_response()
-        if len(helper.message) == 0:
-            helper.set_string("Command finished without a response.")
-        await msg.edit(content=helper.message)
+        # for debugging failure only
+        logger.info("Sending final message response")
+        try:
+            msg = await interaction.original_response()
+            if len(helper.message) == 0:
+                helper.set_string("Command finished without a response.")
+            await msg.edit(content=helper.message)
+        except Exception as e:
+            logger.error("Updating placeholder message failed")

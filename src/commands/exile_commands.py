@@ -2,11 +2,11 @@ import discord
 import logging
 from discord.ext.commands import Bot
 from settings import get_settings
-from services.exile_service import exile_user, unexile_user, get_user_exiles
+from services.exile_service import exile_user, unexile_user
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed, create_response_context
-from random import choice
+
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
