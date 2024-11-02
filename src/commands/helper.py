@@ -41,7 +41,7 @@ def create_bot_errors(bot: Bot) -> None:
                 ephemeral=True,
             )
         else:
-            logger.error(f"An unexpected error has occured {e}")
+            logger.error(f"An unexpected error has occured {error}")
 
 
 @asynccontextmanager
