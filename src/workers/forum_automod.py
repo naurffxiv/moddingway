@@ -25,8 +25,7 @@ async def autodelete_threads(self):
             continue
 
         for thread in channel.threads:
-            last_post = thread.last_message_id
-
+            # skip the for loop if the thread is pinned
             if thread.flags.pinned:
                 continue
 
@@ -41,6 +40,7 @@ async def autodelete_threads(self):
                 logger.error(e)
 
             now = datetime.now(timezone.utc)
+            last_post = thread.last_message_id
             time_since = now - snowflake_time(last_post)
             if starter_message is not None and time_since < timedelta(days=duration):
                 continue
