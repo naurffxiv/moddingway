@@ -82,7 +82,13 @@ async def autodelete_threads(self):
                 logger.error(e)
                 num_error += 1
             # await asyncio.sleep(300)
-        async with create_automod_embed(
-            self, channel_id, num_removed, num_error, datetime.now(timezone.utc)
-        ):
-            pass
+        if num_removed > 0 or num_error > 0:
+            logger.info(
+                f"Removed a total of {num_removed} threads from channel {channel_id}. {num_error} failed removals."
+            )
+            async with create_automod_embed(
+                self, channel_id, num_removed, num_error, datetime.now(timezone.utc)
+            ):
+                pass
+        else:
+            logger.info(f"No threads were marked for deletion in channel {channel_id}.")
