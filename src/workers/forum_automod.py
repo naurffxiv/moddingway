@@ -3,13 +3,17 @@ import discord
 import logging
 import asyncio
 from settings import get_settings
-from util import log_info_and_embed, send_dm
+from util import send_dm, create_interaction_embed_context
 from .helper import create_automod_embed
 from discord.ext import tasks
 from discord.utils import snowflake_time
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
+
+
+class UnableToDM(Exception):
+    pass
 
 
 @tasks.loop(hours=24)
@@ -61,13 +65,19 @@ async def autodelete_threads(self):
                 #             f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
                 #         )
                 #     except discord.Forbidden:
-                #         logger.info(
-                #             f"Unable to DM user {thread.owner_id}, user has DMs disabled."
-                #         )
+                #         raise UnableToDM("User has DMs disabled")
                 # else:
-                #     logger.info(
-                #         f"Unable to DM user {thread.owner_id}, user is not in the server anymore."
-                #     )
+                #     raise UnableToDM("User is not in the server")
+            except UnableToDM as e:
+                logger.info(f"Unable to DM user {thread.owner_id}: {e}")
+                channel = self.get_channel(settings.logging_channel_id)
+                async with create_interaction_embed_context(
+                    channel,
+                    user=thread.owner,
+                    timestamp=datetime.now(timezone.utc),
+                    description=f"<@{thread.owner_id}>'s thread was deleted in <#{channel_id}> but a DM could not be sent: {e}",
+                ):
+                    pass
             except Exception as e:
                 logger.error(e)
                 num_error += 1
