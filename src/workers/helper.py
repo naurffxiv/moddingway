@@ -1,5 +1,4 @@
 from datetime import datetime, timezone, timedelta
-from dataclasses import dataclass
 import logging
 import asyncio
 import discord
@@ -12,12 +11,6 @@ from typing import Optional
 
 class UnableToDM(Exception):
     pass
-
-
-@dataclass
-class AutomodResults:
-    num_removed: int = 0
-    num_errors: int = 0
 
 
 settings = get_settings()
@@ -46,11 +39,16 @@ def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: da
 
 
 async def automod_thread(
-    self, channel_id, thread: discord.Thread, duration: int, num_result: AutomodResults
+    self,
+    channel_id,
+    thread: discord.Thread,
+    duration: int,
+    num_removed: int,
+    num_errors: int,
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
-        return
+        return num_removed, num_errors
 
     # check if starter message was deleted
     starter_message = None
@@ -66,13 +64,13 @@ async def automod_thread(
     last_post = thread.last_message_id
     time_since = now - snowflake_time(last_post)
     if starter_message is not None and time_since < timedelta(days=duration):
-        return
+        return num_removed, num_errors
 
     # delete thread and try to send DM to user
     try:
         await thread.delete()
         logger.info(f"Thread {thread.id} has been deleted successfully")
-        num_result.num_removed += 1
+        ret = num_removed + 1, num_errors
         # TODO: uncomment DM portion and sleep when backlog is dealt with
         # if thread.owner is not None:
         #     try:
@@ -84,6 +82,7 @@ async def automod_thread(
         #         raise UnableToDM("User has DMs disabled")
         # else:
         #     raise UnableToDM("User is not in the server")
+        return ret
     except UnableToDM as e:
         logger.info(f"Unable to DM user {thread.owner_id}: {e}")
         channel = self.get_channel(settings.logging_channel_id)
@@ -96,5 +95,5 @@ async def automod_thread(
             pass
     except Exception as e:
         logger.error(e)
-        num_result.num_errors += 1
+        return num_removed, num_errors + 1
     # await asyncio.sleep(300)
