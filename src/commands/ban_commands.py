@@ -25,9 +25,15 @@ def create_ban_commands(bot: Bot) -> None:
         result = await ban_user(user, reason)
 
         if result[0]: #ban succeeded dont create embed.
-            async with create_logging_embed(
-                interaction, user=user, reason=reason
-            ) as logging_embed:
-                await interaction.response.send_message(result[1], ephemeral=True)
+            if not result[1]: #dm failed 
+                async with create_logging_embed(
+                    interaction, user=user, reason=reason, error = result[2]
+                ) as logging_embed:
+                    await interaction.response.send_message(result[2], ephemeral=True)
+            else: #ban succeeded, dm failed. 
+                async with create_logging_embed(
+                    interaction, user=user, reason=reason, result = result[2]
+                ) as logging_embed:
+                    await interaction.response.send_message(result[2], ephemeral=True)
         else: #ban failed, dont create embed
-            await interaction.response.send_message(result[1], ephemeral=True)
+            await interaction.response.send_message(result[2], ephemeral=True)
