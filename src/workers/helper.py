@@ -8,7 +8,11 @@ settings = get_settings()
 
 
 def create_autounexile_embed(
-    self, user: Optional[discord.Member], discord_id, exile_id: str, end_timestamp: str
+    self,
+    user: Optional[discord.Member],
+    discord_id: int,
+    exile_id: str,
+    end_timestamp: str,
 ):
     return create_interaction_embed_context(
         self.get_channel(settings.logging_channel_id),
