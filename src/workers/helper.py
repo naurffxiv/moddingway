@@ -9,13 +9,17 @@ settings = get_settings()
 
 
 def create_autounexile_embed(
-    self, user: discord.User, exile_id: str, end_timestamp: str
+    self,
+    user: Optional[discord.Member],
+    discord_id: int,
+    exile_id: str,
+    end_timestamp: str,
 ):
     return create_interaction_embed_context(
         self.get_channel(settings.logging_channel_id),
         user=user,
         timestamp=end_timestamp,
-        description=f"<@{user.id}>'s exile has timed out",
+        description=f"<@{discord_id}>'s exile has timed out",
         footer=f"Exile ID: {exile_id}",
     )
 
