@@ -1,11 +1,12 @@
-import sys
-from typing import Optional
+from contextlib import asynccontextmanager
 import discord
 from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
+import logging
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
@@ -40,7 +41,35 @@ def create_bot_errors(bot: Bot) -> None:
                 ephemeral=True,
             )
         else:
-            # Handle other errors if necessary
-            await interaction.response.send_message(
-                "An error occurred while processing the command.", ephemeral=True
-            )
+            logger.error(f"An unexpected error has occured {error}")
+
+
+@asynccontextmanager
+async def create_response_context(interaction: discord.Interaction, sendEphemeral=True):
+    # Can't yield a string since it's immutable, so create a helper class
+    class ResponseHelper:
+        def __init__(self):
+            self.message = ""
+
+        def set_string(self, message):
+            self.message = message
+
+        def append_string(self, message):
+            self.message = f"{self.message}\n{message}"
+
+    await interaction.response.send_message("Processing...", ephemeral=sendEphemeral)
+    helper = ResponseHelper()
+    try:
+        yield helper
+    except Exception as e:
+        helper.append_string(e)
+    finally:
+        # for debugging failure only
+        logger.info("Sending final message response")
+        try:
+            msg = await interaction.original_response()
+            if len(helper.message) == 0:
+                helper.set_string("Command finished without a response.")
+            await msg.edit(content=helper.message)
+        except Exception as e:
+            logger.error("Updating placeholder message failed")

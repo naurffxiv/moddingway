@@ -6,6 +6,7 @@ from database import users_database, exiles_database
 from typing import Optional
 import datetime
 from database.models import Exile, User
+from table2ascii import table2ascii
 
 logger = logging.getLogger(__name__)
 
@@ -65,10 +66,16 @@ async def exile_user(
     )
 
     # message user
-    await send_dm(
-        user,
-        f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
-    )
+    try:
+        await send_dm(
+            user,
+            f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
+        )
+    except Exception as e:
+        log_info_and_embed(
+            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        )
+
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully exiled")
 
 
@@ -104,3 +111,62 @@ async def unexile_user(
     logging_embed.set_footer(text=f"Exile ID: {exile_id}")
 
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
+
+
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+MAX_REASON_WIDTH = 56
+
+
+async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> str:
+    db_user = users_database.get_user(user.id)
+    if db_user is None:
+        return "User not found in database"
+
+    exile_list = exiles_database.get_user_exiles(db_user.user_id)
+
+    if len(exile_list) == 0:
+        return "No exiles found for user"
+
+    exile = exile_list[0]
+
+    exile_id = exile[0]
+    exile_reason = exile[1]
+    exile_start_date = exile[2].strftime(TIME_FORMAT)
+    exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
+    exile_type = ExileStatus(exile[4]).name
+
+    rows = []
+    # Break long exile messages into multiple rows so that formatting in discord message doesn't wrap
+    # These column sizes don't wrap when viewing discord on a 1080p monitor with sidebars opened
+    if len(exile_reason) < 56:
+        rows.append(
+            [
+                exile_id,
+                exile_reason,
+                exile_start_date,
+                exile_end_date,
+                exile_type,
+            ]
+        )
+    else:
+        rows.append(
+            [
+                exile_id,
+                exile_reason[:56],
+                exile_start_date,
+                exile_end_date,
+                exile_type,
+            ]
+        )
+        i = MAX_REASON_WIDTH
+        while i < len(exile_reason):
+            rows.append(["", exile_reason[i : i + MAX_REASON_WIDTH], "", "", ""])
+            i = i + MAX_REASON_WIDTH
+
+    table_output = table2ascii(
+        header=["ID", "Reason", "Start Date", "End Date", "Status"],
+        body=rows,
+        column_widths=[6, 58, 21, 21, 18],
+    )
+
+    return f"Exiles found for <@{user.id}>:\n```{table_output}```"
