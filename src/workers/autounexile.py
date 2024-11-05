@@ -1,9 +1,9 @@
 from discord.ext import tasks
-from discord.ext.commands import Bot
 from database import exiles_database
 from services.exile_service import unexile_user
 from settings import get_settings
 from .helper import create_autounexile_embed
+from enums import ExileStatus
 import logging
 
 settings = get_settings()
@@ -33,6 +33,6 @@ async def autounexile_users(self):
                 raise Exception(error_message)
         except Exception:
             logger.info(
-                f"Auto Unexile failed, removing exile entry {exile.exile_id}: user {exile.discord_id}"
+                f"Auto Unexile failed, updating exile status of exile {exile.exile_id}, user {exile.discord_id} to unknown"
             )
-            exiles_database.remove_user_exiles(exile.user_id)
+            exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNKNOWN)
