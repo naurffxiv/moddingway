@@ -72,16 +72,17 @@ def create_exile_commands(bot: Bot) -> None:
         exile_duration_options = [1, 6, 12, 18, 24]
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
+        duration_string = f"{duration_choice}h"
 
         async with create_response_context(interaction, False) as response_message:
-            async with create_logging_embed(interaction) as logging_embed:
+            async with create_logging_embed(interaction, duration=duration_string) as logging_embed:
                 if safety_choice:
                     response_message.set_string(
                         f"<@{interaction.user.id}> has tested their luck and lives another day..."
                     )
                 else:
                     reason = "roulette"
-                    exile_duration = calculate_time_delta(f"{duration_choice}h")
+                    exile_duration = calculate_time_delta(duration_string)
                     error_message = await exile_user(
                         logging_embed, interaction.user, exile_duration, reason
                     )
