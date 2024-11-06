@@ -19,6 +19,8 @@ class EmbedField(object):
 
 
 class UnableToDM(RuntimeError):
+    # NB: create a custom exception with RuntimeError as base
+    # constructor/methods/attributes are all inherited
     pass
 
 
