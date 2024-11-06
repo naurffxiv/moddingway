@@ -27,6 +27,4 @@ def create_ban_commands(bot: Bot) -> None:
             ) as logging_embed:
                 await ban_user(logging_embed, user, reason)
 
-                response_message.set_string(
-                    f"Successfully banned {user.mention}", ephemeral=True
-                )
+                response_message.set_string(f"Successfully banned {user.mention}")
