@@ -107,8 +107,16 @@ async def unexile_user(
 
         db_user = User(db_user_id, user.id, None, None)
 
-    exile_id = exiles_database.remove_user_exiles(db_user.user_id)
-    logging_embed.set_footer(text=f"Exile ID: {exile_id}")
+    exile = exiles_database.get_user_active_exile(db_user.user_id)
+
+    if exile is None:
+        # This should only happen when someone was manually exiled then unexiled through the bot
+        logger.info(
+            f"No active exile associated with user ID {db_user.user_id} was found. Skipping DB actions..."
+        )
+    else:
+        exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNEXILED)
+        logging_embed.set_footer(text=f"Exile ID: {exile.exile_id}")
 
     log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
 
