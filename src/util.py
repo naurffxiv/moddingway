@@ -105,7 +105,7 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
     if not delta_string:
         return None
 
-    regex = "(\d\d?)([smhd])"  # Matches (digit, digit?)(letter in [s, m, h, d])
+    regex = "^(\d\d?)(sec|min|min|hour|day)"  # Matches (digit, digit?)(option of [sec, min, hour, day])
 
     result = re.search(regex, delta_string)
 
@@ -115,13 +115,13 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
 
         delta = None
 
-        if unit == "s":
+        if unit == "sec":
             delta = timedelta(seconds=duration)
-        elif unit == "m":
+        elif unit == "min":
             delta = timedelta(minutes=duration)
-        elif unit == "h":
+        elif unit == "hour":
             delta = timedelta(hours=duration)
-        elif unit == "d":
+        elif unit == "day":
             delta = timedelta(days=duration)
 
         return delta
