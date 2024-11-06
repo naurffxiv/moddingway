@@ -75,7 +75,9 @@ def create_exile_commands(bot: Bot) -> None:
         duration_string = f"{duration_choice}h"
 
         async with create_response_context(interaction, False) as response_message:
-            async with create_logging_embed(interaction, duration=duration_string) as logging_embed:
+            async with create_logging_embed(
+                interaction, duration=duration_string
+            ) as logging_embed:
                 if safety_choice:
                     response_message.set_string(
                         f"<@{interaction.user.id}> has tested their luck and lives another day..."
