@@ -64,8 +64,6 @@ async def create_response_context(interaction: discord.Interaction, sendEphemera
     except Exception as e:
         helper.append_string(e)
     finally:
-        # for debugging failure only
-        logger.info("Sending final message response")
         try:
             msg = await interaction.original_response()
             if len(helper.message) == 0:

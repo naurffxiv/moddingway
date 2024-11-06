@@ -31,7 +31,7 @@ def create_exile_commands(bot: Bot) -> None:
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(
         user="User being exiled",
-        duration="The duration of the exile. TBA format",
+        duration="The duration of the exile. Duration should be in the form of [1 or 2 digits][s, d, m, h]",
         reason="Reason for exile",
     )
     async def exile(
