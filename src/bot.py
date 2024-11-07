@@ -18,12 +18,15 @@ class ModdingwayBot(Bot):
         guild = discord.Object(id=settings.guild_id)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
+        logger.info("Syncing settings to guild completed")
 
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         workers.start_tasks(self)
 
     def _register_commands(self):
+        logger.info("Starting registering commands")
         create_exile_commands(self)
         create_ban_commands(self)
         create_bot_errors(self)
+        logger.info("Registering commands finished")

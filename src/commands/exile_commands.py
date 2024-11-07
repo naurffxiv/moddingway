@@ -32,7 +32,7 @@ def create_exile_commands(bot: Bot) -> None:
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(
         user="User being exiled",
-        duration="The duration of the exile. TBA format",
+        duration="The duration of the exile. Duration should be in the form of [1 or 2 digits][s, d, m, h]",
         reason="Reason for exile",
     )
     async def exile(
@@ -69,14 +69,23 @@ def create_exile_commands(bot: Bot) -> None:
     )
     async def roulette(interaction: discord.Interaction):
         """Test your luck, fail and be exiled..."""
-        exile_duration_options = [0, 1, 6, 12, 18, 24]
-        rand_choice = choice(exile_duration_options)
+        safety_options = [True, True, True, True, True, False]
+        exile_duration_options = [1, 6, 12, 18, 24]
+        safety_choice = choice(safety_options)
+        duration_choice = choice(exile_duration_options)
+        duration_string = f"{duration_choice}h"
 
         async with create_response_context(interaction, False) as response_message:
-            async with create_logging_embed(interaction) as logging_embed:
-                if rand_choice != 0:
+            async with create_logging_embed(
+                interaction, duration=duration_string
+            ) as logging_embed:
+                if safety_choice:
+                    response_message.set_string(
+                        f"<@{interaction.user.id}> has tested their luck and lives another day..."
+                    )
+                else:
                     reason = "roulette"
-                    exile_duration = calculate_time_delta(f"{rand_choice}h")
+                    exile_duration = calculate_time_delta(duration_string)
                     error_message = await exile_user(
                         logging_embed, interaction.user, exile_duration, reason
                     )
@@ -89,12 +98,8 @@ def create_exile_commands(bot: Bot) -> None:
                         return
                     else:
                         response_message.set_string(
-                            f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {rand_choice} hour(s)."
+                            f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s)."
                         )
-                else:
-                    response_message.set_string(
-                        f"<@{interaction.user.id}> has tested their luck and lives another day..."
-                    )
 
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)

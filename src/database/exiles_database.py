@@ -29,6 +29,26 @@ def add_exile(exile: Exile) -> int:
         return res[0]
 
 
+def update_exile_status(exile_id, exile_status):
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        UPDATE exiles
+        SET exileStatus = %s
+        WHERE exileID = %s
+        """
+
+        params = (
+            exile_status,
+            exile_id,
+        )
+
+        cursor.execute(query, params)
+
+        return
+
+
 def remove_user_exiles(user_id):
     conn = DatabaseConnection()
 
@@ -53,7 +73,7 @@ def get_pending_unexiles() -> list[PendingExile]:
 
     with conn.get_cursor() as cursor:
         query = """
-        SELECT e.exileID, u.discordUserID, e.endTimestamp
+        SELECT e.exileID, u.userID, u.discordUserID, e.endTimestamp
         FROM exiles e
         JOIN users u ON e.userID = u.userID
         WHERE e.exileStatus = %s AND e.endTimestamp < %s;
@@ -87,3 +107,26 @@ def get_user_exiles(user_id) -> List[tuple]:
         res = cursor.fetchall()
 
         return res
+
+
+def get_user_active_exile(user_id) -> PendingExile:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.userID, u.discordUserID, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE u.userID = %s AND  (e.exileStatus = %s OR e.exileStatus = %s)
+        LIMIT 1;
+        """
+
+        params = (user_id, ExileStatus.TIMED_EXILED, ExileStatus.INDEFINITE_EXILE)
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        if res is not None:
+            return PendingExile(*res)
+        else:
+            return None

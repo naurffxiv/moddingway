@@ -28,9 +28,7 @@ def create_ban_commands(bot: Bot) -> None:
             ) as logging_embed:
                 await ban_user(logging_embed, user, reason)
 
-                response_message.set_string(
-                    f"Successfully banned {user.mention}", ephemeral=True
-                )
+                response_message.set_string(f"Successfully banned {user.mention}")
 
     @bot.tree.context_menu(name="Ban User")
     @discord.app_commands.check(is_user_moderator)

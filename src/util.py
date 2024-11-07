@@ -18,6 +18,12 @@ class EmbedField(object):
         self.value = value
 
 
+class UnableToDM(RuntimeError):
+    # NB: create a custom exception with RuntimeError as base
+    # constructor/methods/attributes are all inherited
+    pass
+
+
 @asynccontextmanager
 async def create_interaction_embed_context(
     log_channel: discord.abc.GuildChannel, **kwargs
@@ -130,6 +136,8 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
 
 
 async def is_user_moderator(interaction: discord.Interaction):
-    return user_has_role(interaction.user, Role.ADMINISTRATION) or user_has_role(
-        interaction.user, Role.MANAGEMENT
+    return (
+        user_has_role(interaction.user, Role.ADMINISTRATION)
+        or user_has_role(interaction.user, Role.MANAGEMENT)
+        or user_has_role(interaction.user, Role.MOD)
     )
