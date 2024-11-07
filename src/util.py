@@ -18,6 +18,12 @@ class EmbedField(object):
         self.value = value
 
 
+class UnableToDM(RuntimeError):
+    # NB: create a custom exception with RuntimeError as base
+    # constructor/methods/attributes are all inherited
+    pass
+
+
 @asynccontextmanager
 async def create_interaction_embed_context(
     log_channel: discord.abc.GuildChannel, **kwargs

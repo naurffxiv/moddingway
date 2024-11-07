@@ -13,11 +13,9 @@ logger = logging.getLogger(__name__)
 
 class ModdingwayBot(Bot):
     async def setup_hook(self):
-        logger.info("Starting setup hooks")
         self._register_commands()
 
         guild = discord.Object(id=settings.guild_id)
-        logger.info("Copying settings to guild")
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
         logger.info("Syncing settings to guild completed")
