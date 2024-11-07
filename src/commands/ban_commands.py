@@ -24,7 +24,7 @@ def create_ban_commands(bot: Bot) -> None:
         # result is a tuple of ban state (bool), dm state (bool), and description of rersults
         (ban_state, dm_state, result_description) = await ban_user(user, reason)
 
-        if ban_state:  # ban succeeded dont create embed.
+        if ban_state:  # ban succeeded
             if not dm_state:  # dm failed
                 async with create_logging_embed(
                     interaction, user=user, reason=reason, error=result_description
