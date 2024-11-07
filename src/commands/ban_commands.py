@@ -21,7 +21,7 @@ def create_ban_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Ban the specified user."""
-        # result is a tuple of state and descriptio
+        # result is a tuple of state and description
         result = await ban_user(user, reason)
 
         if result[0]:  # ban succeeded dont create embed.
