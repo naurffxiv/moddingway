@@ -12,8 +12,8 @@ class BanModal(discord.ui.Modal):
     reason = discord.ui.TextInput(
         label="Ban Reason",
         style=discord.TextStyle.long,
-        placeholder="Why is the user banned",
-        max_length=300,
+        placeholder="Reason for banning user",
+        max_length=512,
         required=True,
     )
 
