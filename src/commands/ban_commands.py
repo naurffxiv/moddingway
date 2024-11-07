@@ -21,9 +21,8 @@ def create_ban_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Ban the specified user."""
-        
+
         async with create_response_context(interaction) as response_message:
-            
             (ban_state, dm_state, result_description) = await ban_user(user, reason)
 
             if ban_state:  # ban succeeded
@@ -40,4 +39,3 @@ def create_ban_commands(bot: Bot) -> None:
             else:  # ban failed, dont create embed
                 response_message.set_string(result_description)
         response_message.set_string(result_description)
-
