@@ -21,19 +21,23 @@ def create_ban_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Ban the specified user."""
-        # result is a tuple of state and description
-        result = await ban_user(user, reason)
+        # result is a tuple of ban state (bool), dm state (bool), and description of rersults
+        (ban_state, dm_state, result_description) = await ban_user(user, reason)
 
-        if result[0]:  # ban succeeded dont create embed.
-            if not result[1]:  # dm failed
+        if ban_state:  # ban succeeded dont create embed.
+            if not dm_state:  # dm failed
                 async with create_logging_embed(
-                    interaction, user=user, reason=reason, error=result[2]
+                    interaction, user=user, reason=reason, error=result_description
                 ) as logging_embed:
-                    await interaction.response.send_message(result[2], ephemeral=True)
+                    await interaction.response.send_message(
+                        result_description, ephemeral=True
+                    )
             else:  # ban succeeded, dm failed.
                 async with create_logging_embed(
-                    interaction, user=user, reason=reason, result=result[2]
+                    interaction, user=user, reason=reason, result=result_description
                 ) as logging_embed:
-                    await interaction.response.send_message(result[2], ephemeral=True)
+                    await interaction.response.send_message(
+                        result_description, ephemeral=True
+                    )
         else:  # ban failed, dont create embed
-            await interaction.response.send_message(result[2], ephemeral=True)
+            await interaction.response.send_message(result_description, ephemeral=True)

@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 async def ban_user(
     user: discord.Member, reason: str
 ) -> Optional[Tuple[bool, bool, str]]:
-    """Executes ban of user
+    """Executes ban of user.
 
     Args:
         user (discord.Member): mention or "@"/user ID of the user being banned.
-        reason (str): description of ban reason.
+        reason (str): description of ban reason. Length of reason must be less than 512 characters
 
     Returns:
         Optional[Tuple[bool, bool, str]]: tuple containing (result,dm_state,result_description)
@@ -35,14 +35,8 @@ async def ban_user(
             )
             logger.info(f"Successfully sent dm to {user.mention}")
             dm_state = True
-        except discord.Forbidden as e:
-            logger.error(f"DM to {user.mention} failed due to permission error: {e}")
-            dm_state = False
-        except discord.HTTPException as e:
-            logger.error(f"DM to {user.mention} due to HTTP Error: {e}")
-            dm_state = False
         except Exception as e:
-            logger.error(f"DM to {user.mention} due to Unknown Error: {e}")
+            logger.error(f"DM to {user.mention} due failed due to error: {e}")
             dm_state = False
 
         # attempt Ban
@@ -50,14 +44,8 @@ async def ban_user(
             await user.ban(reason=reason)
             logger.info(f"Successfully banned {user.mention}")
             result = True
-        except discord.Forbidden as e:
-            logger.error(f"Ban of {user.mention} failed due to permission error: {e}")
-            result = False
-        except discord.HTTPException as e:
-            logger.error(f"Ban of {user.mention} failed due to HTTP Error: {e}")
-            result = False
         except Exception as e:
-            logger.error(f"Ban of {user.mention} failed due to Unknown Error: {e}")
+            logger.error(f"Ban of {user.mention} failed due to error: {e}")
             result = False
 
         if not result and dm_state:  # ban fail dm succeed.
