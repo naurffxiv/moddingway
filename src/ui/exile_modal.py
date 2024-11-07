@@ -4,6 +4,7 @@ from util import calculate_time_delta
 from .helper import create_modal_embed
 from commands.helper import create_response_context
 
+
 class ExileModal(discord.ui.Modal):
     def __init__(self, user: discord.Member) -> None:
         super().__init__(title=f"Exile User {user.display_name}")
