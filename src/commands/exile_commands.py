@@ -5,6 +5,7 @@ from settings import get_settings
 from services.exile_service import exile_user, unexile_user, get_user_exiles
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
+from ui import ExileModal
 from .helper import create_logging_embed, create_response_context
 from random import choice
 
@@ -31,7 +32,7 @@ def create_exile_commands(bot: Bot) -> None:
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(
         user="User being exiled",
-        duration="The duration of the exile. Duration should be in the form of [1 or 2 digits][s, d, m, h]",
+        duration="Enter a value between 1 and 99 followed by sec, min, hour, or day. Examples: 1sec, 1min, 1hour, 1day.",
         reason="Reason for exile",
     )
     async def exile(
@@ -44,7 +45,7 @@ def create_exile_commands(bot: Bot) -> None:
         exile_duration = calculate_time_delta(duration)
         if duration and not exile_duration:
             await interaction.response.send_message(
-                "Invalid exile duration given, duration should be in the form of [1 or 2 digits][s, d, m, h]. No action will be taken",
+                "Invalid exile duration given, duration should be in the form value between 1 and 99 followed by sec, min, hour, or day. Examples: 1sec, 1min, 1hour, 1day. No action will be taken",
                 ephemeral=True,
             )
             return
@@ -111,3 +112,29 @@ def create_exile_commands(bot: Bot) -> None:
                 msg = await get_user_exiles(logging_embed, user)
 
                 response_message.set_string(msg)
+
+    @bot.tree.context_menu(name="Exile User for 1 hour")
+    @discord.app_commands.check(is_user_moderator)
+    async def exile_user_1hour_action(
+        interaction: discord.Interaction, user: discord.Member
+    ):
+        """Exile the selected user"""
+        await interaction.response.send_modal(ExileModal(user, "1hour", "1 hour"))
+
+    @bot.tree.context_menu(name="Exile User for 1 day")
+    @discord.app_commands.check(is_user_moderator)
+    async def exile_user_1day_action(
+        interaction: discord.Interaction, user: discord.Member
+    ):
+        """Exile the selected user"""
+        await interaction.response.send_modal(ExileModal(user, "1day", "1 day"))
+
+    @bot.tree.context_menu(name="Exile Message Author for 1 hour")
+    @discord.app_commands.check(is_user_moderator)
+    async def exile_message_author_action(
+        interaction: discord.Interaction, message: discord.Message
+    ):
+        """Exile the user that sent this message"""
+        await interaction.response.send_modal(
+            ExileModal(message.author, "1hour", "1 hour")
+        )
