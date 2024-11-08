@@ -75,31 +75,33 @@ def create_exile_commands(bot: Bot) -> None:
         duration_choice = choice(exile_duration_options)
         duration_string = f"{duration_choice}h"
 
+        if safety_choice:
+            await interaction.response.send_message(
+                f"<@{interaction.user.id}> has tested their luck and lives another day...",
+                ephemeral=False,
+            )
+            return
+
         async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(
                 interaction, duration=duration_string
             ) as logging_embed:
-                if safety_choice:
-                    response_message.set_string(
-                        f"<@{interaction.user.id}> has tested their luck and lives another day..."
-                    )
-                else:
-                    reason = "roulette"
-                    exile_duration = calculate_time_delta(duration_string)
-                    error_message = await exile_user(
-                        logging_embed, interaction.user, exile_duration, reason
-                    )
+                reason = "roulette"
+                exile_duration = calculate_time_delta(duration_string)
+                error_message = await exile_user(
+                    logging_embed, interaction.user, exile_duration, reason
+                )
 
-                    if error_message:
-                        logger.error(f"An error occurred: {error_message}")
-                        response_message.set_string(
-                            "An error occurred while processing the command."
-                        )
-                        return
-                    else:
-                        response_message.set_string(
-                            f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s)."
-                        )
+                if error_message:
+                    logger.error(f"An error occurred: {error_message}")
+                    response_message.set_string(
+                        "An error occurred while processing the command."
+                    )
+                    return
+                else:
+                    response_message.set_string(
+                        f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s)."
+                    )
 
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
