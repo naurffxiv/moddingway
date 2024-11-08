@@ -29,7 +29,8 @@ def prod() -> Settings:
             1273263026744590468: 30,  # lfg
             1273261496968810598: 30,  # lfm
             1240356145311252615: 30,  # temporary
-            1301166606985990144: 7,  # FRU
+            # TODO: uncomment when FRU channel is public
+            # 1301166606985990144: 7,  # FRU
             1300527846468616302: 7,  # scheduled legacy
         },
     )
