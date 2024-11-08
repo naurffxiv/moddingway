@@ -32,7 +32,7 @@ def create_exile_commands(bot: Bot) -> None:
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(
         user="User being exiled",
-        duration="The duration of the exile. Duration should be in the form of [1 or 2 digits][s, d, m, h]",
+        duration="Enter a value between 1 and 99 followed by sec, min, hour, or day. Examples: 1sec, 1min, 1hour, 1day.",
         reason="Reason for exile",
     )
     async def exile(
@@ -45,7 +45,7 @@ def create_exile_commands(bot: Bot) -> None:
         exile_duration = calculate_time_delta(duration)
         if duration and not exile_duration:
             await interaction.response.send_message(
-                "Invalid exile duration given, duration should be in the form of [1 or 2 digits][s, d, m, h]. No action will be taken",
+                "Invalid exile duration given, duration should be in the form value between 1 and 99 followed by sec, min, hour, or day. Examples: 1sec, 1min, 1hour, 1day. No action will be taken",
                 ephemeral=True,
             )
             return
