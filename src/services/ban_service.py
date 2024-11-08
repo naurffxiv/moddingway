@@ -18,8 +18,8 @@ async def ban_user(
         reason (str): description of ban reason. Length of reason must be less than 512 characters
 
     Returns:
-        Optional[Tuple[bool, bool, str]]: tuple containing (result,dm_state,result_description)
-            - result (bool): Indicates whether the ban succeeded.
+        Optional[Tuple[bool, bool, str]]: tuple containing (ban_result,dm_state,result_description)
+            - ban_result (bool): Indicates whether the ban succeeded.
             - dm_state (bool): Indicates whether the DM notification to the user succeeded.
             - result_description (str): A message describing the status of the ban operation.
     """
@@ -28,6 +28,7 @@ async def ban_user(
         dm_state = False
         # attempt to send a DM to the user with the reason for the ban
         try:
+            # TO DO: When the appeal process is implemented, add a link to the appeal process in the message.
             await send_dm(
                 user,
                 f"You are being banned from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason} "
@@ -43,18 +44,18 @@ async def ban_user(
         try:
             await user.ban(reason=reason)
             logger.info(f"Successfully banned {user.mention}")
-            result = True
+            ban_result = True
         except Exception as e:
             logger.error(f"Ban of {user.mention} failed due to error: {e}")
-            result = False
+            ban_result = False
 
-        if not result and dm_state:  # ban fail dm succeed.
+        if not ban_result and dm_state:  # ban fail dm succeed.
             result_description = f"Unable to ban {user.mention}, please ban via discord built-in ban feature. A DM has been sent to {user.mention} with ban reason."
-        elif result and not dm_state:  # ban succeed dm fail.
+        elif ban_result and not dm_state:  # ban succeed dm fail.
             result_description = (
                 f"Successfully banned {user.mention} but DM failed to send."
             )
-        elif result and dm_state:  # full success
+        elif ban_result and dm_state:  # full success
             result_description = f"Successfully banned {user.mention} and DM has been sent with ban reason."
         else:  # full failure
             result_description = f"Unable to ban {user.mention} and unable to send DM. Please ban via discord built-in ban feature or try again later."
@@ -62,6 +63,6 @@ async def ban_user(
     else:
         # reason too large, ban action canceled.
         result_description = f"Unable to ban: {user.mention}, reason given is too long (above 512 characters). Please shorten ban reason."
-        result = False
+        ban_result = False
     # always return this.
-    return (result, dm_state, result_description)
+    return (ban_result, dm_state, result_description)
