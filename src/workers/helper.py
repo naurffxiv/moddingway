@@ -5,7 +5,7 @@ import discord
 from discord.utils import snowflake_time
 from discord.ext.commands import Bot
 from settings import get_settings
-from util import create_interaction_embed_context, send_dm, UnableToDM
+from util import create_interaction_embed_context, send_dm, UnableToNotify
 from typing import Optional
 
 
@@ -45,6 +45,7 @@ async def automod_thread(
     duration: int,
     num_removed: int,
     num_errors: int,
+    notifying_channel: discord.TextChannel,
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
@@ -54,7 +55,7 @@ async def automod_thread(
     starter_message = None
     try:
         starter_message = await thread.fetch_message(thread.id)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)
     except discord.NotFound:
         pass
     except Exception as e:
@@ -66,34 +67,33 @@ async def automod_thread(
     if starter_message is not None and time_since < timedelta(days=duration):
         return num_removed, num_errors
 
-    # delete thread and try to send DM to user
+    # delete thread and try to notify to user
     try:
         await thread.delete()
         logger.info(f"Thread {thread.id} has been deleted successfully")
         ret = num_removed + 1, num_errors
-        # TODO: uncomment DM portion and sleep when backlog is dealt with
-        # if thread.owner is not None:
-        #     try:
-        #         await send_dm(
-        #             thread.owner,
-        #             f'Your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.',
-        #         )
-        #     except discord.Forbidden:
-        #         raise UnableToDM("User has DMs disabled")
-        # else:
-        #     raise UnableToDM("User is not in the server")
+        if thread.owner is not None:
+            try:
+                await notifying_channel.send(
+                    f'{thread.owner.mention}, your post "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the original message has been deleted.'
+                )
+            except Exception as e:
+                raise UnableToNotify(e)
+        else:
+            raise UnableToNotify("User is not in the server")
         return ret
-    except UnableToDM as e:
-        logger.info(f"Unable to DM user {thread.owner_id}: {e}")
+    except UnableToNotify as e:
+        logger.info(f"Unable to notify user {thread.owner_id}: {e}")
         channel = self.get_channel(settings.logging_channel_id)
         async with create_interaction_embed_context(
             channel,
             user=thread.owner,
             timestamp=datetime.now(timezone.utc),
-            description=f"<@{thread.owner_id}>'s thread was deleted in <#{channel_id}> but a DM could not be sent: {e}",
+            description=f"<@{thread.owner_id}>'s thread was deleted in <#{channel_id}> but a notification could not be sent: {e}",
         ):
             pass
+        # NB: not really an error we're worried about since it's just notifying
+        return num_removed + 1, num_errors
     except Exception as e:
         logger.error(e)
         return num_removed, num_errors + 1
-    # await asyncio.sleep(300)

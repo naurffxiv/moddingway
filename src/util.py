@@ -18,7 +18,7 @@ class EmbedField(object):
         self.value = value
 
 
-class UnableToDM(RuntimeError):
+class UnableToNotify(RuntimeError):
     # NB: create a custom exception with RuntimeError as base
     # constructor/methods/attributes are all inherited
     pass

@@ -25,6 +25,7 @@ Postgres-related information is configured in the environment variables instead 
 - MOD_LOGGING_CHANNEL_ID
 - INACTIVE_FORUM_CHANNEL_ID
 - INACTIVE_FORUM_DURATION
+- NOTIFY_CHANNEL_ID
 
 
 Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
