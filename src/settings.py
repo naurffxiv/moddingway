@@ -16,12 +16,14 @@ class Settings(BaseModel):
     postgres_username: str = os.environ["POSTGRES_USER"]
     postgres_password: str = os.environ["POSTGRES_PASSWORD"]
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
+    notify_channel_id: int
 
 
 def prod() -> Settings:
     return Settings(
         guild_id=1172230157776466050,
-        logging_channel_id=1172324840947056681,
+        logging_channel_id=1172324840947056681,  # mod-reports
+        notify_channel_id=1279952544235524269,  # bot-channel
         log_level=logging.INFO,
         postgres_host=os.environ.get("POSTGRES_HOST"),
         postgres_port=os.environ.get("POSTGRES_PORT"),
@@ -51,6 +53,9 @@ def local() -> Settings:
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         automod_inactivity=automod_inactivity,
+        notify_channel_id=os.environ.get(
+            "NOTIFY_CHANNEL_ID", os.environ["MOD_LOGGING_CHANNEL_ID"]
+        ),
     )
 
 

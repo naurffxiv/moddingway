@@ -19,6 +19,11 @@ async def autodelete_threads(self):
         logger.error("Guild not found.")
         return
 
+    notifying_channel = guild.get_channel(settings.notify_channel_id)
+    if notifying_channel is None:
+        logger.error("Notifying channel not found.")
+        return
+
     for channel_id, duration in settings.automod_inactivity.items():
         num_removed = 0
         num_errors = 0
@@ -28,12 +33,24 @@ async def autodelete_threads(self):
 
         async for thread in channel.archived_threads(limit=None):
             num_removed, num_errors = await automod_thread(
-                self, channel_id, thread, duration, num_removed, num_errors
+                self,
+                channel_id,
+                thread,
+                duration,
+                num_removed,
+                num_errors,
+                notifying_channel,
             )
 
         for thread in channel.threads:
             num_removed, num_errors = await automod_thread(
-                self, channel_id, thread, duration, num_removed, num_errors
+                self,
+                channel_id,
+                thread,
+                duration,
+                num_removed,
+                num_errors,
+                notifying_channel,
             )
 
         if num_removed > 0 or num_errors > 0:
