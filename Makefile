@@ -1,3 +1,6 @@
+format:
+	python3 -m black .
+
 stop:
 	docker compose down
 
@@ -17,4 +20,4 @@ python-run:
 database-run:
 	docker compose -f postgres.yml up -d
 
-.PHONY: stop install clean python-build python-run database-run
+.PHONY: format stop install clean python-build python-run database-run
