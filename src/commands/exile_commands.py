@@ -119,7 +119,7 @@ def create_exile_commands(bot: Bot) -> None:
         interaction: discord.Interaction, user: discord.Member
     ):
         """Exile the selected user"""
-        await interaction.response.send_modal(ExileModal(user, "1h", "1 hour"))
+        await interaction.response.send_modal(ExileModal(user, "1hour", "1 hour"))
 
     @bot.tree.context_menu(name="Exile User for 1 day")
     @discord.app_commands.check(is_user_moderator)
@@ -127,7 +127,7 @@ def create_exile_commands(bot: Bot) -> None:
         interaction: discord.Interaction, user: discord.Member
     ):
         """Exile the selected user"""
-        await interaction.response.send_modal(ExileModal(user, "1d", "1 day"))
+        await interaction.response.send_modal(ExileModal(user, "1day", "1 day"))
 
     @bot.tree.context_menu(name="Exile Message Author for 1 hour")
     @discord.app_commands.check(is_user_moderator)
@@ -136,5 +136,5 @@ def create_exile_commands(bot: Bot) -> None:
     ):
         """Exile the user that sent this message"""
         await interaction.response.send_modal(
-            ExileModal(message.author, "1h", "1 hour")
+            ExileModal(message.author, "1hour", "1 hour")
         )
