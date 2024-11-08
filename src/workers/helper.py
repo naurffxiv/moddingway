@@ -75,7 +75,7 @@ async def automod_thread(
         if thread.owner is not None:
             try:
                 await notifying_channel.send(
-                    f'{thread.owner.mention}, your thread "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the starter message has been deleted.'
+                    f'{thread.owner.mention}, your post "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the original message has been deleted.'
                 )
             except Exception as e:
                 raise UnableToNotify(e)
