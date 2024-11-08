@@ -135,4 +135,6 @@ def create_exile_commands(bot: Bot) -> None:
         interaction: discord.Interaction, message: discord.Message
     ):
         """Exile the user that sent this message"""
-        await interaction.response.send_modal(ExileModal(message.author, "1h", "1 hour"))
+        await interaction.response.send_modal(
+            ExileModal(message.author, "1h", "1 hour")
+        )
