@@ -10,13 +10,13 @@ class Settings(BaseModel):
     discord_token: str = os.environ["DISCORD_TOKEN"]
     log_level: int = logging.INFO
     logging_channel_id: int
+    notify_channel_id: int
     postgres_host: str
     postgres_port: str
     database_name: str = "moddingway"
     postgres_username: str = os.environ["POSTGRES_USER"]
     postgres_password: str = os.environ["POSTGRES_PASSWORD"]
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
-    notify_channel_id: int
 
 
 def prod() -> Settings:

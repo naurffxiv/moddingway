@@ -92,7 +92,7 @@ async def automod_thread(
             description=f"<@{thread.owner_id}>'s thread was deleted in <#{channel_id}> but a notification could not be sent: {e}",
         ):
             pass
-        # not really an error we're worried about since it's just notifying
+        # NB: not really an error we're worried about since it's just notifying
         return num_removed + 1, num_errors
     except Exception as e:
         logger.error(e)
