@@ -23,12 +23,22 @@ def create_ban_commands(bot: Bot) -> None:
     ):
         """Ban the specified user."""
         async with create_response_context(interaction) as response_message:
-            async with create_logging_embed(
-                interaction, user=user, reason=reason
-            ) as logging_embed:
-                await ban_user(logging_embed, user, reason)
+            (is_banned, is_dm_sent, result_description) = await ban_user(user, reason)
 
-                response_message.set_string(f"Successfully banned {user.mention}")
+            if is_banned:  # ban succeeded
+                if not is_dm_sent:  # dm failed
+                    async with create_logging_embed(
+                        interaction, user=user, reason=reason, error=result_description
+                    ) as logging_embed:
+                        response_message.set_string(result_description)
+                else:  # ban succeeded, dm failed.
+                    async with create_logging_embed(
+                        interaction, user=user, reason=reason, result=result_description
+                    ) as logging_embed:
+                        response_message.set_string(result_description)
+            else:  # ban failed, dont create embed
+                response_message.set_string(result_description)
+        response_message.set_string(result_description)
 
     @bot.tree.context_menu(name="Ban User")
     @discord.app_commands.check(is_user_moderator)
