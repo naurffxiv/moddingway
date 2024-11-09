@@ -3,6 +3,7 @@ import logging
 from settings import get_settings
 from .helper import create_automod_embed, automod_thread
 from discord.ext import tasks
+from util import create_interaction_embed_context
 from discord.utils import snowflake_time
 
 settings = get_settings()
@@ -27,6 +28,7 @@ async def autodelete_threads(self):
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:
+                logger.error("Forum channel not found.")
                 continue
 
             async for thread in channel.archived_threads(limit=None):
@@ -69,4 +71,11 @@ async def autodelete_threads(self):
                 )
         except Exception as e:
             logger.error(e)
+            async with create_interaction_embed_context(
+                self.get_channel(settings.logging_channel_id),
+                user=self.user,
+                timestamp=datetime.now(timezone.utc),
+                description="Automod task failed to process channel <#{channel_id}>: {e}",
+            ):
+                pass
             continue
