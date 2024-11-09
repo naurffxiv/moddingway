@@ -1,0 +1,17 @@
+name: Automated Tagging
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set version number
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag -a "1.1.${{ github.run_number }}" -m "Release 1.1.${{ github.run_number }}"
+        git push origin "1.1.${{ github.run_number }}"
