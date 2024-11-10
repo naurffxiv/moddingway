@@ -6,7 +6,6 @@ from database import users_database, exiles_database
 from typing import Optional
 import datetime
 from database.models import Exile, User
-from table2ascii import table2ascii
 
 logger = logging.getLogger(__name__)
 
@@ -135,46 +134,17 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
     if len(exile_list) == 0:
         return "No exiles found for user"
 
-    exile = exile_list[0]
+    result = "Exiles found for <@{user.id}>:"
+    for exile in exile_list:
+        exile_id = exile[0]
+        exile_reason = exile[1]
+        exile_start_date = exile[2].strftime(TIME_FORMAT)
+        exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
+        exile_type = ExileStatus(exile[4]).name
 
-    exile_id = exile[0]
-    exile_reason = exile[1]
-    exile_start_date = exile[2].strftime(TIME_FORMAT)
-    exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
-    exile_type = ExileStatus(exile[4]).name
-
-    rows = []
-    # Break long exile messages into multiple rows so that formatting in discord message doesn't wrap
-    # These column sizes don't wrap when viewing discord on a 1080p monitor with sidebars opened
-    if len(exile_reason) < 56:
-        rows.append(
-            [
-                exile_id,
-                exile_reason,
-                exile_start_date,
-                exile_end_date,
-                exile_type,
-            ]
+        result = (
+            result
+            + f"\n* ID: {exile_id} | Start Date: {exile_start_date} | End Date: {exile_end_date} | Type: {exile_type} | Reason: {exile_reason}"
         )
-    else:
-        rows.append(
-            [
-                exile_id,
-                exile_reason[:56],
-                exile_start_date,
-                exile_end_date,
-                exile_type,
-            ]
-        )
-        i = MAX_REASON_WIDTH
-        while i < len(exile_reason):
-            rows.append(["", exile_reason[i : i + MAX_REASON_WIDTH], "", "", ""])
-            i = i + MAX_REASON_WIDTH
 
-    table_output = table2ascii(
-        header=["ID", "Reason", "Start Date", "End Date", "Status"],
-        body=rows,
-        column_widths=[6, 58, 21, 21, 18],
-    )
-
-    return f"Exiles found for <@{user.id}>:\n```{table_output}```"
+    return result
