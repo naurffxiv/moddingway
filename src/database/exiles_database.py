@@ -98,7 +98,8 @@ def get_user_exiles(user_id) -> List[tuple]:
         SELECT e.exileID, e.reason, e.startTimestamp, e.endTimestamp, e.exileStatus
         FROM exiles e
         JOIN users u ON e.userID = u.userID
-        WHERE u.userID = %s;
+        WHERE u.userID = %s
+        ORDER BY e.startTimestamp ASC;
         """
 
         params = (user_id,)

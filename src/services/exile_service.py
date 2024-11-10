@@ -121,7 +121,6 @@ async def unexile_user(
 
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-MAX_REASON_WIDTH = 56
 
 
 async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> str:
@@ -134,7 +133,7 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
     if len(exile_list) == 0:
         return "No exiles found for user"
 
-    result = "Exiles found for <@{user.id}>:"
+    result = f"Exiles found for <@{user.id}>:"
     for exile in exile_list:
         exile_id = exile[0]
         exile_reason = exile[1]
@@ -144,7 +143,7 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
 
         result = (
             result
-            + f"\n* ID: {exile_id} | Start Date: {exile_start_date} | End Date: {exile_end_date} | Type: {exile_type} | Reason: {exile_reason}"
+            + f"\n* ID: {exile_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
         )
 
     return result
