@@ -42,7 +42,7 @@ When you first are setting up the application, copy the file titled `.env_exampl
 * Administration
 * Management
 
-In addition, you will need to give yourself either the `Administration` or `Management` role in order to properly run all commands.
+In addition, you will need to give yourself either the `Admin` or `Mod` role in order to properly run all commands.
 
 ### Black Formatter
 Files in this repo will be run through the [Black Formatter](https://black.readthedocs.io/en/stable/). To minimize merge conflicts, it is recommended to run this formatter on your code before submitting. Most IDEs will have an extension for black, and it is recommended to use those
