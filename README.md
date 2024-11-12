@@ -39,8 +39,8 @@ To run a dockerized version of our postgres database locally, run `make database
 When you first are setting up the application, copy the file titled `.env_example` to be `.env`, and configure the missing enviornment variables. To add the bot account to your server, you can follow the [discord.py instructions](https://discordpy.readthedocs.io/en/stable/discord.html). The server that you use for development also will need to have a channel where the bot will output logging messages, and will need to have the following roles set up
 * Exiled
 * Verified
-* Administration
-* Management
+* Admin
+* Mod
 
 In addition, you will need to give yourself either the `Admin` or `Mod` role in order to properly run all commands.
 
