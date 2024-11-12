@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 async def exile_user(
     logging_embed: discord.Embed,
     user: discord.Member,
-    duration: Optional[datetime.timedelta],
+    duration: datetime.timedelta,
     reason: str,
 ) -> Optional[str]:
     if not user_has_role(user, Role.VERIFIED):
@@ -40,11 +40,8 @@ async def exile_user(
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
-    end_timestamp = None
-    exile_status = ExileStatus.INDEFINITE_EXILE
-    if duration:
-        end_timestamp = start_timestamp + duration
-        exile_status = ExileStatus.TIMED_EXILED
+    end_timestamp = start_timestamp + duration
+    exile_status = ExileStatus.TIMED_EXILED
 
     exile = Exile(
         None,

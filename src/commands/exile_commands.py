@@ -38,7 +38,7 @@ def create_exile_commands(bot: Bot) -> None:
     async def exile(
         interaction: discord.Interaction,
         user: discord.Member,
-        duration: Optional[str],
+        duration: str,
         reason: str,
     ):
         """Exile the specified user."""

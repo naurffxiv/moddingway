@@ -10,7 +10,6 @@ class Role(StrEnum):
 
 
 class ExileStatus(IntEnum):
-    INDEFINITE_EXILE = 0
     TIMED_EXILED = 1
     UNEXILED = 2
     UNKNOWN = 3

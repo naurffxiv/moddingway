@@ -118,11 +118,11 @@ def get_user_active_exile(user_id) -> PendingExile:
         SELECT e.exileID, u.userID, u.discordUserID, e.endTimestamp
         FROM exiles e
         JOIN users u ON e.userID = u.userID
-        WHERE u.userID = %s AND  (e.exileStatus = %s OR e.exileStatus = %s)
+        WHERE u.userID = %s AND  e.exileStatus = %s 
         LIMIT 1;
         """
 
-        params = (user_id, ExileStatus.TIMED_EXILED, ExileStatus.INDEFINITE_EXILE)
+        params = (user_id, ExileStatus.TIMED_EXILED)
 
         cursor.execute(query, params)
         res = cursor.fetchone()
