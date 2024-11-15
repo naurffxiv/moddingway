@@ -4,7 +4,6 @@ from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
 import logging
-import datetime
 import time
 
 settings = get_settings()
