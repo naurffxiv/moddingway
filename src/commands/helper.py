@@ -37,10 +37,9 @@ def create_bot_errors(bot: Bot) -> None:
     async def on_app_command_error(interaction: discord.Interaction, error):
         # Check if the error is due to a cooldown
         if isinstance(error, discord.app_commands.CommandOnCooldown):
-            current_time = int(time.time())
-            remaining_time = int(error.retry_after)
+            remaining_time = int(error.retry_after) + int(time.time())
             await interaction.response.send_message(
-                f"This command is on cooldown. Time remaining: <t:{remaining_time + current_time}:R>",
+                f"This command is on cooldown. Time remaining: <t:{remaining_time}:R>",
                 ephemeral=True,
             )
         else:
