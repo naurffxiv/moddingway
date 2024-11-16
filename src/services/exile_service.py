@@ -94,6 +94,17 @@ async def unexile_user(
     # unexile user
     await add_and_remove_role(user, Role.VERIFIED, Role.EXILED)
 
+    # message user
+    try:
+        await send_dm(
+            user,
+            f"You have been un-exiled from NA Ultimate Raiding - FFXIV.",
+        )
+    except Exception as e:
+        log_info_and_embed(
+            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        )
+
     # update exile record
     db_user = users_database.get_user(user.id)
     if db_user is None:
