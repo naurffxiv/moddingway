@@ -6,6 +6,7 @@ from database import users_database, exiles_database
 from typing import Optional
 import datetime
 from database.models import Exile, User
+from datetime import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,9 @@ async def exile_user(
     end_timestamp = start_timestamp + duration
     exile_status = ExileStatus.TIMED_EXILED
 
+    # create utc timestamp for exile end
+    timestamp = int(end_timestamp.replace(tzinfo=timezone.utc).timestamp())
+
     exile = Exile(
         None,
         db_user.user_id,
@@ -65,7 +69,7 @@ async def exile_user(
     try:
         await send_dm(
             user,
-            f"You are being exiled from NA Ultimate Raiding - FF XIV for the following reason: \n> {reason}",
+            f"You are being exiled from NA Ultimate Raiding - FF XIV.\n**Reason:** {reason}\n**Time remaining:** <t:{timestamp}:R>",
         )
     except Exception as e:
         log_info_and_embed(
