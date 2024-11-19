@@ -27,6 +27,11 @@ CREATE TABLE IF NOT EXISTS exiles (
 
 -- NOTE this should only be run once, then cleaned up into the create statements
 alter table users
+drop column IF EXISTS temporaryPoints,
+drop column IF EXISTS permanentPoints,
+drop column IF EXISTS lastInfractionTimestamp;
+
+alter table users
 add column temporaryPoints INT  not null default 0,
 add column permanentPoints INT  not null default 0,
 add column lastInfractionTimestamp TIMESTAMP;
