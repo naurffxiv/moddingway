@@ -45,7 +45,7 @@ async def automod_thread(
     duration: int,
     num_removed: int,
     num_errors: int,
-    notifying_channel: discord.TextChannel,
+    user_list: list[int],
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
@@ -73,12 +73,8 @@ async def automod_thread(
         logger.info(f"Thread {thread.id} has been deleted successfully")
         ret = num_removed + 1, num_errors
         if thread.owner is not None:
-            try:
-                await notifying_channel.send(
-                    f'{thread.owner.mention}, your post "{thread.name}" in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the original message has been deleted.'
-                )
-            except Exception as e:
-                raise UnableToNotify(e)
+            if thread.owner_id not in user_list:
+                user_list.append(thread.owner_id)
         else:
             raise UnableToNotify("User is not in the server")
         return ret
@@ -95,5 +91,5 @@ async def automod_thread(
         # NB: not really an error we're worried about since it's just notifying
         return num_removed + 1, num_errors
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Unexpected error for thread {thread.id}: {e}")
         return num_removed, num_errors + 1

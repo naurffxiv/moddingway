@@ -3,7 +3,7 @@ import logging
 from settings import get_settings
 from .helper import create_automod_embed, automod_thread
 from discord.ext import tasks
-from util import create_interaction_embed_context
+from util import create_interaction_embed_context, send_chunked_message
 from discord.utils import snowflake_time
 
 settings = get_settings()
@@ -25,6 +25,7 @@ async def autodelete_threads(self):
     for channel_id, duration in settings.automod_inactivity.items():
         num_removed = 0
         num_errors = 0
+        user_list: list[int] = []
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:
@@ -39,7 +40,7 @@ async def autodelete_threads(self):
                     duration,
                     num_removed,
                     num_errors,
-                    notifying_channel,
+                    user_list,
                 )
 
             for thread in channel.threads:
@@ -50,8 +51,13 @@ async def autodelete_threads(self):
                     duration,
                     num_removed,
                     num_errors,
-                    notifying_channel,
+                    user_list,
                 )
+
+            if num_removed > 0:
+                message = " ".join([f"<@{x}>" for x in user_list])
+                message += f"\nYour thread in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the original message has been deleted."
+                await send_chunked_message(notifying_channel, message)
 
             if num_removed > 0 or num_errors > 0:
                 logger.info(
@@ -65,6 +71,7 @@ async def autodelete_threads(self):
                     datetime.now(timezone.utc),
                 ):
                     pass
+
             else:
                 logger.info(
                     f"No threads were marked for deletion in channel {channel_id}."
@@ -75,7 +82,7 @@ async def autodelete_threads(self):
                 self.get_channel(settings.logging_channel_id),
                 user=self.user,
                 timestamp=datetime.now(timezone.utc),
-                description="Automod task failed to process channel <#{channel_id}>: {e}",
+                description=f"Automod task failed to process channel <#{channel_id}>: {e}",
             ):
                 pass
             continue
