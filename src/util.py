@@ -87,7 +87,6 @@ def _split_chunks(message_content: str, from_index: int, max_length: int = 2000)
     # split based on spaces
     space_index = message_content.rfind(" ", from_index, max_index)
     if space_index != -1:
-        print("a")
         return space_index + 1
 
     # else just send a chunk of 2000 characters
