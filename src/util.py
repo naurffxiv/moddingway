@@ -73,11 +73,11 @@ def log_info_and_embed(embed: discord.Embed, logger, message: str):
 
 
 def _split_chunks(message_content: str, from_index: int, max_length: int = 2000):
-    # if message is shorter than max length
-    if (len(message_content) - from_index) < max_length:
-        return len(message_content)
+    max_index = from_index + max_length
 
-    max_index = max_length + from_index
+    # if remaining message is shorter than max chunk size
+    if len(message_content) < max_index:
+        return len(message_content)
 
     # split based on newline
     newline_index = message_content.rfind("\n", from_index, max_index)
