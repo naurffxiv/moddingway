@@ -38,14 +38,14 @@ def create_bot_errors(bot: Bot) -> None:
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             remaining_time = int(error.retry_after) + int(time.time())
             await interaction.response.send_message(
-                f"This command is on cooldown. Time remaining: <t:{remaining_time}:R>.",
+                f"This command is on cooldown. Try again <t:{remaining_time}:R>.",
                 ephemeral=True,
             )
 
         # Handle CheckFailure error
         elif isinstance(error, discord.app_commands.CheckFailure):
             await interaction.response.send_message(
-                "You do not have the permissions to use this command.",
+                "You do not have the 'Mod' role to use this command.",
                 ephemeral=True,
             )
 
