@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 	isMod BOOL NOT NULL,
 	temporaryPoints INT  not null default 0,
 	permanentPoints INT  not null default 0,
-	createTimestamp TIMESTAMP,
+	lastInfractionTimestamp TIMESTAMP,
 	PRIMARY KEY(userID),
 	UNIQUE(discordUserID, discordGuildID)
 );

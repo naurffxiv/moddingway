@@ -13,3 +13,8 @@ class ExileStatus(IntEnum):
     TIMED_EXILED = 1
     UNEXILED = 2
     UNKNOWN = 3
+
+class StrikeSeverity(StrEnum):
+    MINOR = "Minor"
+    MODERATE = "Moderate"
+    SERIOUS = "Serious"
