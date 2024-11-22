@@ -25,7 +25,7 @@ async def autodelete_threads(self):
     for channel_id, duration in settings.automod_inactivity.items():
         num_removed = 0
         num_errors = 0
-        user_list: list[int] = []
+        user_list: set[int] = set()
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:

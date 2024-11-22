@@ -45,7 +45,7 @@ async def automod_thread(
     duration: int,
     num_removed: int,
     num_errors: int,
-    user_list: list[int],
+    user_list: set[int],
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
@@ -73,8 +73,7 @@ async def automod_thread(
         logger.info(f"Thread {thread.id} has been deleted successfully")
         ret = num_removed + 1, num_errors
         if thread.owner is not None:
-            if thread.owner_id not in user_list:
-                user_list.append(thread.owner_id)
+            user_list.add(thread.owner_id)
         else:
             raise UnableToNotify("User is not in the server")
         return ret
