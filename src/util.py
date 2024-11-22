@@ -171,8 +171,4 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
 
 
 async def is_user_moderator(interaction: discord.Interaction):
-    return (
-        user_has_role(interaction.user, Role.ADMINISTRATION)
-        or user_has_role(interaction.user, Role.MANAGEMENT)
-        or user_has_role(interaction.user, Role.MOD)
-    )
+    return (user_has_role(interaction.user, Role.MOD))

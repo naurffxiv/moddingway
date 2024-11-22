@@ -30,20 +30,35 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         fields=fields,
     )
 
-
 def create_bot_errors(bot: Bot) -> None:
     @bot.tree.error
     async def on_app_command_error(interaction: discord.Interaction, error):
-        # Check if the error is due to a cooldown
+        # Handle CommandOnCooldown error
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             remaining_time = int(error.retry_after) + int(time.time())
             await interaction.response.send_message(
-                f"This command is on cooldown. Time remaining: <t:{remaining_time}:R>",
+                f"This command is on cooldown. Time remaining: <t:{remaining_time}:R>.",
                 ephemeral=True,
             )
-        else:
-            logger.error(f"An unexpected error has occurred {error}")
 
+        # Handle CheckFailure error
+        elif isinstance(error, discord.app_commands.CheckFailure):
+            await interaction.response.send_message(
+                "You do not have the permissions to use this command.",
+                ephemeral=True,
+            )
+
+        # Handle other errors (default fallback)
+        else:
+            logger.error(f"An unexpected error has occurred: {error}")
+            try:
+                await interaction.response.send_message(
+                    "An unexpected error occurred. Please contact an admin.",
+                    ephemeral=True,
+                )
+            except discord.InteractionResponded:
+                # If interaction response has already been sent
+                logger.warning("Interaction already responded to.")
 
 @asynccontextmanager
 async def create_response_context(interaction: discord.Interaction, sendEphemeral=True):
