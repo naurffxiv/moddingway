@@ -7,7 +7,7 @@ from enums import StrikeSeverity
 def create_strikes_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
-    @discord.app_commands.describe(user="User being exiled")
+    @discord.app_commands.describe(user="User being striked")
     async def add_strike(
         interaction: discord.Interaction,
         user: discord.Member,
