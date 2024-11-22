@@ -69,7 +69,7 @@ async def exile_user(
     try:
         await send_dm(
             user,
-            f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\n**Time remaining:** <t:{timestamp}:R>",
+            f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\nExile expires <t:{timestamp}:R>",
         )
     except Exception as e:
         log_info_and_embed(
