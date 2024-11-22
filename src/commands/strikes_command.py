@@ -15,4 +15,6 @@ def create_strikes_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Add a strike to the user"""
-        await interaction.response.send_message("This command is not currently implemented", ephemeral=True)
+        await interaction.response.send_message(
+            "This command is not currently implemented", ephemeral=True
+        )

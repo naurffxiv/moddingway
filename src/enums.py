@@ -14,6 +14,7 @@ class ExileStatus(IntEnum):
     UNEXILED = 2
     UNKNOWN = 3
 
+
 class StrikeSeverity(StrEnum):
     MINOR = "Minor"
     MODERATE = "Moderate"
