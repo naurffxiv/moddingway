@@ -72,6 +72,41 @@ def log_info_and_embed(embed: discord.Embed, logger, message: str):
     logger.info(message)
 
 
+def _split_chunks(message_content: str, from_index: int, max_chunk_length: int = 2000):
+    max_index = from_index + max_chunk_length
+
+    # if remaining message is shorter than max chunk size
+    if len(message_content) < max_index:
+        return len(message_content)
+
+    # split based on newline
+    newline_index = message_content.rfind("\n", from_index, max_index)
+    if newline_index != -1:
+        return newline_index + 1
+
+    # split based on spaces
+    space_index = message_content.rfind(" ", from_index, max_index)
+    if space_index != -1:
+        return space_index + 1
+
+    # else just send a chunk of max_chunk_length characters
+    return max_index
+
+
+def chunk_message(message_content: str, max_chunk_length: int = 2000):
+    from_index = 0
+    to_index = 0
+    while to_index < len(message_content):
+        to_index = _split_chunks(message_content, from_index, max_chunk_length)
+        yield message_content[from_index:to_index]
+        from_index = to_index
+
+
+async def send_chunked_message(channel: discord.abc.GuildChannel, message_content: str):
+    for chunk in chunk_message(message_content):
+        await channel.send(chunk)
+
+
 async def send_dm(member: discord.Member, messageContent: str):
     channel = await member.create_dm()
     await channel.send(content=messageContent)
