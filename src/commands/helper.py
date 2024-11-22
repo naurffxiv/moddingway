@@ -30,6 +30,7 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         fields=fields,
     )
 
+
 def create_bot_errors(bot: Bot) -> None:
     @bot.tree.error
     async def on_app_command_error(interaction: discord.Interaction, error):
@@ -59,6 +60,7 @@ def create_bot_errors(bot: Bot) -> None:
             except discord.InteractionResponded:
                 # If interaction response has already been sent
                 logger.warning("Interaction already responded to.")
+
 
 @asynccontextmanager
 async def create_response_context(interaction: discord.Interaction, sendEphemeral=True):
