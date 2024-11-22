@@ -2,3 +2,5 @@ discord
 pydantic
 psycopg2
 black
+django
+djangorestframework

@@ -49,3 +49,7 @@ Files in this repo will be run through the [Black Formatter](https://black.readt
 
 ### Running in Docker
 If you want to run the app in a container, you run the application via `make python-run`. This command will also create a container for the postgres database, and will override the postgres host environment variable to correctly allow the two containers to interact with each other
+
+### API
+
+The API can be run locally in a browser for testing. For this, you will need to add the "API_KEY" environment variable. The dev key can be found in the development channels on the NAUR server. Running `make api-build` will build the API's models, after which the server can be started with `make api-run`.

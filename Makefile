@@ -20,4 +20,11 @@ python-run:
 database-run:
 	docker compose -f postgres.yml up -d
 
+api-build:
+	python3 server/manage.py makemigrations
+	python3 server/manage.py migrate
+
+api-run:
+	python3 server/manage.py runserver
+
 .PHONY: format stop install clean python-build python-run database-run
