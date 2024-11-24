@@ -35,7 +35,6 @@ async def exile_user(
             f"User not found in database, creating new record",
         )
         db_user = users_database.add_user(user.id)
-        logger.info(f"Created user record in DB with id {db_user.user_id}")
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -75,7 +74,7 @@ async def exile_user(
         )
 
     log_info_and_embed(
-        logging_embed, logger, f"<@{user.id}> was successfully exiled for {duration}"
+        logging_embed, logger, f"<@{user.id}> was successfully exiled for {duration}. Exile expires <t:{timestamp}:R>"
     )
 
 
@@ -114,7 +113,6 @@ async def unexile_user(
             f"User not found in database, creating new record",
         )
         db_user = users_database.add_user(user.id)
-        log_info_and_embed(logging_embed, logger, f"User record created in database")
 
     exile = exiles_database.get_user_active_exile(db_user.user_id)
 

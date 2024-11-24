@@ -27,7 +27,6 @@ async def add_strike(
             "User not found in database, creating new record",
         )
         db_user = users_database.add_user(user.id)
-        logger.info(f"Created user record in DB with id {db_user.user_id}")
 
     # create strike
     strike_timestamp = datetime.now()

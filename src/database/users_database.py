@@ -1,9 +1,12 @@
 from . import DatabaseConnection
+import logging
 from .models import User
 from typing import Optional
 from settings import get_settings
 
 settings = get_settings()
+
+logger = logging.getLogger(__name__)
 
 
 def get_user(discord_user_id: int) -> Optional[User]:
@@ -50,6 +53,8 @@ def add_user(discord_user_id: int) -> User:
         cursor.execute(query, params)
 
         res = cursor.fetchone()
+
+        logger.info(f"Created user record in DB with id {res[0]}")
         return User(
             user_id=res[0],
             discord_user_id=str(discord_user_id),
