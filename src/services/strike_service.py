@@ -98,7 +98,7 @@ async def _apply_punishment(
 ) -> str:
     total_points = db_user.get_strike_points()
 
-    # TODO: known error, if an exiled user is given a strike, the follow up exile is not created
+    # TODO: MOD-93 known error, if an exiled user is given a strike, the follow up exile is not created
     exile_reason = (
         "Your actions were severe or frequent enough for you to receive this exile"
     )
