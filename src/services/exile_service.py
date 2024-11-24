@@ -5,7 +5,7 @@ from enums import Role, ExileStatus
 from database import users_database, exiles_database
 from typing import Optional
 import datetime
-from database.models import Exile, create_empty_user
+from database.models import Exile
 from datetime import timezone
 
 logger = logging.getLogger(__name__)
@@ -34,10 +34,7 @@ async def exile_user(
             logger,
             f"User not found in database, creating new record",
         )
-        db_user_id = users_database.add_user(user.id)
-        logger.info(f"Created user record in DB with id {db_user_id}")
-
-        db_user = create_empty_user(db_user_id, user.id)
+        db_user = users_database.add_user(user.id)
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -76,7 +73,11 @@ async def exile_user(
             logging_embed, logger, f"Failed to send DM to exiled user, {e}"
         )
 
-    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully exiled")
+    log_info_and_embed(
+        logging_embed,
+        logger,
+        f"<@{user.id}> was successfully exiled for {duration}. Exile expires <t:{timestamp}:R>",
+    )
 
 
 async def unexile_user(
@@ -114,14 +115,7 @@ async def unexile_user(
             logger,
             error_message,
         )
-<<<<<<< HEAD
-        db_user_id = users_database.add_user(user.id)
-        log_info_and_embed(logging_embed, logger, f"User record created in database")
-
-        db_user = create_empty_user(db_user_id, user.id)
-=======
         return error_message
->>>>>>> origin/1.0-hotfix
 
     exile = exiles_database.get_user_active_exile(db_user.user_id)
 

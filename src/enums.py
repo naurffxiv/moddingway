@@ -13,7 +13,7 @@ class ExileStatus(IntEnum):
     UNKNOWN = 3
 
 
-class StrikeSeverity(StrEnum):
-    MINOR = "Minor"
-    MODERATE = "Moderate"
-    SERIOUS = "Serious"
+class StrikeSeverity(IntEnum):
+    MINOR = 1
+    MODERATE = 2
+    SERIOUS = 3
