@@ -109,12 +109,13 @@ async def unexile_user(
     # update exile record
     db_user = users_database.get_user(user.id)
     if db_user is None:
+        error_message = "User does not have any exiles, no action will be taken"
         log_info_and_embed(
             logging_embed,
             logger,
-            f"User not found in database, creating new record",
+            error_message,
         )
-        db_user = users_database.add_user(user.id)
+        return error_message
 
     exile = exiles_database.get_user_active_exile(db_user.user_id)
 
