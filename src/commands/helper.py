@@ -21,7 +21,10 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case discord.ChannelType:
                     fields.append(EmbedField(key.title(), f"<#{value}>"))
                 case _:
-                    fields.append(EmbedField(key.title(), value))
+                    if "delete_messages_flag" in key:
+                        fields.append(EmbedField("Messages Deleted", value))
+                    else:
+                        fields.append(EmbedField(key.title(), value))
 
     return create_interaction_embed_context(
         interaction.guild.get_channel(settings.logging_channel_id),
