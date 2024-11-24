@@ -15,14 +15,5 @@ class User(BaseModel):
     permanent_points: int
     last_infraction_timestamp: Optional[datetime]
 
-
-def create_empty_user(user_id, discord_user_id, is_mod=False) -> User:
-    return User(
-        user_id=user_id,
-        discord_user_id=discord_user_id,
-        discord_guild_id=settings.guild_id,
-        is_mod=is_mod,
-        temporary_points=0,
-        permanent_points=0,
-        last_infraction_timestamp=None,
-    )
+    def get_strike_points(self) -> int:
+        return self.temporary_points + self.permanent_points

@@ -2,6 +2,8 @@ import discord
 from discord.ext.commands import Bot
 from util import is_user_moderator
 from enums import StrikeSeverity
+from .helper import create_logging_embed, create_response_context
+from services import strike_service
 
 
 def create_strikes_commands(bot: Bot) -> None:
@@ -15,6 +17,15 @@ def create_strikes_commands(bot: Bot) -> None:
         reason: str,
     ):
         """Add a strike to the user"""
-        await interaction.response.send_message(
-            "This command is not currently implemented", ephemeral=True
-        )
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction, user=user, reason=reason, severity=severity.name
+            ) as logging_embed:
+
+                await strike_service.add_strike(
+                    logging_embed, user, severity, reason, interaction.user
+                )
+
+                response_message.set_string(
+                    f"Successfully added strike to  {user.mention}"
+                )
