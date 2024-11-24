@@ -11,7 +11,9 @@ def get_user(discord_user_id: int) -> Optional[User]:
 
     with conn.get_cursor() as cursor:
         query = """
-        SELECT u.userid, u.discordUserId, u.discordGuildId, u.isMod FROM users u
+        SELECT
+        u.userid, u.discordUserId, u.discordGuildId, u.isMod, u.temporaryPoints, u.permanentPoints, u.lastInfractionTimestamp
+        FROM users u
         where u.discorduserid = %s
         """
 
@@ -22,7 +24,15 @@ def get_user(discord_user_id: int) -> Optional[User]:
         res = cursor.fetchone()
 
         if res:
-            return User(res[0], res[1], res[2], res[3])
+            return User(
+                user_id=res[0],
+                discord_user_id=res[1],
+                discord_guild_id=res[2],
+                is_mod=res[3],
+                temporary_points=res[4],
+                permanent_points=res[5],
+                last_infraction_timestamp=res[6],
+            )
 
 
 def add_user(discord_user_id: int) -> int:

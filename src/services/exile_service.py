@@ -5,7 +5,7 @@ from enums import Role, ExileStatus
 from database import users_database, exiles_database
 from typing import Optional
 import datetime
-from database.models import Exile, User
+from database.models import Exile, create_empty_user
 from datetime import timezone
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ async def exile_user(
         db_user_id = users_database.add_user(user.id)
         logger.info(f"Created user record in DB with id {db_user_id}")
 
-        db_user = User(db_user_id, user.id, None, None)
+        db_user = create_empty_user(db_user_id, user.id)
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -108,15 +108,20 @@ async def unexile_user(
     # update exile record
     db_user = users_database.get_user(user.id)
     if db_user is None:
+        error_message = "User does not have any exiles, no action will be taken"
         log_info_and_embed(
             logging_embed,
             logger,
-            f"User not found in database, creating new record",
+            error_message,
         )
+<<<<<<< HEAD
         db_user_id = users_database.add_user(user.id)
         log_info_and_embed(logging_embed, logger, f"User record created in database")
 
-        db_user = User(db_user_id, user.id, None, None)
+        db_user = create_empty_user(db_user_id, user.id)
+=======
+        return error_message
+>>>>>>> origin/1.0-hotfix
 
     exile = exiles_database.get_user_active_exile(db_user.user_id)
 
