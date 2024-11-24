@@ -51,7 +51,7 @@ async def add_strike(
     log_info_and_embed(
         logging_embed,
         logger,
-        f"<@{user.id}> was given a strike with ID {strike.strike_id}, bringing them to {db_user.get_strike_points()} points",
+        f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
     )
 
     punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
@@ -61,7 +61,7 @@ async def add_strike(
     try:
         await send_dm(
             user,
-            f"Your actions in NA Ultimate Raiding - FFXIV resulted in a strike against your account. This may result in punishment depending on frequency or severity of your strikes.\n**Reason:** {reason}",
+            f"Your actions in NA Ultimate Raiding - FFXIV resulted in a strike against your account. This may result in punishment depending on the frequency or severity of your strikes.\n**Reason:** {reason}",
         )
     except Exception as e:
         log_info_and_embed(
@@ -104,9 +104,9 @@ async def _apply_punishment(
     )
 
     if total_points >= 15:
-        punishment = "permanent ban"
+        punishment = "Permanent ban"
         await ban_service.ban_user(
-            user, "Your strike were severe or frequent to be removed from the server"
+            user, "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV"
         )
     elif total_points >= 10 and previous_points < 10:
         punishment = "2 week exile"
@@ -135,6 +135,6 @@ async def _apply_punishment(
             logging_embed, user, timedelta(days=1), exile_reason
         )
     else:
-        punishment = "nothing"
+        punishment = "Nothing"
 
     return punishment
