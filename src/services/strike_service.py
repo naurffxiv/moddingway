@@ -7,6 +7,11 @@ from database import strikes_database, users_database
 from database.models import Strike, User
 from datetime import datetime, timedelta
 from . import exile_service, ban_service
+from constants import (
+    MINOR_INFRACTION_POINTS,
+    MODERATE_INFRACTION_POINTS,
+    SERIOUS_INFRACTION_POINTS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,11 +74,6 @@ async def add_strike(
         )
 
 
-MINOR_INFRACTION_POINTS = 1
-MODERATE_INFRACTION_POINTS = 3
-SERIOUS_INFRACTION_POINTS = 7
-
-
 def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
     match severity:
         case StrikeSeverity.MINOR:
@@ -106,7 +106,8 @@ async def _apply_punishment(
     if total_points >= 15:
         punishment = "Permanent ban"
         await ban_service.ban_user(
-            user, "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV"
+            user,
+            "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
         )
     elif total_points >= 10 and previous_points < 10:
         punishment = "2 week exile"
