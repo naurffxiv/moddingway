@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import discord
+import builtins
 from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
@@ -12,15 +13,17 @@ logger = logging.getLogger(__name__)
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
     fields = [EmbedField("Action", f"/{interaction.command.name}")]
+    # Dynamically add kwargs to fields
     if kwargs is not None:
         for key, value in kwargs.items():
+            key = key.replace("_", " ")
             match (type(value)):
                 case discord.Member:
                     fields.append(EmbedField(key.title(), f"<@{value.id}>"))
                 case discord.ChannelType:
                     fields.append(EmbedField(key.title(), f"<#{value}>"))
-                case _:
-                    fields.append(EmbedField(key.title(), value))
+                case builtins.bool:
+                    fields.append(EmbedField(key.title(), f"{value}"))
 
     return create_interaction_embed_context(
         interaction.guild.get_channel(settings.logging_channel_id),
@@ -34,15 +37,32 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
 def create_bot_errors(bot: Bot) -> None:
     @bot.tree.error
     async def on_app_command_error(interaction: discord.Interaction, error):
-        # Check if the error is due to a cooldown
+        # Handle CommandOnCooldown error
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             remaining_time = int(error.retry_after) + int(time.time())
             await interaction.response.send_message(
-                f"This command is on cooldown. Time remaining: <t:{remaining_time}:R>",
+                f"This command is on cooldown. Try again <t:{remaining_time}:R>.",
                 ephemeral=True,
             )
+
+        # Handle CheckFailure error
+        elif isinstance(error, discord.app_commands.CheckFailure):
+            await interaction.response.send_message(
+                "You do not have the 'Mod' role to use this command.",
+                ephemeral=True,
+            )
+
+        # Handle other errors (default fallback)
         else:
-            logger.error(f"An unexpected error has occurred {error}")
+            logger.error(f"An unexpected error has occurred: {error}")
+            try:
+                await interaction.response.send_message(
+                    "An unexpected error occurred. Please contact an admin.",
+                    ephemeral=True,
+                )
+            except discord.InteractionResponded:
+                # If interaction response has already been sent
+                logger.warning("Interaction already responded to.")
 
 
 @asynccontextmanager

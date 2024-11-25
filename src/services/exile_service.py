@@ -69,7 +69,7 @@ async def exile_user(
     try:
         await send_dm(
             user,
-            f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\n**Time remaining:** <t:{timestamp}:R>",
+            f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\nExile expires <t:{timestamp}:R>",
         )
     except Exception as e:
         log_info_and_embed(
@@ -108,15 +108,13 @@ async def unexile_user(
     # update exile record
     db_user = users_database.get_user(user.id)
     if db_user is None:
+        error_message = "User does not have any exiles, no action will be taken"
         log_info_and_embed(
             logging_embed,
             logger,
-            f"User not found in database, creating new record",
+            error_message,
         )
-        db_user_id = users_database.add_user(user.id)
-        log_info_and_embed(logging_embed, logger, f"User record created in database")
-
-        db_user = User(db_user_id, user.id, None, None)
+        return error_message
 
     exile = exiles_database.get_user_active_exile(db_user.user_id)
 
