@@ -15,30 +15,42 @@ def create_ban_commands(bot: Bot) -> None:
     @discord.app_commands.describe(
         user="User being banned",
         reason="Reason for ban",
+        delete_messages="Whether messages from the banned user should be deleted or not",
     )
     async def ban(
         interaction: discord.Interaction,
         user: discord.Member,
         reason: str,
+        delete_messages: bool = False,  # Default to false for no message deletion as we typically don't want to delete messages.
     ):
         """Ban the specified user."""
         async with create_response_context(interaction) as response_message:
-            (is_banned, is_dm_sent, result_description) = await ban_user(user, reason)
-
-            if is_banned:  # ban succeeded
-                if not is_dm_sent:  # dm failed
-                    async with create_logging_embed(
-                        interaction, user=user, reason=reason, error=result_description
-                    ) as logging_embed:
-                        response_message.set_string(result_description)
-                else:  # ban succeeded, dm failed.
-                    async with create_logging_embed(
-                        interaction, user=user, reason=reason, result=result_description
-                    ) as logging_embed:
-                        response_message.set_string(result_description)
-            else:  # ban failed, dont create embed
-                response_message.set_string(result_description)
-        response_message.set_string(result_description)
+            ban_success, error = await ban_user(user, reason, delete_messages)
+            # Ensure invoking_member has a higher role position than the target user.
+            if user.top_role >= interaction.user.top_role:
+                response_message.set_string(
+                    f"Unable to ban {user.mention}: You cannot ban a user with an equal or higher role than yourself."
+                )
+                return
+            async with create_logging_embed(
+                interaction,
+                user=user,
+                reason=reason,
+                delete_messages=delete_messages,
+            ) as logging_embed:
+                if ban_success:
+                    success_str = f"Successfully banned {user.mention}."
+                    logging_embed.add_field(
+                        name="Result", value=success_str, inline=False
+                    )
+                    response_message.set_string(success_str)
+                    if error:
+                        logging_embed.add_field(
+                            name="DM Status", value=error, inline=False
+                        )
+                else:
+                    logging_embed.add_field(name="Error", value=error, inline=False)
+                    response_message.set_string(error)
 
     @bot.tree.context_menu(name="Ban User")
     @discord.app_commands.check(is_user_moderator)
