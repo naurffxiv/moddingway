@@ -5,7 +5,6 @@ from settings import get_settings
 from services.exile_service import exile_user, unexile_user, get_user_exiles
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
-from ui import ExileModal
 from .helper import create_logging_embed, create_response_context
 from random import choice
 
@@ -114,29 +113,3 @@ def create_exile_commands(bot: Bot) -> None:
                 msg = await get_user_exiles(logging_embed, user)
 
                 response_message.set_string(msg)
-
-    @bot.tree.context_menu(name="Exile User for 1 hour")
-    @discord.app_commands.check(is_user_moderator)
-    async def exile_user_1hour_action(
-        interaction: discord.Interaction, user: discord.Member
-    ):
-        """Exile the selected user"""
-        await interaction.response.send_modal(ExileModal(user, "1hour", "1 hour"))
-
-    @bot.tree.context_menu(name="Exile User for 1 day")
-    @discord.app_commands.check(is_user_moderator)
-    async def exile_user_1day_action(
-        interaction: discord.Interaction, user: discord.Member
-    ):
-        """Exile the selected user"""
-        await interaction.response.send_modal(ExileModal(user, "1day", "1 day"))
-
-    @bot.tree.context_menu(name="Exile Message Author for 1 hour")
-    @discord.app_commands.check(is_user_moderator)
-    async def exile_message_author_action(
-        interaction: discord.Interaction, message: discord.Message
-    ):
-        """Exile the user that sent this message"""
-        await interaction.response.send_modal(
-            ExileModal(message.author, "1hour", "1 hour")
-        )
