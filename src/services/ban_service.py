@@ -15,7 +15,6 @@ async def ban_user(
     """Executes ban of user.
 
      Args:
-         invoking_member (discord.Member): The moderator initiating the ban.
          user (discord.Member): The user being banned.
          reason (str): Reason for the ban.
          delete_messages_flag (bool): Whether to delete the user's messages.
@@ -33,7 +32,7 @@ async def ban_user(
     # Calculate the timestamp for 30 days from now
     appeal_deadline = int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp())
 
-    dm_failed = None
+    dm_failed_message = None
     try:
         await send_dm(
             user,
@@ -47,7 +46,7 @@ async def ban_user(
     except Exception as e:
         err = f"Failed to send DM to {user.mention}: {e}"
         logger.error(err)
-        dm_failed = err
+        dm_failed_message = err
 
     try:
         # 604800 seconds is the maximum value for delete_message_seconds, and is equivalent to 7 days.
@@ -55,7 +54,7 @@ async def ban_user(
         await user.ban(reason=reason, delete_message_seconds=delete_seconds)
         logger.info(f"Successfully banned {user.mention}")
 
-        return True, dm_failed
+        return True, dm_failed_message
     except Exception as e:
         logger.error(f"Failed to ban {user.mention}: {e}")
         return (
