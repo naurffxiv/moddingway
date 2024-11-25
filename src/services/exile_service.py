@@ -159,3 +159,26 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
         )
 
     return result
+
+async def get_active_exiles(logging_embed: discord.Embed) -> str:
+
+
+    exile_list = exiles_database.get_all_active_exiles()
+
+    if len(exile_list) == 0:
+        return "No exiles found for user"
+
+    result = f"Active exiles found for"
+    for exile in exile_list:
+        exile_id = exile[0]
+        exile_reason = exile[1]
+        exile_start_date = exile[2].strftime(TIME_FORMAT)
+        exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
+        exile_type = ExileStatus(exile[4]).name
+
+        result = (
+            result
+            + f"\n* ID: {exile_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
+        )
+
+    return result

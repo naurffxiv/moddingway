@@ -90,26 +90,6 @@ def get_pending_unexiles() -> list[PendingExile]:
         return [PendingExile(*x) for x in res]
 
 
-def get_user_exiles(user_id) -> List[tuple]:
-    conn = DatabaseConnection()
-
-    with conn.get_cursor() as cursor:
-        query = """
-        SELECT e.exileID, e.reason, e.startTimestamp, e.endTimestamp, e.exileStatus
-        FROM exiles e
-        JOIN users u ON e.userID = u.userID
-        WHERE u.userID = %s
-        ORDER BY e.startTimestamp ASC;
-        """
-
-        params = (user_id,)
-
-        cursor.execute(query, params)
-        res = cursor.fetchall()
-
-        return res
-
-
 def get_user_active_exile(user_id) -> PendingExile:
     conn = DatabaseConnection()
 
@@ -129,5 +109,51 @@ def get_user_active_exile(user_id) -> PendingExile:
 
         if res is not None:
             return PendingExile(*res)
+        else:
+            return None
+
+#   exile_id, user_id, discord_id, reason, exile_status, start_timestamp, end_timestamp
+def get_user_exiles(user_id) -> Exile:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE u.userID = %s
+        ORDER BY e.startTimestamp ASC;
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+        
+        if res is not None:
+            return Exile(*res)
+        else:
+            return None
+    
+        
+def get_all_active_exiles() -> Exile:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE e.exileStatus = %s e.reason != 'roulette'
+        LIMIT 1;
+        """
+
+        params = (ExileStatus.TIMED_EXILED)
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        if res is not None:
+            return Exile(*res)
         else:
             return None

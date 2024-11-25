@@ -2,7 +2,7 @@ import discord
 import logging
 from discord.ext.commands import Bot
 from settings import get_settings
-from services.exile_service import exile_user, unexile_user, get_user_exiles
+from services.exile_service import exile_user, unexile_user, get_user_exiles, get_active_exiles
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from ui import ExileModal
@@ -114,6 +114,29 @@ def create_exile_commands(bot: Bot) -> None:
                 msg = await get_user_exiles(logging_embed, user)
 
                 response_message.set_string(msg)
+                
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(user="User whose exile is being checked")
+    async def view_exile(interaction: discord.Interaction, user: discord.Member):
+        """Check the exile status of a user."""
+
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(interaction, user=user) as logging_embed:
+                msg = await get_user_exiles(logging_embed, user)
+
+                response_message.set_string(msg)
+    
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    async def view_active_exiles(interaction: discord.Interaction):
+        """Check all active exiles."""
+
+        async with create_response_context(interaction) as response_message:
+         async with create_logging_embed(interaction) as logging_embed:
+            msg = await get_active_exiles()
+
+            response_message.set_string(msg)
 
     @bot.tree.context_menu(name="Exile User for 1 hour")
     @discord.app_commands.check(is_user_moderator)
