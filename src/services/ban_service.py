@@ -14,7 +14,7 @@ async def ban_user(
     user: discord.Member,
     reason: str,
     delete_messages_flag: bool,
-) -> Optional[Tuple[bool, bool, str]]:
+) -> Optional[Tuple[bool, str]]:
     """Executes ban of user.
 
     Args:
@@ -26,12 +26,10 @@ async def ban_user(
     Returns:
         Optional[Tuple[bool, bool, str]]: Result of the ban operation. Tuple contains:
             - bool: True if ban was successful, False otherwise.
-            - bool: True if DM was successfully sent, False otherwise.
             - str: Description of the result of the ban operation
     """
     if len(reason) >= 512:
         return (
-            False,
             False,
             f"Unable to ban {user.mention}: reason is too long (above 512 characters). Please shorten the ban reason.",
         )
@@ -39,7 +37,6 @@ async def ban_user(
     # Ensure invoking_member has a higher role position than the target user.
     if user.top_role >= invoking_member.top_role:
         return (
-            False,
             False,
             f"Unable to ban {user.mention}: You cannot ban a user with an equal or higher role than yourself.",
         )
@@ -58,7 +55,6 @@ async def ban_user(
             f"If you believe this ban was issued in error you can reach out to the Moderation Team. Otherwise, you may appeal this ban starting on <t:{appeal_deadline}:F>.\n\n"
             "Please note that any further attempts to rejoin the server will be met with a permanent ban.\n\n",
         )
-        dm_state = True
     except Exception as e:
         logger.error(f"Failed to send DM to {user.mention}: {e}")
 
@@ -70,11 +66,10 @@ async def ban_user(
         delete_seconds = 604800 if delete_messages_flag else 0
         await user.ban(reason=reason, delete_message_seconds=delete_seconds)
         logger.info(f"Successfully banned {user.mention}")
-        return (True, dm_state, f"Successfully banned {user.mention}.")
+        return (True, f"Successfully banned {user.mention}.")
     except Exception as e:
         logger.error(f"Failed to ban {user.mention}: {e}")
         return (
             False,
-            dm_state,
             f"Failed to ban {user.mention}. Please try again or use Discord's built-in tools.",
         )
