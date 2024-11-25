@@ -24,9 +24,9 @@ async def ban_user(
         delete_messages_flag (bool): Whether to delete the user's messages.
 
     Returns:
-        Optional[Tuple[bool, bool, str]]: Result of the ban operation. Tuple contains:
-            - bool: True if ban was successful, False otherwise.
-            - str: Description of the result of the ban operation
+        Optional[Tuple[bool, str]]: Result of the ban operation. Tuple contains:
+            - delete_messages_flag: True if ban was successful, False otherwise.
+            - reason: Description of the result of the ban operation
     """
     if len(reason) >= 512:
         return (
@@ -44,7 +44,6 @@ async def ban_user(
     # Calculate the timestamp for 30 days from now
     appeal_deadline = int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp())
 
-    dm_state = False
     try:
         await send_dm(
             user,
