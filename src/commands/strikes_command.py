@@ -29,3 +29,17 @@ def create_strikes_commands(bot: Bot) -> None:
                 response_message.set_string(
                     f"Successfully added strike to  {user.mention}"
                 )
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(user="User whose strikes you are checking")
+    async def strike_details(interaction: discord.Interaction, user: discord.Member):
+        """Add a strike to the user"""
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(interaction, user=user) as logging_embed:
+
+                strike_details = await strike_service.get_user_strikes(
+                    logging_embed, user
+                )
+
+                response_message.set_string(strike_details)
