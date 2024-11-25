@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 import discord
-import builtins
 from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
