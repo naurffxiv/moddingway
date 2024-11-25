@@ -37,7 +37,7 @@ def create_ban_commands(bot: Bot) -> None:
         delete_messages_flag = delete_messages == "Yes"
 
         async with create_response_context(interaction) as response_message:
-            (is_banned, is_dm_sent, result_description) = await ban_user(
+            (is_banned, result_description) = await ban_user(
                 interaction.user, user, reason, delete_messages_flag
             )
 
