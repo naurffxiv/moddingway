@@ -1,5 +1,6 @@
 from . import DatabaseConnection
 from .models import Strike
+from typing import List
 
 
 def add_strike(strike: Strike) -> int:
@@ -28,3 +29,23 @@ def add_strike(strike: Strike) -> int:
         res = cursor.fetchone()
 
         return res[0]
+
+
+def list_strikes(user_id: int) -> List[tuple]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select s.strikeid, s.severity, s.reason, s.createdby  
+        from strikes s
+        join users u on u.userID = s.userID
+        where u.userId = %s
+        order by s.createdtimestamp asc
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        return res

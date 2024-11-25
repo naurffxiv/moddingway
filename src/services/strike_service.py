@@ -74,6 +74,36 @@ async def add_strike(
         )
 
 
+async def get_user_strikes(
+    logging_embed: discord.Embed,
+    user: discord.Member,
+) -> str:
+    db_user = users_database.get_user(user.id)
+    if db_user is None:
+        return "User not found in database"
+
+    strike_list = strikes_database.list_strikes(db_user.user_id)
+
+    if len(strike_list) == 0:
+        return "No exiles found for user"
+
+    result = f"Strikes found for <@{user.id}>: [Temporary points: {db_user.temporary_points} | Permanent points: {db_user.permanent_points}]"
+    for strike in strike_list:
+        strike_id = strike[0]
+        strike_severity = StrikeSeverity(strike[1])
+        strike_reason = strike[2]
+        strike_created_by = strike[3]
+
+        result = (
+            result
+            + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | REASON: {strike_reason}"
+        )
+
+    result = result + f"\nTotal Points: {db_user.get_strike_points()}"
+
+    return result
+
+
 def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
     match severity:
         case StrikeSeverity.MINOR:
