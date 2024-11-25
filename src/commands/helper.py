@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 import discord
-import builtins
 from discord.ext.commands import Bot
 from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
@@ -22,8 +21,8 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                     fields.append(EmbedField(key.title(), f"<@{value.id}>"))
                 case discord.ChannelType:
                     fields.append(EmbedField(key.title(), f"<#{value}>"))
-                case builtins.bool:
-                    fields.append(EmbedField(key.title(), f"{value}"))
+                case _:
+                    fields.append(EmbedField(key.title(), value))
 
     return create_interaction_embed_context(
         interaction.guild.get_channel(settings.logging_channel_id),
