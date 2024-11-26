@@ -110,7 +110,7 @@ def create_exile_commands(bot: Bot) -> None:
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User whose exile is being checked")
     async def view_exile(interaction: discord.Interaction, user: discord.Member):
-        """Check the exile status of a user."""
+        """View the exile status of a user."""
 
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(interaction, user=user) as logging_embed:
@@ -121,7 +121,7 @@ def create_exile_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     async def view_active_exiles(interaction: discord.Interaction):
-        """Check all active exiles."""
+        """View all active exiles for all users."""
 
         async with create_response_context(interaction) as response_message:
             msg = await get_active_exiles()

@@ -117,7 +117,7 @@ def get_user_active_exile(user_id) -> PendingExile:
 
 
 #   exile_id, user_id, discord_id, reason, exile_status, start_timestamp, end_timestamp
-def get_user_exiles(user_id) -> Exile:
+def get_user_exiles(user_id) -> list[Exile]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -137,10 +137,10 @@ def get_user_exiles(user_id) -> Exile:
         if res is not None:
             return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
-            return None
+            return []
 
 
-def get_all_active_exiles() -> Exile:
+def get_all_active_exiles() -> list[Exile]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -159,4 +159,4 @@ def get_all_active_exiles() -> Exile:
         if res is not None:
             return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
-            return None
+            return []
