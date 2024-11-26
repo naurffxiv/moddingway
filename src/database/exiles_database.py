@@ -3,6 +3,9 @@ from .models import Exile, PendingExile
 from enums import ExileStatus
 from datetime import datetime, timezone
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def add_exile(exile: Exile) -> int:
@@ -112,6 +115,7 @@ def get_user_active_exile(user_id) -> PendingExile:
         else:
             return None
 
+
 #   exile_id, user_id, discord_id, reason, exile_status, start_timestamp, end_timestamp
 def get_user_exiles(user_id) -> Exile:
     conn = DatabaseConnection()
@@ -129,13 +133,13 @@ def get_user_exiles(user_id) -> Exile:
 
         cursor.execute(query, params)
         res = cursor.fetchall()
-        
+
         if res is not None:
-            return Exile(*res)
+            return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
             return None
-    
-        
+
+
 def get_all_active_exiles() -> Exile:
     conn = DatabaseConnection()
 
@@ -144,16 +148,15 @@ def get_all_active_exiles() -> Exile:
         SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
         FROM exiles e
         JOIN users u ON e.userID = u.userID
-        WHERE e.exileStatus = %s e.reason != 'roulette'
-        LIMIT 1;
+        WHERE e.exileStatus = %s AND e.reason != 'roulette';
         """
 
-        params = (ExileStatus.TIMED_EXILED)
+        params = (ExileStatus.TIMED_EXILED,)
 
         cursor.execute(query, params)
-        res = cursor.fetchone()
+        res = cursor.fetchall()
 
         if res is not None:
-            return Exile(*res)
+            return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
             return None

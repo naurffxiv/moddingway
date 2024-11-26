@@ -36,7 +36,6 @@ class ExileModal(discord.ui.Modal):
                 duration=self.duration_string,
                 reason=self.reason.value,
             ) as logging_embed:
-
                 error_message = await exile_user(
                     logging_embed, self.user, self.exile_duration, self.reason.value
                 )

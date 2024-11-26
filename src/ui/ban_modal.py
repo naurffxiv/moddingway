@@ -6,7 +6,6 @@ from commands.helper import create_response_context
 
 
 class BanModal(discord.ui.Modal):
-
     def __init__(self, user: discord.Member) -> None:
         self.user = user
         super().__init__(title=f"Ban User {user.display_name}")

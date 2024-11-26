@@ -48,12 +48,13 @@ async def exile_user(
     timestamp = int(end_timestamp.replace(tzinfo=timezone.utc).timestamp())
 
     exile = Exile(
-        None,
-        db_user.user_id,
-        reason,
-        exile_status.value,
-        start_timestamp,
-        end_timestamp,
+        exile_id=None,
+        user_id=db_user.user_id,
+        discord_id=user.id,
+        reason=reason,
+        exile_status=exile_status.value,
+        start_timestamp=start_timestamp,
+        end_timestamp=end_timestamp,
     )
     exile_id = exiles_database.add_exile(exile)
 
@@ -142,41 +143,59 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
 
     if len(exile_list) == 0:
         return "No exiles found for user"
+    else:
+        result = f"Exiles found for <@{user.id}>:"
+        for exile in exile_list:
+            exile_id = exile.exile_id
+            exile_reason = exile.reason
+            exile_start_epoch = round(exile.start_timestamp.timestamp())
+            exile_end_epoch = (
+                round(exile.end_timestamp.timestamp()) if exile.exile_status else None
+            )
+            exile_start_date = f"<t:{exile_start_epoch}:F>"
+            exile_end_date = (
+                f"<t:{exile_end_epoch}:F>" if exile_end_epoch else "Indefinite"
+            )
+            exile_type = ExileStatus(exile.exile_status).name
 
-    result = f"Exiles found for <@{user.id}>:"
-    for exile in exile_list:
-        exile_id = exile[0]
-        exile_reason = exile[1]
-        exile_start_date = exile[2].strftime(TIME_FORMAT)
-        exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
-        exile_type = ExileStatus(exile[4]).name
-
-        result = (
-            result
-            + f"\n* ID: {exile_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
-        )
+            result = (
+                result
+                + f"\n* ID: {exile_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
+            )
 
     return result
 
-async def get_active_exiles(logging_embed: discord.Embed) -> str:
 
-
+async def get_active_exiles() -> str:
+    logger.info("Starting to run database command")
     exile_list = exiles_database.get_all_active_exiles()
-
+    logger.info("db command done")
+    logger.info(type(exile_list))
+    logger.info(len(exile_list))
     if len(exile_list) == 0:
-        return "No exiles found for user"
+        return "No active exiles found"
 
     result = f"Active exiles found for"
     for exile in exile_list:
-        exile_id = exile[0]
-        exile_reason = exile[1]
-        exile_start_date = exile[2].strftime(TIME_FORMAT)
-        exile_end_date = exile[3].strftime(TIME_FORMAT) if exile[3] else "Indefinite"
-        exile_type = ExileStatus(exile[4]).name
+        logger.info(type(exile))
+        exile_id = exile.exile_id
+        if len(exile.discord_id) == 1:
+            discord_id = f"<@{exile.discord_id[0]}>"
+        else:
+            logger.error("Multiple or non 1 discord ID matched to userID.")
+            discord_id = exile.discord_id
+        exile_reason = exile.reason
+        exile_start_epoch = round(exile.start_timestamp.timestamp())
+        exile_end_epoch = (
+            round(exile.end_timestamp.timestamp()) if exile.exile_status else None
+        )
+        exile_start_date = f"<t:{exile_start_epoch}:F>"
+        exile_end_date = f"<t:{exile_end_epoch}:F>" if exile_end_epoch else "Indefinite"
+        exile_type = ExileStatus(exile.exile_status).name
 
         result = (
             result
-            + f"\n* ID: {exile_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
+            + f"\n* ID: {exile_id} | USER: {discord_id} | START DATE: {exile_start_date} | END DATE: {exile_end_date} | TYPE: {exile_type} | REASON: {exile_reason}"
         )
 
     return result
