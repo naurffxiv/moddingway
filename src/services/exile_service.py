@@ -167,11 +167,8 @@ async def get_user_exiles(logging_embed: discord.Embed, user: discord.User) -> s
 
 
 async def get_active_exiles() -> str:
-    logger.info("Starting to run database command")
     exile_list = exiles_database.get_all_active_exiles()
-    logger.info("db command done")
-    logger.info(type(exile_list))
-    logger.info(len(exile_list))
+    logger.info("Database query completed.")
     if len(exile_list) == 0:
         return "No active exiles found"
 
@@ -179,11 +176,7 @@ async def get_active_exiles() -> str:
     for exile in exile_list:
         logger.info(type(exile))
         exile_id = exile.exile_id
-        if len(exile.discord_id) == 1:
-            discord_id = f"<@{exile.discord_id[0]}>"
-        else:
-            logger.error("Multiple or non 1 discord ID matched to userID.")
-            discord_id = exile.discord_id
+        discord_id = f"<@{exile.discord_id}>"
         exile_reason = exile.reason
         exile_start_epoch = round(exile.start_timestamp.timestamp())
         exile_end_epoch = (

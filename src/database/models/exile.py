@@ -11,7 +11,7 @@ class Exile(object):
     ):
         self.exile_id = exile_id
         self.user_id = user_id
-        self.discord_id = (discord_id,)
+        self.discord_id = discord_id
         self.reason = reason
         self.exile_status = exile_status
         self.start_timestamp = start_timestamp
