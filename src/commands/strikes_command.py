@@ -21,7 +21,6 @@ def create_strikes_commands(bot: Bot) -> None:
             async with create_logging_embed(
                 interaction, user=user, reason=reason, severity=severity.name
             ) as logging_embed:
-
                 await strike_service.add_strike(
                     logging_embed, user, severity, reason, interaction.user
                 )
@@ -37,7 +36,6 @@ def create_strikes_commands(bot: Bot) -> None:
         """Add a strike to the user"""
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(interaction, user=user) as logging_embed:
-
                 strike_details = await strike_service.get_user_strikes(
                     logging_embed, user
                 )
