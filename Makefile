@@ -14,14 +14,14 @@ python-build:
 	docker compose build python-app
 
 python-run:
-	docker compose down
+	docker compose down python-app-local
 	docker compose up python-app-local --build
 
 database-run:
 	docker compose -f postgres.yml up -d
 
 database-clean:
-	docker exec postgres_db rm scripts -r
+	docker exec postgres_db rm scripts -r -f
 	docker exec postgres_db mkdir scripts
 	docker cp postgres postgres_db:scripts
 	docker exec postgres_db psql -f scripts/postgres/drop_all_tables.sql -U moddingwayLocalDB moddingway
