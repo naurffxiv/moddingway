@@ -2,7 +2,12 @@ import discord
 import logging
 from discord.ext.commands import Bot
 from settings import get_settings
-from services.exile_service import exile_user, unexile_user, get_user_exiles
+from services.exile_service import (
+    exile_user,
+    unexile_user,
+    get_user_exiles,
+    get_active_exiles,
+)
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed, create_response_context
@@ -53,7 +58,6 @@ def create_exile_commands(bot: Bot) -> None:
             async with create_logging_embed(
                 interaction, user=user, duration=duration, reason=reason
             ) as logging_embed:
-
                 error_message = await exile_user(
                     logging_embed, user, exile_duration, reason
                 )
@@ -105,11 +109,21 @@ def create_exile_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User whose exile is being checked")
-    async def check_exile(interaction: discord.Interaction, user: discord.Member):
-        """Check the exile status of a user."""
+    async def view_exile(interaction: discord.Interaction, user: discord.Member):
+        """View the exile status of a user."""
 
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(interaction, user=user) as logging_embed:
                 msg = await get_user_exiles(logging_embed, user)
 
                 response_message.set_string(msg)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    async def view_active_exiles(interaction: discord.Interaction):
+        """View all active exiles for all users."""
+
+        async with create_response_context(interaction) as response_message:
+            msg = await get_active_exiles()
+
+            response_message.set_string(msg)

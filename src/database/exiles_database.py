@@ -3,6 +3,9 @@ from .models import Exile, PendingExile
 from enums import ExileStatus
 from datetime import datetime, timezone
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def add_exile(exile: Exile) -> int:
@@ -90,26 +93,6 @@ def get_pending_unexiles() -> list[PendingExile]:
         return [PendingExile(*x) for x in res]
 
 
-def get_user_exiles(user_id) -> List[tuple]:
-    conn = DatabaseConnection()
-
-    with conn.get_cursor() as cursor:
-        query = """
-        SELECT e.exileID, e.reason, e.startTimestamp, e.endTimestamp, e.exileStatus
-        FROM exiles e
-        JOIN users u ON e.userID = u.userID
-        WHERE u.userID = %s
-        ORDER BY e.startTimestamp ASC;
-        """
-
-        params = (user_id,)
-
-        cursor.execute(query, params)
-        res = cursor.fetchall()
-
-        return res
-
-
 def get_user_active_exile(user_id) -> PendingExile:
     conn = DatabaseConnection()
 
@@ -131,3 +114,49 @@ def get_user_active_exile(user_id) -> PendingExile:
             return PendingExile(*res)
         else:
             return None
+
+
+#   exile_id, user_id, discord_id, reason, exile_status, start_timestamp, end_timestamp
+def get_user_exiles(user_id) -> list[Exile]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE u.userID = %s
+        ORDER BY e.startTimestamp ASC;
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        if res is not None:
+            return [Exile(*row) for row in res]  # Create a list of Exile objects
+        else:
+            return []
+
+
+def get_all_active_exiles() -> list[Exile]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
+        FROM exiles e
+        JOIN users u ON e.userID = u.userID
+        WHERE e.exileStatus = %s AND e.reason != 'roulette';
+        """
+
+        params = (ExileStatus.TIMED_EXILED,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        if res is not None:
+            return [Exile(*row) for row in res]  # Create a list of Exile objects
+        else:
+            return []

@@ -14,7 +14,7 @@ python-build:
 	docker compose build python-app
 
 python-run:
-	docker compose down
+	docker compose down python-app-local
 	docker compose up python-app-local --build
 
 database-run:
