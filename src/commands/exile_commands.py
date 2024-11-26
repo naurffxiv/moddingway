@@ -139,5 +139,3 @@ def create_exile_commands(bot: Bot) -> None:
             msg = await get_active_exiles()
 
             response_message.set_string(msg)
-
-
