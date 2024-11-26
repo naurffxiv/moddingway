@@ -3,6 +3,7 @@ from discord.ext.commands import Bot
 from settings import get_settings
 from commands.exile_commands import create_exile_commands
 from commands.ban_commands import create_ban_commands
+from commands.strikes_command import create_strikes_commands
 from commands.helper import create_bot_errors
 from commands.slowmode_commands import create_slowmode_commands
 import logging
@@ -30,5 +31,6 @@ class ModdingwayBot(Bot):
         create_exile_commands(self)
         create_ban_commands(self)
         create_slowmode_commands(self)
+        create_strikes_commands(self)
         create_bot_errors(self)
         logger.info("Registering commands finished")

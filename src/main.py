@@ -6,10 +6,6 @@ from database import DatabaseConnection
 
 settings = get_settings()
 
-# TODO:
-# dockerize
-# error handling at the app level
-
 
 if __name__ == "__main__":
     # Configure logging

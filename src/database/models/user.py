@@ -1,8 +1,19 @@
-# TODO: look into using psycopg to handle model mapping for us
-# https://www.psycopg.org/docs/advanced.html#adapting-new-python-types-to-sql-syntax
-class User(object):
-    def __init__(self, user_id, discord_user_id, discord_guild_id, is_mod):
-        self.user_id = user_id
-        self.discord_user_id = discord_user_id
-        self.discord_guild_id = discord_guild_id
-        self.is_mod = is_mod
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+from settings import get_settings
+
+settings = get_settings()
+
+
+class User(BaseModel):
+    user_id: int
+    discord_user_id: str
+    discord_guild_id: str
+    is_mod: bool
+    temporary_points: int
+    permanent_points: int
+    last_infraction_timestamp: Optional[datetime]
+
+    def get_strike_points(self) -> int:
+        return self.temporary_points + self.permanent_points
