@@ -5,7 +5,7 @@ import logging
 from database import DatabaseConnection
 
 settings = get_settings()
-
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Configure logging
@@ -18,5 +18,9 @@ if __name__ == "__main__":
     database_connection = DatabaseConnection()
     database_connection.connect()
     database_connection.create_tables()
+    try:
+        database_connection.debug_database_schema()
+    except Exception as e:
+        logger.error("Error collecting users database schema")
 
     bot.run(settings.discord_token)
