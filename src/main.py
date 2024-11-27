@@ -5,7 +5,7 @@ import logging
 from database import DatabaseConnection
 
 settings = get_settings()
-
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Configure logging

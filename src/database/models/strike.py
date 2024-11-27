@@ -8,7 +8,7 @@ settings = get_settings()
 
 
 class Strike(BaseModel):
-    strike_id: Optional[int]
+    strike_id: Optional[int] = None
     user_id: int
     severity: StrikeSeverity
     reason: str

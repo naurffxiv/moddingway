@@ -13,7 +13,7 @@ class User(BaseModel):
     is_mod: bool
     temporary_points: int
     permanent_points: int
-    last_infraction_timestamp: Optional[datetime]
+    last_infraction_timestamp: Optional[datetime] = None
 
     def get_strike_points(self) -> int:
         return self.temporary_points + self.permanent_points

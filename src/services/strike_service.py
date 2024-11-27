@@ -40,9 +40,9 @@ async def add_strike(
         severity=severity,
         reason=reason,
         created_timestamp=strike_timestamp,
-        created_by=author.id,
+        created_by=str(author.id),
         last_edited_timestamp=strike_timestamp,
-        last_edited_by=author.id,
+        last_edited_by=str(author.id),
     )
     strike.strike_id = strikes_database.add_strike(strike)
     logging_embed.set_footer(text=f"Strike ID: {strike.strike_id}")
