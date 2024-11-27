@@ -7,6 +7,7 @@ from services.exile_service import (
     unexile_user,
     get_user_exiles,
     get_active_exiles,
+    nicer_duration,
 )
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
@@ -54,13 +55,14 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
+        nicer_duration_str = nicer_duration(duration)
         start_timestamp = datetime.datetime.now(datetime.timezone.utc)
         end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
                 interaction,
                 user=user,
-                duration=duration,
+                duration=nicer_duration_str,
                 reason=reason,
                 expiration=end_timestamp,
             ) as logging_embed:
@@ -83,6 +85,7 @@ def create_exile_commands(bot: Bot) -> None:
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
         duration_string = f"{duration_choice}hour"
+        nicer_duration_str = nicer_duration(duration_string)
         start_timestamp = datetime.datetime.now(datetime.timezone.utc)
         end_timestamp = start_timestamp + calculate_time_delta(duration_string)
 
@@ -95,7 +98,7 @@ def create_exile_commands(bot: Bot) -> None:
 
         async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(
-                interaction, duration=duration_string, expiration=end_timestamp
+                interaction, duration=nicer_duration_str, expiration=end_timestamp
             ) as logging_embed:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)

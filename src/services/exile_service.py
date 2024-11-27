@@ -7,6 +7,7 @@ from typing import Optional
 import datetime
 from database.models import Exile
 from datetime import timezone
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -193,3 +194,27 @@ async def get_active_exiles() -> str:
         )
 
     return result
+
+
+def nicer_duration(duration_string: str):
+    if not duration_string:
+        return None
+    regex = "^(\d\d?)(sec|min|min|hour|day)"  # Matches (digit, digit?)(option of [sec, min, hour, day])
+    result = re.search(regex, duration_string)
+    if result:
+        duration = int(result.group(1))
+        unit = result.group(2)
+        p_unit = None
+
+        if unit == "sec":
+            p_unit = "second"
+        elif unit == "min":
+            p_unit = "minute"
+        else:
+            p_unit = unit
+
+        if duration != 1:
+            p_unit += "s"
+
+        return result.group(1) + " " + p_unit
+    return None
