@@ -47,21 +47,6 @@ class DatabaseConnection:
                 script = fd.read()
                 cursor.execute(script)
 
-    def debug_database_schema(self):
-        with self.get_cursor() as cursor:
-            sql = """
-            SELECT column_name, is_nullable, data_type 
-                FROM information_schema.columns 
-            WHERE table_name = 'users';
-            """
-
-            cursor.execute(sql)
-            res = cursor.fetchall()
-
-            logger.info("Users database schema")
-            for row in res:
-                logger.info(row)
-
     # TODO: properly spin down DB connection on exit
 
     def get_cursor(self) -> cursor:
