@@ -24,7 +24,9 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case discord.ChannelType:
                     fields.append(EmbedField(key.title(), f"<#{value}>"))
                 case datetime.datetime:
-                    timestamp_epoch = int(value.replace(tzinfo=timezone.utc).timestamp())
+                    timestamp_epoch = int(
+                        value.replace(tzinfo=timezone.utc).timestamp()
+                    )
                     fields.append(EmbedField(key.title(), f"<t:{timestamp_epoch}:R>"))
                 case _:
                     fields.append(EmbedField(key.title(), value))

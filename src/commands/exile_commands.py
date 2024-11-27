@@ -58,7 +58,11 @@ def create_exile_commands(bot: Bot) -> None:
         end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
-                interaction, user=user, duration=duration, reason=reason, expiration=end_timestamp
+                interaction,
+                user=user,
+                duration=duration,
+                reason=reason,
+                expiration=end_timestamp,
             ) as logging_embed:
                 error_message = await exile_user(
                     logging_embed, user, exile_duration, reason
