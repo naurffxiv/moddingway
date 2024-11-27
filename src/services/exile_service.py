@@ -77,7 +77,7 @@ async def exile_user(
     log_info_and_embed(
         logging_embed,
         logger,
-        f"<@{user.id}> was successfully exiled for {duration}. Exile expires <t:{timestamp}:R>",
+        f"<@{user.id}> was successfully exiled",
     )
 
 
