@@ -5,6 +5,8 @@ from settings import get_settings
 from util import EmbedField, create_interaction_embed_context
 import logging
 import time
+import datetime
+from datetime import timezone
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -21,6 +23,9 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                     fields.append(EmbedField(key.title(), f"<@{value.id}>"))
                 case discord.ChannelType:
                     fields.append(EmbedField(key.title(), f"<#{value}>"))
+                case datetime.datetime:
+                    timestamp_epoch = int(value.replace(tzinfo=timezone.utc).timestamp())
+                    fields.append(EmbedField(key.title(), f"<t:{timestamp_epoch}:R>"))
                 case _:
                     fields.append(EmbedField(key.title(), value))
 
