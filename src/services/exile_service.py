@@ -33,7 +33,15 @@ async def exile_user(
             error_message,
         )
         return error_message
-
+    if user_has_role(user, Role.MOD) or user_has_role(user, Role.ADMIN):
+        error_message = "User is a mod or an admin, no action will be taken"
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Error",
+            error_message,
+        )
+        return error_message
     # look up user in DB
     db_user = users_database.get_user(user.id)
     if db_user is None:
@@ -102,15 +110,7 @@ async def unexile_user(
             error_message,
         )
         return error_message
-    if user_has_role(user, Role.MOD) or user_has_role(user, Role.ADMIN):
-        error_message = "User is a mod or an admin, no action will be taken"
-        log_info_and_add_field(
-            logging_embed,
-            logger,
-            "Error",
-            error_message,
-        )
-        return error_message
+
     # unexile user
     await add_and_remove_role(user, Role.VERIFIED, Role.EXILED)
 
