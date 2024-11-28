@@ -7,11 +7,13 @@ from services.exile_service import (
     unexile_user,
     get_user_exiles,
     get_active_exiles,
+    format_time_string,
 )
 from util import is_user_moderator, calculate_time_delta
 from typing import Optional
 from .helper import create_logging_embed, create_response_context
 from random import choice
+import datetime
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -54,9 +56,15 @@ def create_exile_commands(bot: Bot) -> None:
             )
             return
 
+        start_timestamp = datetime.datetime.now(datetime.timezone.utc)
+        end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
-                interaction, user=user, duration=duration, reason=reason
+                interaction,
+                user=user,
+                duration=format_time_string(duration),
+                reason=reason,
+                expiration=end_timestamp,
             ) as logging_embed:
                 error_message = await exile_user(
                     logging_embed, user, exile_duration, reason
@@ -77,6 +85,8 @@ def create_exile_commands(bot: Bot) -> None:
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
         duration_string = f"{duration_choice}hour"
+        start_timestamp = datetime.datetime.now(datetime.timezone.utc)
+        end_timestamp = start_timestamp + calculate_time_delta(duration_string)
 
         if safety_choice:
             await interaction.response.send_message(
@@ -87,7 +97,9 @@ def create_exile_commands(bot: Bot) -> None:
 
         async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(
-                interaction, duration=duration_string
+                interaction,
+                duration=format_time_string(duration_string),
+                expiration=end_timestamp,
             ) as logging_embed:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)
