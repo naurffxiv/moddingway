@@ -48,3 +48,6 @@ Files in this repo will be run through the [Black Formatter](https://black.readt
 
 ### Running in Docker
 If you want to run the app in a container, you run the application via `make python-run`. This command will also create a container for the postgres database, and will override the postgres host environment variable to correctly allow the two containers to interact with each other
+
+### Reseeding the Database
+By default, when you run the application either via python or docker, records in the database will persist. If you want to reset the database, you can do so by running `make database-clean` while the postgres container is running on your machine. If the database container is not found by the command, you can first start it by running `make database-run`
