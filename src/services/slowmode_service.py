@@ -1,6 +1,6 @@
 import discord
 import logging
-from util import log_info_and_embed
+from util import log_info_and_add_field
 
 logger = logging.getLogger(__name__)
 
@@ -12,11 +12,7 @@ async def edit_slowmode(
 ) -> str:
     if interval < 0 or interval > 21600:
         error_message = "Interval must be between 0 and 21600 seconds"
-        log_info_and_embed(
-            logging_embed,
-            logger,
-            error_message,
-        )
+        log_info_and_add_field(logging_embed, logger, "Error", error_message)
         return error_message
 
     # check if channel is already set to the desired entry
@@ -27,11 +23,7 @@ async def edit_slowmode(
             error_message = (
                 f"Slowmode is already set to {interval} seconds in {channel.mention}"
             )
-        log_info_and_embed(
-            logging_embed,
-            logger,
-            error_message,
-        )
+        log_info_and_add_field(logging_embed, logger, "Error", error_message)
         return error_message
 
     # set slowmode
@@ -41,9 +33,5 @@ async def edit_slowmode(
         result = f"Successfully turned off slowmode in {channel.mention}"
     else:
         result = f"Successfully set slowmode to {interval} seconds in {channel.mention}"
-    log_info_and_embed(
-        logging_embed,
-        logger,
-        result,
-    )
+    log_info_and_add_field(logging_embed, logger, "Result", result)
     return result

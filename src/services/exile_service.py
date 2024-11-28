@@ -1,6 +1,12 @@
 import discord
 import logging
-from util import log_info_and_embed, add_and_remove_role, send_dm, user_has_role
+from util import (
+    log_info_and_add_field,
+    log_info_and_embed,
+    add_and_remove_role,
+    send_dm,
+    user_has_role,
+)
 from enums import Role, ExileStatus
 from database import users_database, exiles_database
 from typing import Optional
@@ -20,9 +26,10 @@ async def exile_user(
 ) -> Optional[str]:
     if not user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
-        log_info_and_embed(
+        log_info_and_add_field(
             logging_embed,
             logger,
+            "Error",
             error_message,
         )
         return error_message
@@ -71,13 +78,14 @@ async def exile_user(
             f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\nExile expiration: <t:{timestamp}:R>",
         )
     except Exception as e:
-        log_info_and_embed(
-            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        log_info_and_add_field(
+            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
         )
 
-    log_info_and_embed(
+    log_info_and_add_field(
         logging_embed,
         logger,
+        "Result",
         f"<@{user.id}> was successfully exiled",
     )
 
@@ -87,9 +95,10 @@ async def unexile_user(
 ) -> Optional[str]:
     if not user_has_role(user, Role.EXILED):
         error_message = "User is not currently exiled, no action will be taken"
-        log_info_and_embed(
+        log_info_and_add_field(
             logging_embed,
             logger,
+            "Error",
             error_message,
         )
         return error_message
@@ -104,17 +113,20 @@ async def unexile_user(
             f"You have been un-exiled from NA Ultimate Raiding - FFXIV.",
         )
     except Exception as e:
-        log_info_and_embed(
-            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        log_info_and_add_field(
+            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
         )
 
     # update exile record
     db_user = users_database.get_user(user.id)
     if db_user is None:
-        error_message = "User does not have any exiles, no action will be taken"
-        log_info_and_embed(
+        error_message = (
+            "User has been unexiled, but no user record was found in the database"
+        )
+        log_info_and_add_field(
             logging_embed,
             logger,
+            "Error",
             error_message,
         )
         return error_message
@@ -130,7 +142,9 @@ async def unexile_user(
         exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNEXILED)
         logging_embed.set_footer(text=f"Exile ID: {exile.exile_id}")
 
-    log_info_and_embed(logging_embed, logger, f"<@{user.id}> was successfully unexiled")
+    log_info_and_add_field(
+        logging_embed, logger, "Result", f"<@{user.id}> was successfully unexiled"
+    )
 
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
