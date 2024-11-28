@@ -89,7 +89,8 @@ async def create_response_context(interaction: discord.Interaction, sendEphemera
     try:
         yield helper
     except Exception as e:
-        helper.append_string(e)
+        helper.append_string("An unexpected error has occurred")
+        raise e
     finally:
         try:
             msg = await interaction.original_response()
