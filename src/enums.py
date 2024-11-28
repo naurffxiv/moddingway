@@ -5,7 +5,7 @@ class Role(StrEnum):
     EXILED = "Exiled"
     VERIFIED = "Verified"
     MOD = "Mod"
-    ADMING = "Admin"
+    ADMIN = "Admin"
 
 
 class ExileStatus(IntEnum):
