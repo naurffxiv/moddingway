@@ -56,7 +56,7 @@ async def autodelete_threads(self):
 
             if num_removed > 0:
                 message = " ".join([f"<@{x}>" for x in user_list])
-                message += f"\nYour thread in <#{channel_id}> has been automatically deleted as {duration} days have passed without any activity or the original message has been deleted."
+                message += f"\nYour post(s) in <#{channel_id}> were deleted for inactivity of {duration} days or your original message in the post was deleted."
                 await send_chunked_message(notifying_channel, message)
 
             if num_removed > 0 or num_errors > 0:
