@@ -72,6 +72,16 @@ def log_info_and_embed(embed: discord.Embed, logger, message: str):
     logger.info(message)
 
 
+def log_info_and_add_field(embed: discord.Embed, logger, name: str, value: str):
+    """
+    Write a log message to both the default logger and add the string to
+    the discord message that will be sent to the logging channel upon command
+    finishing
+    """
+    embed.add_field(name=name, value=value, inline=False)
+    logger.info(f"{name}: {value}")
+
+
 def _split_chunks(message_content: str, from_index: int, max_chunk_length: int = 2000):
     max_index = from_index + max_chunk_length
 

@@ -1,7 +1,7 @@
 import discord
 import logging
 from typing import Optional, Tuple
-from util import log_info_and_embed, send_dm
+from util import send_dm
 from settings import get_settings
 from datetime import datetime, timedelta, timezone
 

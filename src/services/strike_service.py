@@ -2,7 +2,7 @@ import discord
 import logging
 from enums import StrikeSeverity
 from database import users_database
-from util import log_info_and_embed, send_dm
+from util import log_info_and_embed, send_dm, log_info_and_add_field
 from database import strikes_database, users_database
 from database.models import Strike, User
 from datetime import datetime, timedelta
@@ -53,9 +53,10 @@ async def add_strike(
     _apply_strike_point_penalty(db_user, severity)
     users_database.update_user_strike_points(db_user)
 
-    log_info_and_embed(
+    log_info_and_add_field(
         logging_embed,
         logger,
+        "Result",
         f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
     )
 
@@ -69,8 +70,8 @@ async def add_strike(
             f"Your actions in NA Ultimate Raiding - FFXIV resulted in a strike against your account. This may result in punishment depending on the frequency or severity of your strikes.\n**Reason:** {reason}",
         )
     except Exception as e:
-        log_info_and_embed(
-            logging_embed, logger, f"Failed to send DM to exiled user, {e}"
+        log_info_and_add_field(
+            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
         )
 
 
