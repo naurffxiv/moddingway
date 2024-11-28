@@ -196,7 +196,7 @@ async def get_active_exiles() -> str:
     return result
 
 
-def nicer_duration(duration_string: str):
+def format_time_string(duration_string: str):
     if not duration_string:
         return None
     regex = "^(\d\d?)(sec|min|min|hour|day)"  # Matches (digit, digit?)(option of [sec, min, hour, day])
