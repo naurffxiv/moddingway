@@ -6,6 +6,7 @@ from util import (
     add_and_remove_role,
     send_dm,
     user_has_role,
+    is_user_moderator,
 )
 from enums import Role, ExileStatus
 from database import users_database, exiles_database
@@ -33,8 +34,8 @@ async def exile_user(
             error_message,
         )
         return error_message
-    if user_has_role(user, Role.MOD) or user_has_role(user, Role.ADMIN):
-        error_message = "User is a mod or an admin, no action will be taken"
+    if user_has_role(user, Role.MOD):
+        error_message = "User is a mod, no action will be taken"
         log_info_and_add_field(
             logging_embed,
             logger,
