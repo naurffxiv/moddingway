@@ -127,10 +127,15 @@ def create_exile_commands(bot: Bot) -> None:
         """View logged exiles of a user."""
 
         async with create_response_context(interaction) as response_message:
-            async with create_logging_embed(interaction, user=user) as logging_embed:
-                msg = await get_user_exiles(logging_embed, user)
-
+            try:
+                msg = await get_user_exiles(user)
                 response_message.set_string(msg)
+            except Exception as e:
+                logger.error(f"Error in get_user_exiles: {str(e)}")
+                async with create_logging_embed(interaction, user=user, error=str(e)):
+                    response_message.set_string(
+                        "An error occurred while fetching user exiles."
+                    )
 
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
