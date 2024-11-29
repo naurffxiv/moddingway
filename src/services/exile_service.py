@@ -23,6 +23,7 @@ async def exile_user(
     user: discord.Member,
     duration: datetime.timedelta,
     reason: str,
+    interaction: discord.Interaction,
 ) -> Optional[str]:
     if not user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
@@ -33,8 +34,8 @@ async def exile_user(
             error_message,
         )
         return error_message
-    if user_has_role(user, Role.MOD):
-        error_message = "User is a mod, no action will be taken"
+    if user.top_role >= interaction.user.top_role:
+        error_message = f"Unable to exile {user.mention}: You cannot exile a user with an equal or higher role than yourself."
         log_info_and_add_field(
             logging_embed,
             logger,

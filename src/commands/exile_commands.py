@@ -67,7 +67,7 @@ def create_exile_commands(bot: Bot) -> None:
                 expiration=end_timestamp,
             ) as logging_embed:
                 error_message = await exile_user(
-                    logging_embed, user, exile_duration, reason
+                    logging_embed, user, exile_duration, reason, interaction
                 )
 
                 response_message.set_string(
@@ -104,7 +104,7 @@ def create_exile_commands(bot: Bot) -> None:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)
                 error_message = await exile_user(
-                    logging_embed, interaction.user, exile_duration, reason
+                    logging_embed, interaction.user, exile_duration, reason, interaction
                 )
 
                 if error_message:
