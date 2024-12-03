@@ -137,46 +137,31 @@ async def _apply_punishment(
     exile_reason = (
         "Your actions were severe or frequent enough for you to receive this exile"
     )
-
+    punishment_days = 0
     if total_points >= 15:
         punishment = "Permanent ban"
         await ban_service.ban_user(
             user,
             "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
         )
-    elif total_points >= 10 and previous_points < 10:
-        punishment = "2 week exile"
-        await exile_service.exile_user(
-            logging_embed,
-            user,
-            timedelta(weeks=2),
-            exile_reason,
-            interaction,
-        )
-    elif total_points >= 7 and previous_points < 7:
-        punishment = "1 week exile"
-        await exile_service.exile_user(
-            logging_embed,
-            user,
-            timedelta(weeks=1),
-            exile_reason,
-            interaction,
-        )
-    elif total_points >= 5 and previous_points < 5:
-        punishment = "3 day exile"
-        await exile_service.exile_user(
-            logging_embed,
-            user,
-            timedelta(days=3),
-            exile_reason,
-            interaction,
-        )
-    elif total_points >= 3 and previous_points < 3:
-        punishment = "1 day exile"
-        await exile_service.exile_user(
-            logging_embed, user, timedelta(days=1), exile_reason, interaction
-        )
-    else:
-        punishment = "Nothing"
+    if total_points >= 10 and previous_points < 10:
+        punishment_days += 14
+    if total_points >= 7 and previous_points < 7:
+        punishment_days += 7
+    if total_points >= 5 and previous_points < 5:
+        punishment_days += 3
+    if total_points >= 3 and previous_points < 3:
+        punishment_days += 1
 
+    if punishment_days == 0:
+        punishment = "Nothing"
+    else:
+        punishment = f"{punishment_days} day exile"
+        await exile_service.exile_user(
+            logging_embed,
+            user,
+            timedelta(days=punishment_days),
+            exile_reason,
+            interaction,
+        )
     return punishment
