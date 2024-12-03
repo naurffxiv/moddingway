@@ -140,7 +140,13 @@ async def _apply_punishment(
     punishment_days = 0
 
     if total_points >= 15:
-        punishment_days = "infinite"
+        punishment = "Permanent ban"
+        await ban_service.ban_user(
+            user,
+            "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
+            False,
+        )
+        return punishment
     if total_points >= 10 and previous_points < 10:
         punishment_days += 14
     if total_points >= 7 and previous_points < 7:
@@ -152,13 +158,6 @@ async def _apply_punishment(
 
     if punishment_days == 0:
         punishment = "Nothing"
-    elif punishment_days == "infinite":
-        punishment = "Permanent ban"
-        await ban_service.ban_user(
-            user,
-            "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
-            False,
-        )
     else:
         punishment = f"{punishment_days} day exile"
         await exile_service.exile_user(
