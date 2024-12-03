@@ -22,6 +22,7 @@ async def add_strike(
     severity: StrikeSeverity,
     reason: str,
     author: discord.Member,
+    interaction: discord.Interaction,
 ):
     # find user in DB
     db_user = users_database.get_user(user.id)
@@ -60,7 +61,9 @@ async def add_strike(
         f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
     )
 
-    punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
+    punishment = await _apply_punishment(
+        logging_embed, user, db_user, previous_points, interaction
+    )
     logging_embed.add_field(name="Punishment", value=punishment)
 
     # message user
@@ -126,6 +129,7 @@ async def _apply_punishment(
     user: discord.Member,
     db_user: User,
     previous_points: int,
+    interaction: discord.Interaction,
 ) -> str:
     total_points = db_user.get_strike_points()
 
@@ -147,6 +151,7 @@ async def _apply_punishment(
             user,
             timedelta(weeks=2),
             exile_reason,
+            interaction,
         )
     elif total_points >= 7 and previous_points < 7:
         punishment = "1 week exile"
@@ -155,16 +160,21 @@ async def _apply_punishment(
             user,
             timedelta(weeks=1),
             exile_reason,
+            interaction,
         )
     elif total_points >= 5 and previous_points < 5:
         punishment = "3 day exile"
         await exile_service.exile_user(
-            logging_embed, user, timedelta(days=3), exile_reason
+            logging_embed,
+            user,
+            timedelta(days=3),
+            exile_reason,
+            interaction,
         )
     elif total_points >= 3 and previous_points < 3:
         punishment = "1 day exile"
         await exile_service.exile_user(
-            logging_embed, user, timedelta(days=1), exile_reason
+            logging_embed, user, timedelta(days=1), exile_reason, interaction
         )
     else:
         punishment = "Nothing"
