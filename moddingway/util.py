@@ -113,7 +113,7 @@ def chunk_message(message_content: str, max_chunk_length: int = 2000):
         line = message_content[from_index:to_index].strip()
         if len(line) == 0:
             from_index = to_index
-            continue 
+            continue
         yield line
         from_index = to_index
 
