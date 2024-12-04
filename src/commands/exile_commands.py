@@ -89,7 +89,7 @@ def create_exile_commands(bot: Bot) -> None:
     )
     async def roulette(interaction: discord.Interaction):
         """Test your luck, fail and be exiled..."""
-        safety_options = [False]
+        safety_options = [True, True, True, True, True, False]
         exile_duration_options = [1, 6, 12, 18, 24]
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
