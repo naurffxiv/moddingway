@@ -8,8 +8,7 @@ from discord.ext.commands import Bot
 from discord.utils import snowflake_time
 
 from moddingway.settings import get_settings
-from moddingway.util import (UnableToNotify, create_interaction_embed_context,
-                             send_dm)
+from moddingway.util import UnableToNotify, create_interaction_embed_context, send_dm
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

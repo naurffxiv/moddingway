@@ -9,8 +9,13 @@ import discord
 from moddingway.database import exiles_database, users_database
 from moddingway.database.models import Exile
 from moddingway.enums import ExileStatus, Role
-from moddingway.util import (add_and_remove_role, log_info_and_add_field,
-                             log_info_and_embed, send_dm, user_has_role)
+from moddingway.util import (
+    add_and_remove_role,
+    log_info_and_add_field,
+    log_info_and_embed,
+    send_dm,
+    user_has_role,
+)
 
 logger = logging.getLogger(__name__)
 

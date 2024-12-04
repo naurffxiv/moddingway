@@ -5,9 +5,13 @@ from random import choice
 import discord
 from discord.ext.commands import Bot
 
-from moddingway.services.exile_service import (exile_user, format_time_string,
-                                               get_active_exiles,
-                                               get_user_exiles, unexile_user)
+from moddingway.services.exile_service import (
+    exile_user,
+    format_time_string,
+    get_active_exiles,
+    get_user_exiles,
+    unexile_user,
+)
 from moddingway.settings import get_settings
 from moddingway.util import calculate_time_delta, is_user_moderator
 

@@ -3,9 +3,11 @@ from datetime import datetime, timedelta
 
 import discord
 
-from moddingway.constants import (MINOR_INFRACTION_POINTS,
-                                  MODERATE_INFRACTION_POINTS,
-                                  SERIOUS_INFRACTION_POINTS)
+from moddingway.constants import (
+    MINOR_INFRACTION_POINTS,
+    MODERATE_INFRACTION_POINTS,
+    SERIOUS_INFRACTION_POINTS,
+)
 from moddingway.database import strikes_database, users_database
 from moddingway.database.models import Strike, User
 from moddingway.enums import StrikeSeverity
