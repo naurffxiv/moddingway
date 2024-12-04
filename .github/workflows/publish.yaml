@@ -42,7 +42,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./src/Dockerfile
+          file: ./moddingway/Dockerfile
           push: true
           tags: ${{ steps.app-meta.outputs.tags }}
           labels: ${{ steps.app-meta.outputs.labels }}
