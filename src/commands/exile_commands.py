@@ -56,7 +56,7 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-        if user_has_role(interaction.user, Role.MOD):
+        if user_has_role(user, Role.MOD):
             logger.warning(
                 f"{interaction.user.id} used the exile command on {user.id}, it failed because targeted user is a mod."
             )
