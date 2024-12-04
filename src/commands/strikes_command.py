@@ -26,7 +26,7 @@ def create_strikes_commands(bot: Bot) -> None:
                 )
 
                 response_message.set_string(
-                    f"Successfully added strike to  {user.mention}"
+                    f"Successfully added strike to {user.mention}"
                 )
 
     @bot.tree.command()
@@ -35,9 +35,6 @@ def create_strikes_commands(bot: Bot) -> None:
     async def view_strikes(interaction: discord.Interaction, user: discord.Member):
         """View the strikes of the user"""
         async with create_response_context(interaction) as response_message:
-            async with create_logging_embed(interaction, user=user) as logging_embed:
-                strike_details = await strike_service.get_user_strikes(
-                    logging_embed, user
-                )
+            strike_details = await strike_service.get_user_strikes(user)
 
-                response_message.set_string(strike_details)
+            response_message.set_string(strike_details)

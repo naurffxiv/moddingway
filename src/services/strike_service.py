@@ -79,7 +79,6 @@ async def add_strike(
 
 
 async def get_user_strikes(
-    logging_embed: discord.Embed,
     user: discord.Member,
 ) -> str:
     db_user = users_database.get_user(user.id)
