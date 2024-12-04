@@ -22,7 +22,7 @@ def create_strikes_commands(bot: Bot) -> None:
                 interaction, user=user, reason=reason, severity=severity.name
             ) as logging_embed:
                 await strike_service.add_strike(
-                    logging_embed, user, severity, reason, interaction.user, interaction
+                    logging_embed, user, severity, reason, interaction.user
                 )
 
                 response_message.set_string(
