@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-import os
 import logging
+import os
+
+from pydantic import BaseModel
 
 
 class Settings(BaseModel):

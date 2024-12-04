@@ -1,13 +1,15 @@
+import logging
+
 import discord
 from discord.ext.commands import Bot
-from moddingway.settings import get_settings
-from moddingway.commands.exile_commands import create_exile_commands
+
+from moddingway import workers
 from moddingway.commands.ban_commands import create_ban_commands
-from moddingway.commands.strikes_command import create_strikes_commands
+from moddingway.commands.exile_commands import create_exile_commands
 from moddingway.commands.helper import create_bot_errors
 from moddingway.commands.slowmode_commands import create_slowmode_commands
-import logging
-from moddingway import workers
+from moddingway.commands.strikes_command import create_strikes_commands
+from moddingway.settings import get_settings
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

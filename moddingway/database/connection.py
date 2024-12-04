@@ -1,9 +1,10 @@
-import psycopg2
-from psycopg2.extensions import cursor
 import logging
 import os
-from moddingway.settings import get_settings
 
+import psycopg2
+from psycopg2.extensions import cursor
+
+from moddingway.settings import get_settings
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

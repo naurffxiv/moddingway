@@ -1,20 +1,16 @@
-import discord
-import logging
-from typing import Optional
 import datetime
-from datetime import timezone
+import logging
 import re
-from moddingway.util import (
-    log_info_and_add_field,
-    log_info_and_embed,
-    add_and_remove_role,
-    send_dm,
-    user_has_role,
-)
-from moddingway.enums import Role, ExileStatus
-from moddingway.database import users_database, exiles_database
-from moddingway.database.models import Exile
+from datetime import timezone
+from typing import Optional
 
+import discord
+
+from moddingway.database import exiles_database, users_database
+from moddingway.database.models import Exile
+from moddingway.enums import ExileStatus, Role
+from moddingway.util import (add_and_remove_role, log_info_and_add_field,
+                             log_info_and_embed, send_dm, user_has_role)
 
 logger = logging.getLogger(__name__)
 

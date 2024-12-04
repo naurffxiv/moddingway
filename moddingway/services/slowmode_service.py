@@ -1,5 +1,7 @@
-import discord
 import logging
+
+import discord
+
 from moddingway.util import log_info_and_add_field
 
 logger = logging.getLogger(__name__)

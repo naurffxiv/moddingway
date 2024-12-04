@@ -1,8 +1,10 @@
+import logging
+from datetime import datetime, timezone
+
+from moddingway.enums import ExileStatus
+
 from . import DatabaseConnection
 from .models import Exile, PendingExile
-from moddingway.enums import ExileStatus
-from datetime import datetime, timezone
-import logging
 
 logger = logging.getLogger(__name__)
 

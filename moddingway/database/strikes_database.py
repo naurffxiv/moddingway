@@ -1,6 +1,7 @@
+from typing import List
+
 from . import DatabaseConnection
 from .models import Strike
-from typing import List
 
 
 def add_strike(strike: Strike) -> int:

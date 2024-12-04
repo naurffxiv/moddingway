@@ -1,8 +1,10 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
-from moddingway.settings import get_settings
+from typing import Optional
+
+from pydantic import BaseModel
+
 from moddingway.enums import StrikeSeverity
+from moddingway.settings import get_settings
 
 settings = get_settings()
 

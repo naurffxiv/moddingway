@@ -1,9 +1,13 @@
-from datetime import datetime, timezone
 import logging
-from moddingway.settings import get_settings
-from .helper import create_automod_embed, automod_thread
+from datetime import datetime, timezone
+
 from discord.ext import tasks
-from moddingway.util import create_interaction_embed_context, send_chunked_message
+
+from moddingway.settings import get_settings
+from moddingway.util import (create_interaction_embed_context,
+                             send_chunked_message)
+
+from .helper import automod_thread, create_automod_embed
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

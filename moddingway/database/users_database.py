@@ -1,8 +1,10 @@
-from . import DatabaseConnection
 import logging
-from .models import User
 from typing import Optional
+
 from moddingway.settings import get_settings
+
+from . import DatabaseConnection
+from .models import User
 
 settings = get_settings()
 
