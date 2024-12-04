@@ -56,9 +56,12 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-        if user.top_role >= interaction.user.top_role:
+        if user_has_role(interaction.user, Role.MOD):
+            logger.warning(
+                f"{interaction.user.id} used the exile command on {user.id}, it failed because targeted user is a mod."
+            )
             await interaction.response.send_message(
-                f"Unable to exile {user.mention}: You cannot exile a user with an equal or higher role than yourself.",
+                f"Unable to exile {user.mention}: You cannot exile a mod.",
                 ephemeral=True,
             )
             return
@@ -86,7 +89,7 @@ def create_exile_commands(bot: Bot) -> None:
     )
     async def roulette(interaction: discord.Interaction):
         """Test your luck, fail and be exiled..."""
-        safety_options = [True, True, True, True, True, False]
+        safety_options = [False]
         exile_duration_options = [1, 6, 12, 18, 24]
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
