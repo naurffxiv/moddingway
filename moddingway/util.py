@@ -110,7 +110,11 @@ def chunk_message(message_content: str, max_chunk_length: int = 2000):
     to_index = 0
     while to_index < len(message_content):
         to_index = _split_chunks(message_content, from_index, max_chunk_length)
-        yield message_content[from_index:to_index]
+        line = message_content[from_index:to_index].strip()
+        if len(line) == 0:
+            from_index = to_index
+            continue 
+        yield line
         from_index = to_index
 
 
