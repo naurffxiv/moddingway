@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2.extensions import cursor
 import logging
 import os
-from settings import get_settings
+from moddingway.settings import get_settings
 
 
 settings = get_settings()

@@ -1,8 +1,8 @@
 import discord
-from bot import ModdingwayBot
-from settings import get_settings
+from moddingway.bot import ModdingwayBot
+from moddingway.settings import get_settings
 import logging
-from database import DatabaseConnection
+from moddingway.database import DatabaseConnection
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

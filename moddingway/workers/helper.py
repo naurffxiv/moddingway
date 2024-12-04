@@ -4,8 +4,8 @@ import asyncio
 import discord
 from discord.utils import snowflake_time
 from discord.ext.commands import Bot
-from settings import get_settings
-from util import create_interaction_embed_context, send_dm, UnableToNotify
+from moddingway.settings import get_settings
+from moddingway.util import create_interaction_embed_context, send_dm, UnableToNotify
 from typing import Optional
 
 

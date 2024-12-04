@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 import discord
 from discord.ext.commands import Bot
-from settings import get_settings
-from util import EmbedField, create_interaction_embed_context
+from moddingway.settings import get_settings
+from moddingway.util import EmbedField, create_interaction_embed_context
 import logging
 import time
 import datetime

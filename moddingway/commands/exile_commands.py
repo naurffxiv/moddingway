@@ -1,19 +1,19 @@
 import discord
 import logging
+import datetime
+from random import choice
 from discord.ext.commands import Bot
-from settings import get_settings
-from services.exile_service import (
+from moddingway.settings import get_settings
+from moddingway.services.exile_service import (
     exile_user,
     unexile_user,
     get_user_exiles,
     get_active_exiles,
     format_time_string,
 )
-from util import is_user_moderator, calculate_time_delta
-from typing import Optional
+from moddingway.util import is_user_moderator, calculate_time_delta
 from .helper import create_logging_embed, create_response_context
-from random import choice
-import datetime
+
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

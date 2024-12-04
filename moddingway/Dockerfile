@@ -7,4 +7,4 @@ RUN --mount=type=bind,source=requirements.txt,target=/tmp/requirements.txt \
 COPY . /opt/app
 WORKDIR /opt/app
 
-CMD ["python", "./src/main.py"]
+CMD ["python", "./main.py"]

@@ -7,7 +7,7 @@ services:
     container_name: pythonBot
     build:
       context: .
-      dockerfile: ./src/Dockerfile
+      dockerfile: ./moddingway/Dockerfile
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}

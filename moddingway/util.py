@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
 import discord
-from settings import get_settings
+from moddingway.settings import get_settings
 import re
 from typing import Optional
 from datetime import timedelta
-from enums import Role
+from moddingway.enums import Role
 
 settings = get_settings()
 

@@ -1,8 +1,8 @@
 import discord
 import logging
 from typing import Optional, Tuple
-from util import send_dm
-from settings import get_settings
+from moddingway.util import send_dm
+from moddingway.settings import get_settings
 from datetime import datetime, timedelta, timezone
 
 settings = get_settings()

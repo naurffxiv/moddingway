@@ -1,9 +1,9 @@
 import discord
 import logging
 from discord.ext.commands import Bot
-from settings import get_settings
-from services.slowmode_service import edit_slowmode
-from util import is_user_moderator
+from moddingway.settings import get_settings
+from moddingway.services.slowmode_service import edit_slowmode
+from moddingway.util import is_user_moderator
 from .helper import create_logging_embed, create_response_context
 
 settings = get_settings()

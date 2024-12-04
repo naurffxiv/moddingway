@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from settings import get_settings
+from moddingway.settings import get_settings
 
 settings = get_settings()
 

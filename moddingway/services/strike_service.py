@@ -1,13 +1,13 @@
 import discord
 import logging
-from enums import StrikeSeverity
-from database import users_database
-from util import log_info_and_embed, send_dm, log_info_and_add_field
-from database import strikes_database, users_database
-from database.models import Strike, User
+from moddingway.enums import StrikeSeverity
+from moddingway.database import users_database
+from moddingway.util import log_info_and_embed, send_dm, log_info_and_add_field
+from moddingway.database import strikes_database, users_database
+from moddingway.database.models import Strike, User
 from datetime import datetime, timedelta
 from . import exile_service, ban_service
-from constants import (
+from moddingway.constants import (
     MINOR_INFRACTION_POINTS,
     MODERATE_INFRACTION_POINTS,
     SERIOUS_INFRACTION_POINTS,

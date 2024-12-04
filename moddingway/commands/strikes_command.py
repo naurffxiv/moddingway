@@ -1,9 +1,9 @@
 import discord
 from discord.ext.commands import Bot
-from util import is_user_moderator
-from enums import StrikeSeverity
+from moddingway.util import is_user_moderator
+from moddingway.enums import StrikeSeverity
 from .helper import create_logging_embed, create_response_context
-from services import strike_service
+from moddingway.services import strike_service
 
 
 def create_strikes_commands(bot: Bot) -> None:

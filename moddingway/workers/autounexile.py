@@ -1,9 +1,9 @@
 from discord.ext import tasks
-from database import exiles_database
-from services.exile_service import unexile_user
-from settings import get_settings
+from moddingway.database import exiles_database
+from moddingway.services.exile_service import unexile_user
+from moddingway.settings import get_settings
 from .helper import create_autounexile_embed
-from enums import ExileStatus
+from moddingway.enums import ExileStatus
 import logging
 
 settings = get_settings()
