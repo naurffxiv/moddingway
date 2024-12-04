@@ -4,7 +4,7 @@ begin;
 delete from exiles;
 delete from strikes;
 delete from users;
-
+delete from notes;
 -- seed users
 insert into users 
 (userid, discordUserID, discordguildid, ismod)
