@@ -28,3 +28,23 @@ def add_note(note: Note) -> int:
         res = cursor.fetchone()
 
         return res[0]
+
+
+def list_notes(user_id: int) -> List[tuple]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select n.noteid, n.note, n.createdby  
+        from notes n
+        join users u on u.userID = n.userID
+        where u.userId = %s
+        order by n.createdtimestamp asc
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchall()
+
+        return res
