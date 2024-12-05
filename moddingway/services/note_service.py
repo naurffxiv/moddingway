@@ -44,3 +44,25 @@ async def add_note(
         "Result",
         f"<@{user.id}> was given a note",
     )
+
+
+async def get_user_notes(
+    user: discord.Member,
+) -> str:
+    db_user = users_database.get_user(user.id)
+    if db_user is None:
+        return "User not found in database"
+
+    note_list = notes_database.list_notes(db_user.user_id)
+    logger.debug(note_list)
+
+    if len(note_list) == 0:
+        return "No notes found for user"
+    result = f"Notes found for <@{user.id}>:"
+    for note in note_list:
+        result = (
+            result
+            + f"\n* ID: {note.note_id} | Note Creator: <@{note.created_by}> | Last Editor: <@{note.last_editor}> | Note: {note.content}"
+        )
+
+    return result
