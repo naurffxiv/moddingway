@@ -1,11 +1,12 @@
 import discord
 from discord.ext.commands import Bot
-
+import logging
 from moddingway.enums import StrikeSeverity
 from moddingway.services import strike_service
-from moddingway.util import is_user_moderator
-
+from moddingway.util import is_user_moderator, user_has_role
+from enums import Role
 from .helper import create_logging_embed, create_response_context
+logger = logging.getLogger(__name__)
 
 
 def create_strikes_commands(bot: Bot) -> None:
@@ -18,17 +19,26 @@ def create_strikes_commands(bot: Bot) -> None:
         severity: StrikeSeverity,
         reason: str,
     ):
+        if user_has_role(user, Role.MOD):
+            logger.warning(
+                f"{interaction.user.id} used the add strike command on {user.id}, it failed because targeted user is a mod."
+            )
+            await interaction.response.send_message(
+                f"Unable to add strike to {user.mention}: You cannot add strike to a mod.",
+                ephemeral=True,
+            )
+            return
         """Add a strike to the user"""
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
                 interaction, user=user, reason=reason, severity=severity.name
             ) as logging_embed:
                 await strike_service.add_strike(
-                    logging_embed, user, severity, reason, interaction.user, interaction
+                    logging_embed, user, severity, reason, interaction.user
                 )
 
                 response_message.set_string(
-                    f"Successfully added strike to  {user.mention}"
+                    f"Successfully added strike to {user.mention}"
                 )
 
     @bot.tree.command()
@@ -37,9 +47,6 @@ def create_strikes_commands(bot: Bot) -> None:
     async def view_strikes(interaction: discord.Interaction, user: discord.Member):
         """View the strikes of the user"""
         async with create_response_context(interaction) as response_message:
-            async with create_logging_embed(interaction, user=user) as logging_embed:
-                strike_details = await strike_service.get_user_strikes(
-                    logging_embed, user
-                )
+            strike_details = await strike_service.get_user_strikes(user)
 
-                response_message.set_string(strike_details)
+            response_message.set_string(strike_details)

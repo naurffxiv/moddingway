@@ -24,7 +24,6 @@ async def add_strike(
     severity: StrikeSeverity,
     reason: str,
     author: discord.Member,
-    interaction: discord.Interaction,
 ):
     # find user in DB
     db_user = users_database.get_user(user.id)
@@ -63,9 +62,7 @@ async def add_strike(
         f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
     )
 
-    punishment = await _apply_punishment(
-        logging_embed, user, db_user, previous_points, interaction
-    )
+    punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
     logging_embed.add_field(name="Punishment", value=punishment)
 
     # message user
@@ -81,7 +78,6 @@ async def add_strike(
 
 
 async def get_user_strikes(
-    logging_embed: discord.Embed,
     user: discord.Member,
 ) -> str:
     db_user = users_database.get_user(user.id)
@@ -131,7 +127,6 @@ async def _apply_punishment(
     user: discord.Member,
     db_user: User,
     previous_points: int,
-    interaction: discord.Interaction,
 ) -> str:
     total_points = db_user.get_strike_points()
 
@@ -163,10 +158,6 @@ async def _apply_punishment(
     else:
         punishment = f"{punishment_days} day exile"
         await exile_service.exile_user(
-            logging_embed,
-            user,
-            timedelta(days=punishment_days),
-            exile_reason,
-            interaction,
+            logging_embed, user, timedelta(days=punishment_days), exile_reason
         )
     return punishment

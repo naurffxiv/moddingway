@@ -13,7 +13,9 @@ from moddingway.services.exile_service import (
     unexile_user,
 )
 from moddingway.settings import get_settings
-from moddingway.util import calculate_time_delta, is_user_moderator
+from moddingway.util import calculate_time_delta, is_user_moderator, user_has_role
+
+from enums import Role
 
 from .helper import create_logging_embed, create_response_context
 
@@ -57,7 +59,15 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-
+        if user_has_role(user, Role.MOD):
+            logger.warning(
+                f"{interaction.user.id} used the exile command on {user.id}, it failed because targeted user is a mod."
+            )
+            await interaction.response.send_message(
+                f"Unable to exile {user.mention}: You cannot exile a mod.",
+                ephemeral=True,
+            )
+            return
         start_timestamp = datetime.datetime.now(datetime.timezone.utc)
         end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
@@ -69,7 +79,7 @@ def create_exile_commands(bot: Bot) -> None:
                 expiration=end_timestamp,
             ) as logging_embed:
                 error_message = await exile_user(
-                    logging_embed, user, exile_duration, reason, interaction
+                    logging_embed, user, exile_duration, reason
                 )
 
                 response_message.set_string(
@@ -96,7 +106,12 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=False,
             )
             return
-
+        if user_has_role(interaction.user, Role.MOD):
+            await interaction.response.send_message(
+                f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s).",
+                ephemeral=False,
+            )
+            return
         async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(
                 interaction,
@@ -106,7 +121,7 @@ def create_exile_commands(bot: Bot) -> None:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)
                 error_message = await exile_user(
-                    logging_embed, interaction.user, exile_duration, reason, interaction
+                    logging_embed, interaction.user, exile_duration, reason
                 )
 
                 if error_message:
