@@ -2,10 +2,14 @@ import discord
 from discord.ext.commands import Bot
 from settings import get_settings
 from services.ban_service import ban_user
-from util import is_user_moderator
+from util import is_user_moderator, user_has_role
 from .helper import create_logging_embed, create_response_context
+from enums import Role
+import logging
 
 settings = get_settings()
+
+logger = logging.getLogger(__name__)
 
 
 def create_ban_commands(bot: Bot) -> None:
@@ -22,15 +26,18 @@ def create_ban_commands(bot: Bot) -> None:
         reason: str,
         delete_messages: bool = False,  # Default to false for no message deletion as we typically don't want to delete messages.
     ):
+        if user_has_role(user, Role.MOD):
+            logger.warning(
+                f"{interaction.user.id} used the ban command on {user.id}, it failed because targeted user is a mod."
+            )
+            await interaction.response.send_message(
+                f"Unable to ban {user.mention}: You cannot ban a mod.",
+                ephemeral=True,
+            )
+            return
         """Ban the specified user."""
         async with create_response_context(interaction) as response_message:
             ban_success, error = await ban_user(user, reason, delete_messages)
-            # Ensure invoking_member has a higher role position than the target user.
-            if user.top_role >= interaction.user.top_role:
-                response_message.set_string(
-                    f"Unable to ban {user.mention}: You cannot ban a user with an equal or higher role than yourself."
-                )
-                return
             async with create_logging_embed(
                 interaction,
                 user=user,
