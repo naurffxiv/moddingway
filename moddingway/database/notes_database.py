@@ -1,6 +1,23 @@
+from dataclasses import dataclass
+from datetime import datetime
 from . import DatabaseConnection
 from .models import Note
 from typing import List
+
+
+@dataclass
+class Note_Display:
+    note_id: int
+    content: str
+    created_by: int
+    last_editor: datetime
+
+
+def from_db_row(row: tuple) -> "Note_Display":
+
+    return Note_Display(
+        note_id=row[0], content=row[1], created_by=row[2], last_editor=row[3]
+    )
 
 
 def add_note(note: Note) -> int:
@@ -28,3 +45,23 @@ def add_note(note: Note) -> int:
         res = cursor.fetchone()
 
         return res[0]
+
+
+def list_notes(user_id: int) -> List[Note_Display]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select n.noteid, n.note, n.createdby, n.lastEditedBy  
+        from notes n
+        join users u on u.userID = n.userID
+        where u.userId = %s
+        order by n.createdtimestamp asc
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        return [from_db_row(row) for row in rows]

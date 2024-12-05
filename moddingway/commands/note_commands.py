@@ -22,5 +22,14 @@ def create_note_commands(bot: Bot) -> None:
                 await note_service.add_note(logging_embed, user, note, interaction.user)
 
                 response_message.set_string(
-                    f"Successfully added note to  {user.mention}"
+                    f"Successfully added note to {user.mention}"
                 )
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(user="User whose notes you are viewing")
+    async def view_notes(interaction: discord.Interaction, user: discord.Member):
+        """View the notes of the user"""
+        async with create_response_context(interaction) as response_message:
+            note_details = await note_service.get_user_notes(user)
+            response_message.set_string(note_details)
