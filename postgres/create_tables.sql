@@ -39,4 +39,16 @@ CREATE TABLE IF NOT EXISTS strikes (
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
+
+CREATE TABLE IF NOT EXISTS notes (
+	noteID INT GENERATED ALWAYS AS IDENTITY,
+	userID INT NOT null,
+	note TEXT,
+	createdTimestamp TIMESTAMP,
+	createdBy VARCHAR(20) NOT NULL,
+	lastEditedTimestamp TIMESTAMP,
+	lastEditedBy VARCHAR(20) NOT NULL,
+	PRIMARY KEY(noteID),
+	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
+);
 COMMIT;
