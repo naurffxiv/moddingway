@@ -46,6 +46,25 @@ async def add_note(
     )
 
 
+async def get_a_note(
+    note_id: int,
+) -> str:
+    db_note = notes_database.get_note(note_id)
+    if db_note is None:
+        return "Note not found in database"
+
+    for note in db_note:
+        note_id = note[0]
+        note_text = note[1]
+        note_created_by = note[2]
+        result = (
+            result
+            + f"\n* ID: {note_id} | NOTE: {note_text} | Moderator: <@{note_created_by}>"
+        )
+
+    return result
+
+
 async def get_user_notes(
     user: discord.Member,
 ) -> str:
@@ -56,7 +75,7 @@ async def get_user_notes(
     note_list = notes_database.list_notes(db_user.user_id)
 
     if len(note_list) == 0:
-        return "No exiles found for user"
+        return "No notes found for user"
     result = f"Notes found for <@{user.id}>:"
     for note in note_list:
         # logger.debug(note)
@@ -67,5 +86,45 @@ async def get_user_notes(
             result
             + f"\n* ID: {note_id} | NOTE: {note_text} | Moderator: <@{note_created_by}>"
         )
+
+    return result
+
+
+async def delete_user_note(
+    logging_embed: discord.Embed,
+    note_id: int,
+) -> str:
+    note_row = notes_database.get_note(note_id)
+    logger.debug(note_row)
+    if note_row is None:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note not found",
+        )
+        return "Note not found in database"
+
+    result = notes_database.delete_note(note_id)
+
+    if result:
+        logging_embed.set_footer(text=f"Note ID: {note_id}")
+
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note deleted",
+        )
+
+        result = f"Note {note_id} deleted"
+    else:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Error deleting note",
+        )
+        result = "There was an error deleting note from the database"
 
     return result

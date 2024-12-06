@@ -3,6 +3,10 @@ from discord.ext.commands import Bot
 from util import is_user_moderator
 from .helper import create_logging_embed, create_response_context
 from services import note_service
+from database import notes_database
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def create_note_commands(bot: Bot) -> None:
@@ -33,3 +37,49 @@ def create_note_commands(bot: Bot) -> None:
         async with create_response_context(interaction) as response_message:
             note_details = await note_service.get_user_notes(user)
             response_message.set_string(note_details)
+
+    class MyView(discord.ui.View):
+        def __init__(
+            self, note_id: int, interaction: discord.Interaction, *args, **kwargs
+        ):
+            super().__init__(*args, **kwargs)
+            self.note_id = note_id
+            self.original_interaction = interaction
+
+        @discord.ui.button(label="Confirm", style=discord.ButtonStyle.success)
+        async def first_button_callback(
+            self, interaction: discord.Interaction, button: discord.ui.Button
+        ):
+            async with create_response_context(interaction) as response_message:
+                async with create_logging_embed(
+                    self.original_interaction, note_id=self.note_id
+                ) as logging_embed:
+                    msg = await note_service.delete_user_note(
+                        logging_embed, self.note_id
+                    )
+
+                    response_message.set_string(msg)
+
+        @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+        async def second_button_callback(
+            self, interaction: discord.Interaction, button: discord.ui.Button
+        ):
+            async with create_response_context(interaction) as response_message:
+                response_message.set_string("Note deletion cancelled")
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(note_id="Note id to delete")
+    async def delete_note(
+        interaction: discord.Interaction,
+        note_id: int,
+    ):
+        note_row = notes_database.get_note(note_id)
+        if note_row:
+            await interaction.response.send_message(
+                f"Are you sure you want to delete this note? {note_row[1]}",
+                view=MyView(note_id=note_id, interaction=interaction, timeout=30),
+                ephemeral=True,
+            ) 
+        else:
+            await interaction.response.send_message("Note not found", ephemeral=True)

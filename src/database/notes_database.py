@@ -48,3 +48,38 @@ def list_notes(user_id: int) -> List[tuple]:
         res = cursor.fetchall()
 
         return res
+
+
+def get_note(note_id: int) -> List[tuple]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select n.noteid, n.note, n.createdby  
+        from notes n
+        join users u on u.userID = n.userID
+        where n.noteid = %s
+        """
+
+        params = (note_id,)
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        return res
+
+
+def delete_note(note_id: int) -> List[tuple]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        delete from notes n
+        where n.noteid = %s
+        """
+        params = (note_id,)
+
+        cursor.execute(query, params)
+        rows_affected = cursor.rowcount
+
+        return rows_affected > 0
