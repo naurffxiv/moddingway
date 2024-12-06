@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 from . import DatabaseConnection
 from .models import Note
 from typing import List
@@ -10,14 +9,16 @@ class Note_Display:
     note_id: int
     content: str
     created_by: int
-    last_editor: datetime
+    last_editor: int
 
 
 def from_db_row(row: tuple) -> "Note_Display":
-
-    return Note_Display(
-        note_id=row[0], content=row[1], created_by=row[2], last_editor=row[3]
-    )
+    try:
+        return Note_Display(
+            note_id=row[0], content=row[1], created_by=row[2], last_editor=row[3]
+        )
+    except:
+        return None
 
 
 def add_note(note: Note) -> int:
@@ -65,3 +66,38 @@ def list_notes(user_id: int) -> List[Note_Display]:
         rows = cursor.fetchall()
 
         return [from_db_row(row) for row in rows]
+
+
+def get_note(note_id: int) -> Note_Display:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select n.noteid, n.note, n.createdby , n.lastEditedBy  
+        from notes n
+        join users u on u.userID = n.userID
+        where n.noteid = %s
+        """
+
+        params = (note_id,)
+
+        cursor.execute(query, params)
+        row = cursor.fetchone()
+
+        return from_db_row(row)
+
+
+def delete_note(note_id: int) -> bool:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        delete from notes n
+        where n.noteid = %s
+        """
+        params = (note_id,)
+
+        cursor.execute(query, params)
+        rows_affected = cursor.rowcount
+
+        return rows_affected > 0
