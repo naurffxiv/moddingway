@@ -78,7 +78,7 @@ def create_note_commands(bot: Bot) -> None:
         note_row = notes_database.get_note(note_id)
         if note_row:
             await interaction.response.send_message(
-                f"Are you sure you want to delete this note? \n {note_row[1]}",
+                f"Are you sure you want to delete this note? \n`{note_row[1]}`",
                 view=MyView(note_id=note_id, interaction=interaction, timeout=30),
                 ephemeral=True,
             )

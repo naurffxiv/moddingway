@@ -75,7 +75,7 @@ async def get_user_notes(
     note_list = notes_database.list_notes(db_user.user_id)
 
     if len(note_list) == 0:
-        return "No notes found for user"
+        return f"No notes found for user <@{user.id}>"
     result = f"Notes found for <@{user.id}>:"
     for note in note_list:
         # logger.debug(note)
@@ -117,7 +117,7 @@ async def delete_user_note(
             f"Note deleted",
         )
 
-        result = f"Note {note_id} deleted"
+        result = f"Successfully deleted note: {note_id}"
     else:
         log_info_and_add_field(
             logging_embed,
