@@ -46,6 +46,16 @@ async def add_note(
     )
 
 
+async def get_note_by_id(
+    note_id: int,
+) -> str:
+    db_note = notes_database.get_note(note_id)
+    if db_note:
+        return f"\n* ID: {db_note.note_id} | Note: {db_note.content} | Note Creator: <@{db_note.created_by}> | Last Editor: <@{db_note.last_editor}>"
+    else:
+        return
+
+
 async def get_user_notes(
     user: discord.Member,
 ) -> str:
@@ -54,15 +64,53 @@ async def get_user_notes(
         return "User not found in database"
 
     note_list = notes_database.list_notes(db_user.user_id)
-    logger.debug(note_list)
 
     if len(note_list) == 0:
-        return "No notes found for user"
+        return f"No notes found for user <@{user.id}>"
     result = f"Notes found for <@{user.id}>:"
     for note in note_list:
         result = (
             result
             + f"\n* ID: {note.note_id} | Note Creator: <@{note.created_by}> | Last Editor: <@{note.last_editor}> | Note: {note.content}"
         )
+
+    return result
+
+
+async def delete_user_note(
+    logging_embed: discord.Embed,
+    note_id: int,
+) -> str:
+    note_row = notes_database.get_note(note_id)
+    if note_row is None:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note not found, no action will be taken",
+        )
+        return "Note not found in database, no action will be taken"
+
+    result = notes_database.delete_note(note_id)
+
+    if result:
+        logging_embed.set_footer(text=f"Note ID: {note_id}")
+
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note deleted",
+        )
+
+        result = f"Successfully deleted note: {note_id}"
+    else:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Error deleting note",
+        )
+        result = "There was an error deleting note from the database"
 
     return result
