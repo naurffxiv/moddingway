@@ -13,6 +13,7 @@ def create_note_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User to add note to")
+    @discord.app_commands.describe(note="Note for user, no more than 300 characters")
     async def add_note(
         interaction: discord.Interaction,
         user: discord.Member,
@@ -77,9 +78,27 @@ def create_note_commands(bot: Bot) -> None:
         note_row = notes_database.get_note(note_id)
         if note_row:
             await interaction.response.send_message(
-                f"Are you sure you want to delete this note? {note_row[1]}",
+                f"Are you sure you want to delete this note? \n {note_row[1]}",
                 view=MyView(note_id=note_id, interaction=interaction, timeout=30),
                 ephemeral=True,
-            ) 
+            )
         else:
             await interaction.response.send_message("Note not found", ephemeral=True)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(note_id="Note id to update")
+    async def edit_note(
+        interaction: discord.Interaction,
+        new_note: str,
+        note_id: int,
+    ):
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction, new_note=new_note
+            ) as logging_embed:
+                msg = await note_service.update_user_note(
+                    logging_embed, interaction.user, new_note, note_id
+                )
+
+                response_message.set_string(msg)

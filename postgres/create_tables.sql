@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS notes (
 	noteID INT GENERATED ALWAYS AS IDENTITY,
 	userID INT NOT null,
 	note TEXT,
+	CONSTRAINT note_length CHECK (length(note) <= 300),
 	createdTimestamp TIMESTAMP,
 	createdBy VARCHAR(20) NOT NULL,
 	lastEditedTimestamp TIMESTAMP,

@@ -35,7 +35,7 @@ def list_notes(user_id: int) -> List[tuple]:
 
     with conn.get_cursor() as cursor:
         query = """
-        select n.noteid, n.note, n.createdby  
+        select n.noteid, n.note, n.createdby , n.lasteditedBy
         from notes n
         join users u on u.userID = n.userID
         where u.userId = %s
@@ -83,3 +83,21 @@ def delete_note(note_id: int) -> List[tuple]:
         rows_affected = cursor.rowcount
 
         return rows_affected > 0
+
+
+def update_note(new_note: str, last_author: str, note_id: int) -> List[tuple]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        update notes n 
+        set note = %s, lastEditedBy = %s
+        where n.noteid = %s
+        returning *
+        """
+        params = (new_note, last_author, note_id)
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        return res

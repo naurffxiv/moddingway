@@ -82,9 +82,10 @@ async def get_user_notes(
         note_id = note[0]
         note_text = note[1]
         note_created_by = note[2]
+        note_last_author = note[3]
         result = (
             result
-            + f"\n* ID: {note_id} | NOTE: {note_text} | Moderator: <@{note_created_by}>"
+            + f"\n* ID: {note_id} | NOTE: {note_text} | Note creator: <@{note_created_by}> | Last edit: <@{note_last_author}>"
         )
 
     return result
@@ -95,7 +96,6 @@ async def delete_user_note(
     note_id: int,
 ) -> str:
     note_row = notes_database.get_note(note_id)
-    logger.debug(note_row)
     if note_row is None:
         log_info_and_add_field(
             logging_embed,
@@ -128,3 +128,34 @@ async def delete_user_note(
         result = "There was an error deleting note from the database"
 
     return result
+
+
+async def update_user_note(
+    logging_embed: discord.Embed,
+    last_author: discord.Member,
+    new_note: str,
+    note_id: int,
+) -> str:
+    db_note = notes_database.get_note(note_id)
+    if db_note is None:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note not found",
+        )
+        return "Note not found in database"
+    old_note = db_note[1]
+    try:
+        notes_database.update_note(new_note, str(last_author.id), note_id)
+        logging_embed.set_footer(text=f"Note ID: {note_id}")
+        logging_embed.add_field(name="Old note", value=old_note)
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Note updated",
+        )
+        return "Note succesfully updated"
+    except:
+        return "There was an error updating note"
