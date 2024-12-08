@@ -5,6 +5,7 @@ from random import choice
 import discord
 from discord.ext.commands import Bot
 
+from moddingway.enums import Role
 from moddingway.services.exile_service import (
     exile_user,
     format_time_string,
@@ -14,8 +15,6 @@ from moddingway.services.exile_service import (
 )
 from moddingway.settings import get_settings
 from moddingway.util import calculate_time_delta, is_user_moderator, user_has_role
-
-from enums import Role
 
 from .helper import create_logging_embed, create_response_context
 
