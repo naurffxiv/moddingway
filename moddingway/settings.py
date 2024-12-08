@@ -8,15 +8,15 @@ class Settings(BaseModel):
     """Class for keeping track of settings"""
 
     guild_id: int
-    discord_token: str = os.environ["DISCORD_TOKEN"]
+    discord_token: str = os.environ.get("DISCORD_TOKEN")
     log_level: int = logging.INFO
     logging_channel_id: int
     notify_channel_id: int
     postgres_host: str
     postgres_port: str
     database_name: str = "moddingway"
-    postgres_username: str = os.environ["POSTGRES_USER"]
-    postgres_password: str = os.environ["POSTGRES_PASSWORD"]
+    postgres_username: str = os.environ.get("POSTGRES_USER")
+    postgres_password: str = os.environ.get("POSTGRES_PASSWORD")
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
 
 
@@ -48,14 +48,14 @@ def local() -> Settings:
         automod_inactivity = {}
 
     return Settings(
-        guild_id=int(os.environ["GUILD_ID"]),
-        logging_channel_id=int(os.environ["MOD_LOGGING_CHANNEL_ID"]),
+        guild_id=int(os.environ.get("GUILD_ID", 0)),
+        logging_channel_id=int(os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)),
         log_level=logging.DEBUG,
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         automod_inactivity=automod_inactivity,
         notify_channel_id=os.environ.get(
-            "NOTIFY_CHANNEL_ID", os.environ["MOD_LOGGING_CHANNEL_ID"]
+            "NOTIFY_CHANNEL_ID", os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
         ),
     )
 
