@@ -41,6 +41,7 @@ def test_chunk_message(input: str, max_chunk_length: int, output_array: List[str
         ("55min", timedelta(minutes=55)),
         ("1hour", timedelta(hours=1)),
         ("3day", timedelta(days=3)),
+        ("3days", timedelta(days=3)),
     ],
 )
 def test_calculate_time_delta(input, expect):
