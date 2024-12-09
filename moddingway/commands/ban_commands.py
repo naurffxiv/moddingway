@@ -1,12 +1,12 @@
 import discord
 from discord.ext.commands import Bot
 
+from moddingway.enums import Role
 from moddingway.services.ban_service import ban_user
 from moddingway.settings import get_settings
 from moddingway.util import is_user_moderator, user_has_role
 
 from .helper import create_logging_embed, create_response_context
-from enums import Role
 import logging
 
 settings = get_settings()
