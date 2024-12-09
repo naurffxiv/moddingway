@@ -44,9 +44,6 @@ def test_chunk_message(input: str, max_chunk_length: int, output_array: List[str
     ],
 )
 def test_calculate_time_delta(input, expect):
-    input = "1hour"
-    expect = timedelta(hours=1)
-
     res = util.calculate_time_delta(input)
 
     if expect is None:

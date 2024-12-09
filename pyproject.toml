@@ -1,2 +1,9 @@
+[project]
+name = "moddingway"
+version = "0.0.0"
+
+[tool.setuptools]
+packages = ["moddingway"]
+
 [tool.isort]
 profile = "black"

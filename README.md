@@ -36,12 +36,19 @@ To run a dockerized version of our postgres database locally, run `make database
 ## Development recommendations
 
 ### First time setup
-When you first are setting up the application, copy the file titled `.env_example` to be `.env`, and configure the missing enviornment variables. To add the bot account to your server, you can follow the [discord.py instructions](https://discordpy.readthedocs.io/en/stable/discord.html). The server that you use for development also will need to have a channel where the bot will output logging messages, and will need to have the following roles set up
-* Exiled
-* Verified
+We recommend getting a [virtual environment](https://docs.python.org/3/library/venv.html) set up for python before you start development. All required packages to run the application are defined in `requirements.txt`
+
+When you first are setting up the application, copy the file titled `.env_example` to be `.env`, and configure the missing enviornment variables. To add the bot account to your server, you can follow the [discord.py instructions](https://discordpy.readthedocs.io/en/stable/discord.html). The server that you use for development also will need to have a channel where the bot will output logging messages, and will need to have the following roles set up, in this priority order
 * Mod
+* Verified
+* Exiled
 
 In addition, you will need to give yourself the `Mod` role in order to properly run all moderation commands.
+
+
+## Testing
+This application uses pytest to run automated unit tests. To install pytest, run `pip install pytest`. To confirm that pytest installed properly, run the command `pytest --version` and you should get an output like `pytest 8.3.4`. If you get an error related to the command being missing, you must either add the pytest install to your path, or you can replace all instances of `pytest` in suggested commands with `python -m pytest`. Alternatively, most IDEs support running tests directly in the IDE with pytest.
+
 
 ### Black Formatter
 Files in this repo will be run through the [Black Formatter](https://black.readthedocs.io/en/stable/). To minimize merge conflicts, it is recommended to run this formatter on your code before submitting. Most IDEs will have an extension for black, and it is recommended to use those
