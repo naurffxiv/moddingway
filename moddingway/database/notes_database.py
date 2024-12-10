@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from . import DatabaseConnection
 from .models import Note
 from typing import List
+from datetime import datetime
 
 
 @dataclass
@@ -96,6 +97,25 @@ def delete_note(note_id: int) -> bool:
         where n.noteid = %s
         """
         params = (note_id,)
+
+        cursor.execute(query, params)
+        rows_affected = cursor.rowcount
+
+        return rows_affected == 1
+
+
+def update_note(
+    new_note: str, last_author: str, update_timestamp: datetime, note_id: int
+) -> bool:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        update notes n 
+        set note = %s, lastEditedBy = %s, lastEditedTimestamp = %s
+        where n.noteid = %s
+        """
+        params = (new_note, last_author, update_timestamp, note_id)
 
         cursor.execute(query, params)
         rows_affected = cursor.rowcount
