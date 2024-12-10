@@ -2,8 +2,9 @@ from datetime import timedelta
 from typing import List
 
 import pytest
+from pytest_mock.plugin import MockerFixture
 
-from moddingway import util
+from moddingway import enums, util
 
 single_line_case = ("short message", 100, ["short message"])
 medium_len_case = (
@@ -50,3 +51,39 @@ def test_calculate_time_delta(input, expect):
         assert res is None
     else:
         assert res == expect
+
+
+@pytest.fixture
+def create_role(mocker):
+    def __create_role(name: str):
+        mocked_role = mocker.Mock()
+        mocked_role.name = name
+        return mocked_role
+
+    return __create_role
+
+
+@pytest.mark.parametrize(
+    "input_role_names,role,expected_result",
+    [
+        ([], enums.Role.VERIFIED, False),
+        (["Mod"], enums.Role.VERIFIED, False),
+        (["Verified"], enums.Role.VERIFIED, True),
+        (["Mod", "Verified"], enums.Role.VERIFIED, True),
+    ],
+)
+def test_user_has_role(
+    input_role_names: List[str],
+    role: enums.Role,
+    expected_result: bool,
+    mocker: MockerFixture,
+    create_role,
+):
+    roles = [create_role(name=role_name) for role_name in input_role_names]
+    mocked_member = mocker.Mock(roles=roles)
+
+    res = util.user_has_role(mocked_member, role)
+
+    assert res == expected_result
+
+
