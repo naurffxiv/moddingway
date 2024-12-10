@@ -39,13 +39,10 @@ def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: da
 
 
 async def automod_thread(
-    self,
-    channel_id,
     thread: discord.Thread,
     duration: int,
     num_removed: int,
     num_errors: int,
-    user_list: set[int],
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
@@ -67,27 +64,10 @@ async def automod_thread(
     if starter_message is not None and time_since < timedelta(days=duration):
         return num_removed, num_errors
 
-    # delete thread and try to notify to user
+    # delete thread
     try:
         await thread.delete()
         logger.info(f"Thread {thread.id} has been deleted successfully")
-        ret = num_removed + 1, num_errors
-        if thread.owner is not None:
-            user_list.add(thread.owner_id)
-        else:
-            raise UnableToNotify("User is not in the server")
-        return ret
-    except UnableToNotify as e:
-        logger.info(f"Unable to notify user {thread.owner_id}: {e}")
-        channel = self.get_channel(settings.logging_channel_id)
-        async with create_interaction_embed_context(
-            channel,
-            user=thread.owner,
-            timestamp=datetime.now(timezone.utc),
-            description=f"<@{thread.owner_id}>'s thread was deleted in <#{channel_id}> but a notification could not be sent: {e}",
-        ):
-            pass
-        # NB: not really an error we're worried about since it's just notifying
         return num_removed + 1, num_errors
     except Exception as e:
         logger.error(f"Unexpected error for thread {thread.id}: {e}")
