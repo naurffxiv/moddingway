@@ -27,7 +27,6 @@ async def autodelete_threads(self):
     for channel_id, duration in settings.automod_inactivity.items():
         num_removed = 0
         num_errors = 0
-        user_list: set[int] = set()
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:
@@ -36,30 +35,19 @@ async def autodelete_threads(self):
 
             async for thread in channel.archived_threads(limit=None):
                 num_removed, num_errors = await automod_thread(
-                    self,
-                    channel_id,
                     thread,
                     duration,
                     num_removed,
                     num_errors,
-                    user_list,
                 )
 
             for thread in channel.threads:
                 num_removed, num_errors = await automod_thread(
-                    self,
-                    channel_id,
                     thread,
                     duration,
                     num_removed,
                     num_errors,
-                    user_list,
                 )
-
-            if num_removed > 0:
-                message = " ".join([f"<@{x}>" for x in user_list])
-                message += f"\nYour post(s) in <#{channel_id}> were deleted for inactivity of {duration} days or your original message in the post was deleted."
-                await send_chunked_message(notifying_channel, message)
 
             if num_removed > 0 or num_errors > 0:
                 logger.info(
