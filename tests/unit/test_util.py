@@ -54,32 +54,46 @@ def test_calculate_time_delta(input, expect):
 
 
 @pytest.fixture
-def create_role(mocker):
-    def __create_role(name: str):
+def create_role(mocker: MockerFixture):
+    def __create_role(name: enums.Role):
         mocked_role = mocker.Mock()
-        mocked_role.name = name
+        # name is used specifically in the Mock constructor
+        # we need to configure it outside the constructor
+        mocked_role.name = name.value
+
         return mocked_role
 
     return __create_role
 
 
+@pytest.fixture
+def naur_guild(mocker: MockerFixture, create_role):
+    return mocker.Mock(
+        roles=[
+            create_role(enums.Role.MOD),
+            create_role(enums.Role.VERIFIED),
+            create_role(enums.Role.EXILED),
+        ]
+    )
+
+
 @pytest.mark.parametrize(
-    "input_role_names,role,expected_result",
+    "input_roles,role,expected_result",
     [
         ([], enums.Role.VERIFIED, False),
-        (["Mod"], enums.Role.VERIFIED, False),
-        (["Verified"], enums.Role.VERIFIED, True),
-        (["Mod", "Verified"], enums.Role.VERIFIED, True),
+        ([enums.Role.MOD], enums.Role.VERIFIED, False),
+        ([enums.Role.VERIFIED], enums.Role.VERIFIED, True),
+        ([enums.Role.MOD, enums.Role.VERIFIED], enums.Role.VERIFIED, True),
     ],
 )
 def test_user_has_role(
-    input_role_names: List[str],
+    input_roles: List[str],
     role: enums.Role,
     expected_result: bool,
     mocker: MockerFixture,
     create_role,
 ):
-    roles = [create_role(name=role_name) for role_name in input_role_names]
+    roles = [create_role(name=role_name) for role_name in input_roles]
     mocked_member = mocker.Mock(roles=roles)
 
     res = util.user_has_role(mocked_member, role)
@@ -87,3 +101,26 @@ def test_user_has_role(
     assert res == expected_result
 
 
+async def test_add_and_remove_role(mocker: MockerFixture, naur_guild):
+    role_to_add = enums.Role.EXILED
+    role_to_remove = enums.Role.VERIFIED
+
+    mock_add_roles = mocker.AsyncMock()
+    mock_remove_roles = mocker.AsyncMock()
+
+    # NB eventually making a mocked Member should be a fixture, but I want to understand
+    # needs a bit more before doing so
+    mocked_member = mocker.Mock(
+        guild=naur_guild, add_roles=mock_add_roles, remove_roles=mock_remove_roles
+    )
+
+    await util.add_and_remove_role(mocked_member, role_to_add, role_to_remove)
+
+    mock_add_roles.assert_called_once()
+    mock_remove_roles.assert_called_once()
+
+    added_role = mock_add_roles.call_args[0][0]
+    assert added_role.name == role_to_add.value
+
+    removed_role = mock_remove_roles.call_args[0][0]
+    assert removed_role.name == role_to_remove.value
