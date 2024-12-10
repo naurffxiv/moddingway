@@ -87,3 +87,21 @@ def create_note_commands(bot: Bot) -> None:
 
         else:
             await interaction.response.send_message("Note not found", ephemeral=True)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(note_id="Note id to update")
+    async def edit_note(
+        interaction: discord.Interaction,
+        new_note: str,
+        note_id: int,
+    ):
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction, new_note=new_note
+            ) as logging_embed:
+                msg = await note_service.update_user_note(
+                    logging_embed, interaction.user, new_note, note_id
+                )
+
+                response_message.set_string(msg)
