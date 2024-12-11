@@ -1,6 +1,7 @@
 begin;
 
 -- clear all data
+delete from notes;
 delete from exiles;
 delete from strikes;
 delete from users;

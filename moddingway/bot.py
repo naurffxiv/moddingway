@@ -9,6 +9,7 @@ from moddingway.commands.exile_commands import create_exile_commands
 from moddingway.commands.helper import create_bot_errors
 from moddingway.commands.slowmode_commands import create_slowmode_commands
 from moddingway.commands.strikes_command import create_strikes_commands
+from moddingway.commands.note_commands import create_note_commands
 from moddingway.settings import get_settings
 
 settings = get_settings()
@@ -34,5 +35,6 @@ class ModdingwayBot(Bot):
         create_ban_commands(self)
         create_slowmode_commands(self)
         create_strikes_commands(self)
+        create_note_commands(self)
         create_bot_errors(self)
         logger.info("Registering commands finished")

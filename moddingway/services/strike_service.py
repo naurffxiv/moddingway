@@ -95,7 +95,6 @@ async def get_user_strikes(
         strike_severity = StrikeSeverity(strike[1])
         strike_reason = strike[2]
         strike_created_by = strike[3]
-
         result = (
             result
             + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | REASON: {strike_reason}"
