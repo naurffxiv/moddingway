@@ -3,12 +3,12 @@ from pytest_mock.plugin import MockerFixture
 from moddingway.database.models import User
 from moddingway.services import exile_service
 from datetime import timedelta
+from moddingway import enums
 
 
-async def test_exile_user__unverified(mocker: MockerFixture):
+async def test_exile_user__unverified(mocker: MockerFixture, create_member):
     # Arrange
-    mocker.patch("moddingway.util.user_has_role", return_value=False)
-    mocked_member = mocker.Mock()
+    mocked_member = create_member(roles=[enums.Role.EXILED])
 
     # Act
     res = await exile_service.exile_user(
@@ -33,7 +33,7 @@ async def test_exile_user__verified_existing_user_dm_failed(mocker: MockerFixtur
     mocker.patch("moddingway.database.users_database.get_user", return_value=mock_database_user)
     mocker.patch("moddingway.database.exiles_database.add_exile", return_value=4001)
 
-    mocked_member = create_member()
+    mocked_member = create_member(roles=[enums.Role.VERIFIED])
 
     # Act
     res = await exile_service.exile_user(
