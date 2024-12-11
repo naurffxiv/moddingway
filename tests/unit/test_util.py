@@ -63,14 +63,12 @@ def test_calculate_time_delta(input, expect):
     ],
 )
 def test_user_has_role(
-    input_roles: List[str],
+    input_roles: List[enums.Role],
     role: enums.Role,
     expected_result: bool,
-    mocker: MockerFixture,
-    create_role,
+    create_member
 ):
-    roles = [create_role(name=role_name) for role_name in input_roles]
-    mocked_member = mocker.Mock(roles=roles)
+    mocked_member = create_member(roles=input_roles)
 
     res = util.user_has_role(mocked_member, role)
 
