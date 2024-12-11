@@ -2,8 +2,9 @@ from datetime import timedelta
 from typing import List
 
 import pytest
+from pytest_mock.plugin import MockerFixture
 
-from moddingway import util
+from moddingway import enums, util
 
 single_line_case = ("short message", 100, ["short message"])
 medium_len_case = (
@@ -50,3 +51,51 @@ def test_calculate_time_delta(input, expect):
         assert res is None
     else:
         assert res == expect
+
+
+@pytest.mark.parametrize(
+    "input_roles,role,expected_result",
+    [
+        ([], enums.Role.VERIFIED, False),
+        ([enums.Role.MOD], enums.Role.VERIFIED, False),
+        ([enums.Role.VERIFIED], enums.Role.VERIFIED, True),
+        ([enums.Role.MOD, enums.Role.VERIFIED], enums.Role.VERIFIED, True),
+    ],
+)
+def test_user_has_role(
+    input_roles: List[str],
+    role: enums.Role,
+    expected_result: bool,
+    mocker: MockerFixture,
+    create_role,
+):
+    roles = [create_role(name=role_name) for role_name in input_roles]
+    mocked_member = mocker.Mock(roles=roles)
+
+    res = util.user_has_role(mocked_member, role)
+
+    assert res == expected_result
+
+
+async def test_add_and_remove_role(mocker: MockerFixture, naur_guild):
+    role_to_add = enums.Role.EXILED
+    role_to_remove = enums.Role.VERIFIED
+
+    mock_add_roles = mocker.AsyncMock()
+    mock_remove_roles = mocker.AsyncMock()
+
+    # NB eventually we should make a fixture that creates Member mocks
+    mocked_member = mocker.Mock(
+        guild=naur_guild, add_roles=mock_add_roles, remove_roles=mock_remove_roles
+    )
+
+    await util.add_and_remove_role(mocked_member, role_to_add, role_to_remove)
+
+    mock_add_roles.assert_called_once()
+    mock_remove_roles.assert_called_once()
+
+    added_role = mock_add_roles.call_args[0][0]
+    assert added_role.name == role_to_add.value
+
+    removed_role = mock_remove_roles.call_args[0][0]
+    assert removed_role.name == role_to_remove.value
