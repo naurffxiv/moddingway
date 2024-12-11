@@ -84,8 +84,7 @@ async def test_add_and_remove_role(mocker: MockerFixture, naur_guild):
     mock_add_roles = mocker.AsyncMock()
     mock_remove_roles = mocker.AsyncMock()
 
-    # NB eventually making a mocked Member should be a fixture, but I want to understand
-    # needs a bit more before doing so
+    # NB eventually we should make a fixture that creates Member mocks
     mocked_member = mocker.Mock(
         guild=naur_guild, add_roles=mock_add_roles, remove_roles=mock_remove_roles
     )
