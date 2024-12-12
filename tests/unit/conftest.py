@@ -44,7 +44,7 @@ def naur_guild(mocker: MockerFixture, create_role):
 
 @pytest.fixture
 def create_member(mocker: MockerFixture, naur_guild, create_role):
-    def __create_member(roles: List[enums.Role] = [enums.Role.VERIFIED]):
+    def __create_member(roles: List[enums.Role] = [enums.Role.VERIFIED], allows_dms: bool = True):
         role_list = [create_role(role) for role in roles]
         mocked_member = mocker.Mock(
             guild=naur_guild,
@@ -52,6 +52,10 @@ def create_member(mocker: MockerFixture, naur_guild, create_role):
             add_roles=mocker.AsyncMock(),
             remove_roles=mocker.AsyncMock(),
         )
+
+        mocked_member.create_dm = mocker.AsyncMock()
+        if not allows_dms:
+            mocked_member.create_dm.side_effect = Exception("Cannot create DM")
 
         return mocked_member
     return __create_member
