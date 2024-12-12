@@ -49,7 +49,6 @@ async def add_strike(
 
     # increment user points, update
     db_user.last_infraction_timestamp = strike_timestamp
-    previous_points = db_user.get_strike_points()
     _apply_strike_point_penalty(db_user, severity)
     users_database.update_user_strike_points(db_user)
 
@@ -60,7 +59,7 @@ async def add_strike(
         f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
     )
 
-    punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
+    punishment = await _apply_punishment(logging_embed, user, db_user)
     logging_embed.add_field(name="Punishment", value=punishment)
 
     # message user
@@ -124,7 +123,6 @@ async def _apply_punishment(
     logging_embed: discord.Embed,
     user: discord.Member,
     db_user: User,
-    previous_points: int,
 ) -> str:
     total_points = db_user.get_strike_points()
 
@@ -142,13 +140,13 @@ async def _apply_punishment(
             False,
         )
         return punishment
-    if total_points >= 10 and previous_points < 10:
+    if total_points >= 10:
         punishment_days += 14
-    if total_points >= 7 and previous_points < 7:
+    if total_points >= 7:
         punishment_days += 7
-    if total_points >= 5 and previous_points < 5:
+    if total_points >= 5:
         punishment_days += 3
-    if total_points >= 3 and previous_points < 3:
+    if total_points >= 3:
         punishment_days += 1
 
     if punishment_days == 0:
