@@ -56,9 +56,9 @@ async def test_exile_user__verified_existing_user_dm_failed(
     assert res is None
     create_user_mock.assert_not_called()
     mocked_logging_embed.set_footer.assert_called_with(text=f"Exile ID: {exile_id}")
+    # TODO check exile create call to confirm data is correct
 
     assert any(
         call[1].get("name", "") == "DM Status"
         for call in mocked_logging_embed.add_field.call_args_list
     )
-    
