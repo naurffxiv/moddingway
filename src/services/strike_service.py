@@ -49,6 +49,7 @@ async def add_strike(
 
     # increment user points, update
     db_user.last_infraction_timestamp = strike_timestamp
+    previous_points = db_user.get_strike_points()
     _apply_strike_point_penalty(db_user, severity)
     users_database.update_user_strike_points(db_user)
 
@@ -56,10 +57,10 @@ async def add_strike(
         logging_embed,
         logger,
         "Result",
-        f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
+        f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points from {previous_points} points",
     )
 
-    punishment = await _apply_punishment(logging_embed, user, db_user)
+    punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
     logging_embed.add_field(name="Punishment", value=punishment)
 
     # message user
@@ -119,10 +120,32 @@ def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
             )
 
 
+def _calculate_punishment(previous_points: int, total_points: int) -> int:
+
+    thresholds = [(10, 14), (7, 7), (5, 3), (3, 1)]
+
+    punishment_days = 0
+    speedrun = False
+
+    for points_threshold, days in thresholds:
+        if total_points >= points_threshold and previous_points < points_threshold:
+            punishment_days += days
+            speedrun = True
+
+    if not speedrun:
+        for points_threshold, days in thresholds:
+            if total_points >= points_threshold and previous_points >= points_threshold:
+                punishment_days = days
+                break
+
+    return punishment_days
+
+
 async def _apply_punishment(
     logging_embed: discord.Embed,
     user: discord.Member,
     db_user: User,
+    previous_points: int,
 ) -> str:
     total_points = db_user.get_strike_points()
 
@@ -130,7 +153,6 @@ async def _apply_punishment(
     exile_reason = (
         "Your actions were severe or frequent enough for you to receive this exile"
     )
-    punishment_days = 0
 
     if total_points >= 15:
         punishment = "Permanent ban"
@@ -140,14 +162,8 @@ async def _apply_punishment(
             False,
         )
         return punishment
-    if total_points >= 10:
-        punishment_days += 14
-    if total_points >= 7:
-        punishment_days += 7
-    if total_points >= 5:
-        punishment_days += 3
-    if total_points >= 3:
-        punishment_days += 1
+
+    punishment_days = _calculate_punishment(previous_points, total_points)
 
     if punishment_days == 0:
         punishment = "Nothing"
