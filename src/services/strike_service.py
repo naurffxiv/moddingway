@@ -11,6 +11,7 @@ from constants import (
     MINOR_INFRACTION_POINTS,
     MODERATE_INFRACTION_POINTS,
     SERIOUS_INFRACTION_POINTS,
+    THRESHOLDS_PUNISHMENT,
 )
 
 logger = logging.getLogger(__name__)
@@ -122,18 +123,16 @@ def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
 
 def _calculate_punishment(previous_points: int, total_points: int) -> int:
 
-    thresholds = [(10, 14), (7, 7), (5, 3), (3, 1)]
-
     punishment_days = 0
-    speedrun = False
+    jumped_multiple_thresholds = False
 
-    for points_threshold, days in thresholds:
+    for points_threshold, days in THRESHOLDS_PUNISHMENT:
         if total_points >= points_threshold and previous_points < points_threshold:
             punishment_days += days
-            speedrun = True
+            jumped_multiple_thresholds = True
 
-    if not speedrun:
-        for points_threshold, days in thresholds:
+    if not jumped_multiple_thresholds:
+        for points_threshold, days in THRESHOLDS_PUNISHMENT:
             if total_points >= points_threshold and previous_points >= points_threshold:
                 punishment_days = days
                 break
