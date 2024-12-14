@@ -7,6 +7,7 @@ from moddingway.constants import (
     MINOR_INFRACTION_POINTS,
     MODERATE_INFRACTION_POINTS,
     SERIOUS_INFRACTION_POINTS,
+    THRESHOLDS_PUNISHMENT,
 )
 from moddingway.database import strikes_database, users_database
 from moddingway.database.models import Strike, User
@@ -59,7 +60,7 @@ async def add_strike(
         logging_embed,
         logger,
         "Result",
-        f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points",
+        f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points from {previous_points} points",
     )
 
     punishment = await _apply_punishment(logging_embed, user, db_user, previous_points)
@@ -121,6 +122,25 @@ def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
             )
 
 
+def _calculate_punishment(previous_points: int, total_points: int) -> int:
+
+    punishment_days = 0
+    jumped_multiple_thresholds = False
+
+    for points_threshold, days in THRESHOLDS_PUNISHMENT:
+        if total_points >= points_threshold and previous_points < points_threshold:
+            punishment_days += days
+            jumped_multiple_thresholds = True
+
+    if not jumped_multiple_thresholds:
+        for points_threshold, days in THRESHOLDS_PUNISHMENT:
+            if total_points >= points_threshold and previous_points >= points_threshold:
+                punishment_days = days
+                break
+
+    return punishment_days
+
+
 async def _apply_punishment(
     logging_embed: discord.Embed,
     user: discord.Member,
@@ -133,7 +153,6 @@ async def _apply_punishment(
     exile_reason = (
         "Your actions were severe or frequent enough for you to receive this exile"
     )
-    punishment_days = 0
 
     if total_points >= 15:
         punishment = "Permanent ban"
@@ -143,14 +162,8 @@ async def _apply_punishment(
             False,
         )
         return punishment
-    if total_points >= 10 and previous_points < 10:
-        punishment_days += 14
-    if total_points >= 7 and previous_points < 7:
-        punishment_days += 7
-    if total_points >= 5 and previous_points < 5:
-        punishment_days += 3
-    if total_points >= 3 and previous_points < 3:
-        punishment_days += 1
+
+    punishment_days = _calculate_punishment(previous_points, total_points)
 
     if punishment_days == 0:
         punishment = "Nothing"
