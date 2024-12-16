@@ -77,6 +77,7 @@ def test_user_has_role(
     assert res == expected_result
 
 
+@pytest.mark.asyncio
 async def test_add_and_remove_role(mocker: MockerFixture, naur_guild):
     role_to_add = enums.Role.EXILED
     role_to_remove = enums.Role.VERIFIED
