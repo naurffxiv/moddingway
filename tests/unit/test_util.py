@@ -63,39 +63,31 @@ def test_calculate_time_delta(input, expect):
     ],
 )
 def test_user_has_role(
-    input_roles: List[str],
+    input_roles: List[enums.Role],
     role: enums.Role,
     expected_result: bool,
-    mocker: MockerFixture,
-    create_role,
+    create_member,
 ):
-    roles = [create_role(name=role_name) for role_name in input_roles]
-    mocked_member = mocker.Mock(roles=roles)
+    mocked_member = create_member(roles=input_roles)
 
     res = util.user_has_role(mocked_member, role)
 
     assert res == expected_result
 
 
-async def test_add_and_remove_role(mocker: MockerFixture, naur_guild):
+async def test_add_and_remove_role(create_member):
     role_to_add = enums.Role.EXILED
     role_to_remove = enums.Role.VERIFIED
 
-    mock_add_roles = mocker.AsyncMock()
-    mock_remove_roles = mocker.AsyncMock()
-
-    # NB eventually we should make a fixture that creates Member mocks
-    mocked_member = mocker.Mock(
-        guild=naur_guild, add_roles=mock_add_roles, remove_roles=mock_remove_roles
-    )
+    mocked_member = create_member(roles=[enums.Role.VERIFIED])
 
     await util.add_and_remove_role(mocked_member, role_to_add, role_to_remove)
 
-    mock_add_roles.assert_called_once()
-    mock_remove_roles.assert_called_once()
+    mocked_member.add_roles.assert_called_once()
+    mocked_member.remove_roles.assert_called_once()
 
-    added_role = mock_add_roles.call_args[0][0]
+    added_role = mocked_member.add_roles.call_args[0][0]
     assert added_role.name == role_to_add.value
 
-    removed_role = mock_remove_roles.call_args[0][0]
+    removed_role = mocked_member.remove_roles.call_args[0][0]
     assert removed_role.name == role_to_remove.value
