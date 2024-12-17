@@ -76,15 +76,17 @@ def create_db_user(mocker: MockerFixture):
         last_infraction_timestamp: Optional[datetime] = None,
         get_strike_points: Optional[int] = None,
     ):
-        mocked_user = mocker.Mock(spec=User)
-        mocked_user.user_id = user_id
-        mocked_user.discord_user_id = discord_user_id
-        mocked_user.discord_guild_id = discord_guild_id
-        mocked_user.is_mod = is_mod
-        mocked_user.temporary_points = temporary_points
-        mocked_user.permanent_points = permanent_points
-        mocked_user.last_infraction_timestamp = last_infraction_timestamp
-        mocked_user.get_strike_points = mocker.Mock(return_value=get_strike_points)
+        mocked_user = mocker.Mock(
+            spec=User,
+            user_id=user_id,
+            discord_user_id=discord_user_id,
+            discord_guild_id=discord_guild_id,
+            is_mod=is_mod,
+            temporary_points=temporary_points,
+            permanent_points=permanent_points,
+            last_infraction_timestamp=last_infraction_timestamp,
+            get_strike_points=mocker.Mock(return_value=get_strike_points),
+        )
         return mocked_user
 
     return __create_db_user

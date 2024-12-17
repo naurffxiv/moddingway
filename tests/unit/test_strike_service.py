@@ -1,13 +1,12 @@
 import pytest
 from pytest_mock.plugin import MockerFixture
 from moddingway.database.models import Strike
-from moddingway.services import strike_service
+from moddingway.services import strike_service, ban_service, exile_service
 from moddingway import enums
 from typing import List
 import discord
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "previous_points,total_points,expected_punishment",
     [
@@ -19,8 +18,11 @@ import discord
         (9, 12, "14 day exile"),
         (12, 13, "14 day exile"),
         (10, 15, "Permanent ban"),
+        (0, 3, "1 day exile"),
+        (10, 17, "Permanent ban"),
     ],
 )
+@pytest.mark.asyncio
 async def test_apply_punisment(
     previous_points: int,
     total_points: int,
@@ -28,13 +30,37 @@ async def test_apply_punisment(
     mocker: MockerFixture,
     create_db_user,
 ):
-    mocked_logging_embed = mocker.Mock()
-    mocked_user = mocker.Mock(roles=[enums.Role.VERIFIED])
+    mocked_user = mocker.Mock()
     mocked_db_user = create_db_user(get_strike_points=total_points)
-    res = await strike_service._apply_punishment(
-        mocked_logging_embed, mocked_user, mocked_db_user, previous_points
-    )
+    mocked_ban = mocker.patch("moddingway.services.ban_service.ban_user")
+    mocked_embed = mocker.Mock(spec=discord.Embed)
+    # I tried to use patch here but it would override all test cases apparently spy can just observe without interrupting.
+    spy_calculate_punishment = mocker.spy(strike_service, "_calculate_punishment")
 
+    mocked_exile_user = mocker.patch("moddingway.services.exile_service.exile_user")
+
+    res = await strike_service._apply_punishment(
+        mocked_embed, mocked_user, mocked_db_user, previous_points
+    )
+    if total_points >= 15:
+        mocked_ban.assert_called_once_with(
+            mocked_user,
+            "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
+            False,
+        )
+    else:
+        mocked_ban.assert_not_called()
+        spy_calculate_punishment.assert_called_once_with(previous_points, total_points)
+        punishment_days = spy_calculate_punishment.spy_return
+        if punishment_days == 0:
+            mocked_exile_user.assert_not_called()
+        else:
+            mocked_exile_user.assert_called_once_with(
+                mocked_embed,
+                mocked_user,
+                mocker.ANY,
+                "Your actions were severe or frequent enough for you to receive this exile",
+            )
     assert res == expected_punishment
 
 
@@ -85,9 +111,9 @@ async def test_get_user_strikes(
 
 
 @pytest.mark.asyncio
-async def test_add_strike(create_db_user,mocker:MockerFixture):
+async def test_add_strike(create_db_user, mocker: MockerFixture):
 
-    mocked_db_user = create_db_user(user_id=1,temporary_points=0,get_strike_points=0)
+    mocked_db_user = create_db_user(user_id=1, temporary_points=0, get_strike_points=0)
 
     mocked_user = mocker.Mock(spec=discord.Member, id=1)
 
@@ -98,24 +124,38 @@ async def test_add_strike(create_db_user,mocker:MockerFixture):
     mocked_logging_embed.add_field = mocker.Mock()
     mocked_logging_embed.set_footer = mocker.Mock()
 
-    
+    mocked_get_user = mocker.patch(
+        "moddingway.database.users_database.get_user", return_value=mocked_db_user
+    )
+    mocked_add_strike = mocker.patch(
+        "moddingway.database.strikes_database.add_strike", return_value=1
+    )
 
-    mocked_get_user = mocker.patch("moddingway.database.users_database.get_user", return_value=mocked_db_user)
-    mocked_add_strike = mocker.patch("moddingway.database.strikes_database.add_strike",return_value=1)
-    
     mocked_strike = mocker.Mock()
     mocked_strike_class = mocker.patch(
         "moddingway.services.strike_service.Strike",
         autospec=True,
-        return_value=mocked_strike
+        return_value=mocked_strike,
     )
-    
-    mocked_update_user_strike_points = mocker.patch("moddingway.database.users_database.update_user_strike_points", return_value=None)
-    
-    mocked_punishment = mocker.Mock()
-    mocked__apply_punishment = mocker.patch("moddingway.services.strike_service._apply_punishment",return_value=mocked_punishment)
 
-    await strike_service.add_strike(logging_embed=mocked_logging_embed,user=mocked_user,severity=enums.StrikeSeverity.MODERATE,reason="test",author=mocked_author)
+    mocked_update_user_strike_points = mocker.patch(
+        "moddingway.database.users_database.update_user_strike_points",
+        return_value=None,
+    )
+
+    mocked_punishment = mocker.Mock()
+    mocked__apply_punishment = mocker.patch(
+        "moddingway.services.strike_service._apply_punishment",
+        return_value=mocked_punishment,
+    )
+
+    await strike_service.add_strike(
+        logging_embed=mocked_logging_embed,
+        user=mocked_user,
+        severity=enums.StrikeSeverity.MODERATE,
+        reason="test",
+        author=mocked_author,
+    )
 
     mocked_get_user.assert_called_with(mocked_user.id)
 
@@ -123,10 +163,10 @@ async def test_add_strike(create_db_user,mocker:MockerFixture):
         user_id=mocked_user.id,
         severity=enums.StrikeSeverity.MODERATE,
         reason="test",
-        created_timestamp=mocker.ANY, 
+        created_timestamp=mocker.ANY,
         created_by=str(mocked_author.id),
-        last_edited_timestamp=mocker.ANY, 
-        last_edited_by=str(mocked_author.id)
+        last_edited_timestamp=mocker.ANY,
+        last_edited_by=str(mocked_author.id),
     )
 
     mocked_add_strike.assert_called_with(mocked_strike)
@@ -134,8 +174,5 @@ async def test_add_strike(create_db_user,mocker:MockerFixture):
     mocked_update_user_strike_points.assert_called_with(mocked_db_user)
 
     mocked__apply_punishment.assert_called_with(
-        mocked_logging_embed,
-        mocked_user,
-        mocked_db_user,
-        0
+        mocked_logging_embed, mocked_user, mocked_db_user, 0
     )
