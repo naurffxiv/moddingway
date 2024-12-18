@@ -59,7 +59,7 @@ async def add_strike(
     log_info_and_add_field(
         logging_embed,
         logger,
-        "Strike Points",
+        "Strike Point Adjustment",
         f"<@{user.id}> was given a strike, bringing them to {db_user.get_strike_points()} points from {previous_points} points",
     )
 
