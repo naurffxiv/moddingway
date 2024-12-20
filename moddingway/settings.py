@@ -1,7 +1,9 @@
 import logging
 import os
+from typing import Optional
 
 from pydantic import BaseModel
+from ast import literal_eval
 
 
 class Settings(BaseModel):
@@ -18,6 +20,9 @@ class Settings(BaseModel):
     postgres_username: str = os.environ.get("POSTGRES_USER")
     postgres_password: str = os.environ.get("POSTGRES_PASSWORD")
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
+    sticky_roles: list[
+        str
+    ]  # roles that grant access to channels that should be stripped/restored on exile/unexile
 
 
 def prod() -> Settings:
@@ -35,6 +40,10 @@ def prod() -> Settings:
             1301166606985990144: 7,  # FRU
             1300527846468616302: 7,  # scheduled legacy
         },
+        sticky_roles=[
+            "FRU Cleared",
+            "PtC Reloaded",
+        ],
     )
 
 
@@ -57,6 +66,7 @@ def local() -> Settings:
         notify_channel_id=os.environ.get(
             "NOTIFY_CHANNEL_ID", os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
         ),
+        sticky_roles=literal_eval(os.environ.get("STICKY_ROLE_ARRAY", "None")) or [],
     )
 
 
