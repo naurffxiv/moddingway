@@ -2,7 +2,8 @@ import datetime
 from typing import List
 import pytest
 from pytest_mock.plugin import MockerFixture
-#from datetime import datetime
+
+# from datetime import datetime
 from typing import Optional
 from moddingway import enums
 from moddingway.database.models import User, Strike
@@ -47,7 +48,9 @@ def naur_guild(mocker: MockerFixture, create_role):
 @pytest.fixture
 def create_member(mocker: MockerFixture, naur_guild, create_role):
     def __create_member(
-        roles: List[enums.Role] = [enums.Role.VERIFIED], allows_dms: bool = True, id:Optional[int] = None
+        roles: List[enums.Role] = [enums.Role.VERIFIED],
+        allows_dms: bool = True,
+        id: Optional[int] = None,
     ):
         role_list = [create_role(role) for role in roles]
         mocked_member = mocker.Mock(
@@ -66,6 +69,7 @@ def create_member(mocker: MockerFixture, naur_guild, create_role):
         return mocked_member
 
     return __create_member
+
 
 @pytest.fixture
 def create_db_user(mocker: MockerFixture):
@@ -94,17 +98,16 @@ def create_db_user(mocker: MockerFixture):
 
     return __create_db_user
 
+
 @pytest.fixture
 def create_embed(mocker: MockerFixture):
-    def __create_embed(
-        
-    ):
-        mocked_user = mocker.Mock(
-            spec=discord.Embed
-        )
+    def __create_embed():
+        mocked_user = mocker.Mock(spec=discord.Embed)
         return mocked_user
 
     return __create_embed
+
+
 # @pytest.fixture
 # def create_db_strike(mocker: MockerFixture):
 #     def __create_db_strike(

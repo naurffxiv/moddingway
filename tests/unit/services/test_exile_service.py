@@ -5,6 +5,7 @@ from moddingway.services import exile_service
 from datetime import timedelta
 from moddingway import enums
 
+
 @pytest.mark.asyncio
 async def test_exile_user__unverified(mocker: MockerFixture, create_member):
     # Arrange
@@ -18,6 +19,7 @@ async def test_exile_user__unverified(mocker: MockerFixture, create_member):
     # Assert
     assert res is not None
     assert res == "User is not currently verified, no action will be taken"
+
 
 @pytest.mark.asyncio
 async def test_exile_user__verified_existing_user_dm_failed(

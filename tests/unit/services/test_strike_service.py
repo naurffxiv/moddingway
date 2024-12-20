@@ -8,7 +8,6 @@ import discord
 from datetime import timedelta
 
 
-
 @pytest.mark.parametrize(
     "previous_points,total_points,expected_punishment",
     [
@@ -113,11 +112,13 @@ async def test_get_user_strikes(
 
 
 @pytest.mark.asyncio
-async def test_add_strike(create_db_user, create_member, create_embed, mocker: MockerFixture):
+async def test_add_strike(
+    create_db_user, create_member, create_embed, mocker: MockerFixture
+):
 
     mocked_db_user = create_db_user(user_id=1, temporary_points=0, get_strike_points=0)
 
-    #mocked_user = mocker.Mock(spec=discord.Member, id=1)
+    # mocked_user = mocker.Mock(spec=discord.Member, id=1)
     mocked_user = create_member(id=1)
 
     mocked_author = mocker.Mock(spec=discord.Member)
