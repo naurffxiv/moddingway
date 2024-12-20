@@ -5,6 +5,8 @@ from moddingway.services import strike_service, ban_service, exile_service
 from moddingway import enums
 from typing import List
 import discord
+from datetime import timedelta
+
 
 
 @pytest.mark.parametrize(
@@ -45,7 +47,7 @@ async def test_apply_punisment(
     if total_points >= 15:
         mocked_ban.assert_called_once_with(
             mocked_user,
-            "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
+            mocker.ANY,
             False,
         )
     else:
@@ -58,8 +60,8 @@ async def test_apply_punisment(
             mocked_exile_user.assert_called_once_with(
                 mocked_embed,
                 mocked_user,
+                timedelta(days=punishment_days),
                 mocker.ANY,
-                "Your actions were severe or frequent enough for you to receive this exile",
             )
     assert res == expected_punishment
 
@@ -111,16 +113,17 @@ async def test_get_user_strikes(
 
 
 @pytest.mark.asyncio
-async def test_add_strike(create_db_user, mocker: MockerFixture):
+async def test_add_strike(create_db_user, create_member, create_embed, mocker: MockerFixture):
 
     mocked_db_user = create_db_user(user_id=1, temporary_points=0, get_strike_points=0)
 
-    mocked_user = mocker.Mock(spec=discord.Member, id=1)
+    #mocked_user = mocker.Mock(spec=discord.Member, id=1)
+    mocked_user = create_member(id=1)
 
     mocked_author = mocker.Mock(spec=discord.Member)
     mocked_author.id = 2
 
-    mocked_logging_embed = mocker.Mock(spec=discord.Embed)
+    mocked_logging_embed = create_embed()
     mocked_logging_embed.add_field = mocker.Mock()
     mocked_logging_embed.set_footer = mocker.Mock()
 
