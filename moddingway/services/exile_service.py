@@ -79,7 +79,7 @@ async def exile_user(
     # check for any sticky roles to strip
     try:
         for role in user.roles:
-            if role.name in settings.sticky_roles:
+            if role.id in settings.sticky_roles:
                 discord_role = user.guild.get_role(role.id)
                 if discord_role is not None:
                     roles_to_save.append(user.guild.get_role(discord_role.id))
