@@ -137,9 +137,7 @@ def create_exile_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User whose logged exile are being viewed")
-    async def view_logged_exiles(
-        interaction: discord.Interaction, user: discord.Member
-    ):
+    async def view_logged_exiles(interaction: discord.Interaction, user: discord.User):
         """View logged exiles of a user."""
 
         async with create_response_context(interaction) as response_message:
