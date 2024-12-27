@@ -62,7 +62,7 @@ def create_note_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User whose notes you are viewing")
-    async def view_notes(interaction: discord.Interaction, user: discord.Member):
+    async def view_notes(interaction: discord.Interaction, user: discord.User):
         """View the notes of the user"""
         async with create_response_context(interaction) as response_message:
             note_details = await note_service.get_user_notes(user)
