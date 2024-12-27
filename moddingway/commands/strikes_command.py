@@ -47,7 +47,7 @@ def create_strikes_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     @discord.app_commands.describe(user="User whose strikes you are viewing")
-    async def view_strikes(interaction: discord.Interaction, user: discord.Member):
+    async def view_strikes(interaction: discord.Interaction, user: discord.User):
         """View the strikes of the user"""
         async with create_response_context(interaction) as response_message:
             strike_details = await strike_service.get_user_strikes(user)

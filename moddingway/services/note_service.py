@@ -57,7 +57,7 @@ async def get_note_by_id(
 
 
 async def get_user_notes(
-    user: discord.Member,
+    user: discord.User,
 ) -> str:
     db_user = users_database.get_user(user.id)
     if db_user is None:
