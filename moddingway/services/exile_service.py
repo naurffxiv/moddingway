@@ -6,9 +6,10 @@ from typing import Optional
 
 import discord
 
-from moddingway.database import exiles_database, users_database
+from moddingway.database import exiles_database, users_database, roles_database
 from moddingway.database.models import Exile
 from moddingway.enums import ExileStatus, Role
+from moddingway.settings import get_settings
 from moddingway.util import (
     add_and_remove_role,
     log_info_and_add_field,
@@ -17,6 +18,7 @@ from moddingway.util import (
     user_has_role,
 )
 
+settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
@@ -67,10 +69,33 @@ async def exile_user(
     logger.info(f"Created exile with ID {exile_id}")
     logging_embed.set_footer(text=f"Exile ID: {exile_id}")
 
+    roles_to_save: list[Role] = []
+
     # change user role
     await add_and_remove_role(
         user, role_to_add=Role.EXILED, role_to_remove=Role.VERIFIED
     )
+
+    # check for any sticky roles to strip
+    try:
+        for role in user.roles:
+            if role.id in settings.sticky_roles:
+                discord_role = user.guild.get_role(role.id)
+                if discord_role is not None:
+                    roles_to_save.append(user.guild.get_role(discord_role.id))
+
+        if len(roles_to_save) > 0:
+            await user.remove_roles(*roles_to_save)
+            roles_database.add_sticky_roles(
+                db_user.user_id, [role.id for role in roles_to_save]
+            )
+    except Exception as e:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Error",
+            f"Sticky roles could not be completely removed, {e}",
+        )
 
     # message user
     try:
@@ -92,7 +117,7 @@ async def exile_user(
 
 
 async def unexile_user(
-    logging_embed: discord.Embed, user: discord.User
+    logging_embed: discord.Embed, user: discord.Member
 ) -> Optional[str]:
     if not user_has_role(user, Role.EXILED):
         error_message = "User is not currently exiled, no action will be taken"
@@ -142,6 +167,27 @@ async def unexile_user(
     else:
         exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNEXILED)
         logging_embed.set_footer(text=f"Exile ID: {exile.exile_id}")
+
+    # check for any sticky roles to restore
+    try:
+        roles_to_restore: list[Role] = []
+        for role in roles_database.get_sticky_roles(db_user.user_id):
+            discord_role = user.guild.get_role(int(role))
+            if discord_role is not None:
+                roles_to_restore.append(discord_role)
+            else:
+                logger.error("Role %s was not found in the server, skipping...", role)
+
+        if len(roles_to_restore) > 0:
+            await user.add_roles(*roles_to_restore)
+            roles_database.remove_sticky_roles(db_user.user_id)
+    except Exception as e:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Error",
+            f"Sticky roles could not be completely removed, {e}",
+        )
 
     log_info_and_add_field(
         logging_embed, logger, "Result", f"<@{user.id}> was successfully unexiled"
