@@ -79,7 +79,7 @@ async def add_strike(
 
 
 async def get_user_strikes(
-    user: discord.Member,
+    user: discord.User,
 ) -> str:
     db_user = users_database.get_user(user.id)
     if db_user is None:
