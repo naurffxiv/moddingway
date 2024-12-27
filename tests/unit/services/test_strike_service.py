@@ -35,7 +35,7 @@ async def test_apply_punisment(
     mocked_db_user = create_db_user(get_strike_points=total_points)
     mocked_ban = mocker.patch("moddingway.services.ban_service.ban_user")
     mocked_embed = mocker.Mock(spec=discord.Embed)
-    # I tried to use patch here but it would override all test cases apparently spy can just observe without interrupting.
+
     spy_calculate_punishment = mocker.spy(strike_service, "_calculate_punishment")
 
     mocked_exile_user = mocker.patch("moddingway.services.exile_service.exile_user")
@@ -118,7 +118,6 @@ async def test_add_strike(
 
     mocked_db_user = create_db_user(user_id=1, temporary_points=0, get_strike_points=0)
 
-    # mocked_user = mocker.Mock(spec=discord.Member, id=1)
     mocked_user = create_member(id=1)
 
     mocked_author = mocker.Mock(spec=discord.Member)

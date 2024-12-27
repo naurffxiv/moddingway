@@ -80,7 +80,7 @@ def create_db_user(mocker: MockerFixture):
         is_mod: Optional[bool] = None,
         temporary_points: Optional[int] = None,
         permanent_points: Optional[int] = None,
-        last_infraction_timestamp: Optional[datetime] = None,
+        last_infraction_timestamp: Optional[datetime.datetime] = None,
         get_strike_points: Optional[int] = None,
     ):
         mocked_user = mocker.Mock(
@@ -106,29 +106,3 @@ def create_embed(mocker: MockerFixture):
         return mocked_user
 
     return __create_embed
-
-
-# @pytest.fixture
-# def create_db_strike(mocker: MockerFixture):
-#     def __create_db_strike(
-#         strike_id: Optional[int] = None,
-#         user_id: Optional[int] = None,
-#         severity: Optional[enums.StrikeSeverity] = None,
-#         reason: Optional[str] = None,
-#         created_timestamp: Optional[datetime] = None,
-#         created_by: Optional[str] = None,
-#         last_edited_timestamp: Optional[datetime] = None,
-#         last_edited_by: Optional[str] = None,
-#     ):
-#         mocked_strike = mocker.Mock(spec=Strike)
-#         mocked_strike.strike_id = strike_id
-#         mocked_strike.user_id = user_id
-#         mocked_strike.severity = severity
-#         mocked_strike.reason = reason
-#         mocked_strike.created_timestamp = created_timestamp
-#         mocked_strike.created_by = created_by
-#         mocked_strike.last_edited_timestamp = last_edited_timestamp
-#         mocked_strike.last_edited_by = last_edited_by
-#         return mocked_strike
-
-#     return __create_db_strike
