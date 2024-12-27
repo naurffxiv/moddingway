@@ -175,6 +175,8 @@ async def unexile_user(
             discord_role = user.guild.get_role(int(role))
             if discord_role is not None:
                 roles_to_restore.append(discord_role)
+            else:
+                logger.error("Role %s was not found in the server, skipping...", role)
 
         if len(roles_to_restore) > 0:
             await user.add_roles(*roles_to_restore)
