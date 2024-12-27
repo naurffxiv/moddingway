@@ -62,7 +62,7 @@ def create_bot_errors(bot: Bot) -> None:
 
         # Handle other errors (default fallback)
         else:
-            logger.error(f"An unexpected error has occurred: {error}")
+            logger.error(f"An unexpected error has occurred: {error}", exc_info=error)
             try:
                 await interaction.response.send_message(
                     "An unexpected error occurred. Please contact an admin.",

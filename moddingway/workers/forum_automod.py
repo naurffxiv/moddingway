@@ -67,7 +67,7 @@ async def autodelete_threads(self):
                     f"No threads were marked for deletion in channel {channel_id}."
                 )
         except Exception as e:
-            logger.error(e)
+            logger.error(e, exc_info=e)
             async with create_interaction_embed_context(
                 self.get_channel(settings.logging_channel_id),
                 user=self.user,

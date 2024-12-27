@@ -56,7 +56,7 @@ async def automod_thread(
     except discord.NotFound:
         pass
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=e)
 
     now = datetime.now(timezone.utc)
     last_post = thread.last_message_id
@@ -70,5 +70,5 @@ async def automod_thread(
         logger.info(f"Thread {thread.id} has been deleted successfully")
         return num_removed + 1, num_errors
     except Exception as e:
-        logger.error(f"Unexpected error for thread {thread.id}: {e}")
+        logger.error(f"Unexpected error for thread {thread.id}: {e}", exc_info=e)
         return num_removed, num_errors + 1
