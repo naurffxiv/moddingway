@@ -87,3 +87,20 @@ def update_user_strike_points(user: User):
         )
 
         cursor.execute(query, params)
+
+
+def decrement_old_strike_points() -> int:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+            UPDATE users SET
+            temporarypoints = temporarypoints - 1,
+            lastinfractiontimestamp = lastinfractiontimestamp + INTERVAL '90 day'
+            WHERE temporarypoints  > 0
+            AND lastinfractiontimestamp < current_date - INTERVAL '90 day'
+        """
+
+        cursor.execute(query)
+
+        return cursor.rowcount
