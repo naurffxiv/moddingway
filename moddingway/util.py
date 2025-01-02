@@ -162,7 +162,7 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
     if not delta_string:
         return None
 
-    regex = "^(\d\d?)(sec|min|min|hour|day)"  # Matches (digit, digit?)(option of [sec, min, hour, day])
+    regex = r"^(\d\d?)(sec|min|min|hour|day)"  # Matches (digit, digit?)(option of [sec, min, hour, day])
 
     result = re.search(regex, delta_string)
 
