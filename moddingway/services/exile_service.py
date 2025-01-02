@@ -28,6 +28,23 @@ async def exile_user(
     duration: datetime.timedelta,
     reason: str,
 ) -> Optional[str]:
+    db_user = users_database.get_user(user.id)
+    if db_user:
+        currentExile = exiles_database.get_user_active_exile(db_user.user_id)
+        if not user_has_role(user, Role.VERIFIED) and currentExile:
+            logger.warning(currentExile.end_timestamp)
+            new_endTimestamp = currentExile.end_timestamp + duration
+            logger.warning(new_endTimestamp)
+            exiles_database.extend_exile_duration(currentExile.exile_id, new_endTimestamp)
+            logger.info(f"Extended exile {currentExile.exile_id}")
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"Exile extended until {new_endTimestamp}",
+            )
+            return "User exile extended"
+    
     if not user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
         log_info_and_add_field(
@@ -38,7 +55,7 @@ async def exile_user(
         )
         return error_message
     # look up user in DB
-    db_user = users_database.get_user(user.id)
+    #db_user = users_database.get_user(user.id)
     if db_user is None:
         log_info_and_embed(
             logging_embed,
@@ -46,6 +63,7 @@ async def exile_user(
             f"User not found in database, creating new record",
         )
         db_user = users_database.add_user(user.id)
+
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
