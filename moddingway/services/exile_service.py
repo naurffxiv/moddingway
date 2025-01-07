@@ -52,8 +52,6 @@ async def exile_user(
             error_message,
         )
         return error_message
-    # look up user in DB
-    # db_user = users_database.get_user(user.id)
     if db_user is None:
         log_info_and_embed(
             logging_embed,
