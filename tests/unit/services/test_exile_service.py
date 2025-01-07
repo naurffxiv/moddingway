@@ -5,9 +5,10 @@ from datetime import timedelta
 from moddingway import enums
 import pytest
 
+
 @pytest.mark.asyncio
 async def test_exile_user__unverified(mocker: MockerFixture, create_member):
-    # Arrange 
+    # Arrange
     mocked_member = create_member()
     mock_database_user = User(
         user_id=1,
@@ -20,16 +21,22 @@ async def test_exile_user__unverified(mocker: MockerFixture, create_member):
     mocker.patch(
         "moddingway.database.users_database.get_user", return_value=mock_database_user
     )
-    mocker.patch('moddingway.database.exiles_database.get_user_active_exile', return_value=None)
-    mocker.patch('moddingway.util.user_has_role', return_value=False)
+    mocker.patch(
+        "moddingway.database.exiles_database.get_user_active_exile", return_value=None
+    )
+    mocker.patch("moddingway.util.user_has_role", return_value=False)
     # Act
     res = await exile_service.exile_user(
-        mocker.Mock(description=""), mocked_member, timedelta(days=1), "test_exile_user__unverified"
+        mocker.Mock(description=""),
+        mocked_member,
+        timedelta(days=1),
+        "test_exile_user__unverified",
     )
 
     # Assert
     assert res is not None
     assert res == "User is not currently verified, no action will be taken"
+
 
 @pytest.mark.asyncio
 async def test_exile_user__verified_existing_user_dm_failed(
@@ -44,7 +51,9 @@ async def test_exile_user__verified_existing_user_dm_failed(
         temporary_points=0,
         permanent_points=0,
     )
-    mocker.patch('moddingway.database.exiles_database.get_user_active_exile', return_value=None)
+    mocker.patch(
+        "moddingway.database.exiles_database.get_user_active_exile", return_value=None
+    )
     mocker.patch(
         "moddingway.database.users_database.get_user", return_value=mock_database_user
     )
