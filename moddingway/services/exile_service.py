@@ -15,9 +15,9 @@ from moddingway.util import (
     log_info_and_add_field,
     log_info_and_embed,
     send_dm,
-    user_has_role,
     timestamp_to_epoch,
 )
+import moddingway.util
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ async def exile_user(
     db_user = users_database.get_user(user.id)
     if db_user:
         currentExile = exiles_database.get_user_active_exile(db_user.user_id)
-        if not user_has_role(user, Role.VERIFIED) and currentExile:
+        if not moddingway.util.user_has_role(user, Role.VERIFIED) and currentExile:
             new_endTimestamp = currentExile.end_timestamp + duration
             exiles_database.update_exile_end(currentExile.exile_id, new_endTimestamp)
             log_info_and_add_field(
@@ -43,7 +43,7 @@ async def exile_user(
             )
             return "User exile extended"
 
-    if not user_has_role(user, Role.VERIFIED):
+    if not moddingway.util.user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
         log_info_and_add_field(
             logging_embed,
