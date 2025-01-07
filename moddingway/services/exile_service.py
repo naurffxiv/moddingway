@@ -15,8 +15,9 @@ from moddingway.util import (
     log_info_and_add_field,
     log_info_and_embed,
     send_dm,
-    user_has_role,
+    timestamp_to_epoch,
 )
+import moddingway.util
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -28,7 +29,21 @@ async def exile_user(
     duration: datetime.timedelta,
     reason: str,
 ) -> Optional[str]:
-    if not user_has_role(user, Role.VERIFIED):
+    db_user = users_database.get_user(user.id)
+    if db_user:
+        currentExile = exiles_database.get_user_active_exile(db_user.user_id)
+        if not moddingway.util.user_has_role(user, Role.VERIFIED) and currentExile:
+            new_endTimestamp = currentExile.end_timestamp + duration
+            exiles_database.update_exile_end(currentExile.exile_id, new_endTimestamp)
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"Exile extended until <t:{timestamp_to_epoch(new_endTimestamp)}>",
+            )
+            return "User exile extended"
+
+    if not moddingway.util.user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
         log_info_and_add_field(
             logging_embed,
@@ -37,8 +52,6 @@ async def exile_user(
             error_message,
         )
         return error_message
-    # look up user in DB
-    db_user = users_database.get_user(user.id)
     if db_user is None:
         log_info_and_embed(
             logging_embed,
@@ -108,6 +121,12 @@ async def exile_user(
             logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
         )
 
+    log_info_and_add_field(
+        logging_embed,
+        logger,
+        "Expiration",
+        f"<t:{timestamp_to_epoch(end_timestamp)}:R>",
+    )
     log_info_and_add_field(
         logging_embed,
         logger,
@@ -211,9 +230,9 @@ async def get_user_exiles(user: discord.User) -> str:
         for exile in exile_list:
             exile_id = exile.exile_id
             exile_reason = exile.reason
-            exile_start_epoch = round(exile.start_timestamp.timestamp())
+            exile_start_epoch = timestamp_to_epoch(exile.start_timestamp)
             exile_end_epoch = (
-                round(exile.end_timestamp.timestamp()) if exile.exile_status else None
+                timestamp_to_epoch(exile.end_timestamp) if exile.exile_status else None
             )
             exile_start_date = f"<t:{exile_start_epoch}:F>"
             exile_end_date = (
