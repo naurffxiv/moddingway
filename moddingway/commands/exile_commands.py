@@ -75,7 +75,7 @@ def create_exile_commands(bot: Bot) -> None:
                 user=user,
                 duration=format_time_string(duration),
                 reason=reason,
-                expiration=end_timestamp,
+                # expiration=end_timestamp,
             ) as logging_embed:
                 error_message = await exile_user(
                     logging_embed, user, exile_duration, reason

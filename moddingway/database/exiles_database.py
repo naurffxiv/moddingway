@@ -117,7 +117,7 @@ def get_user_active_exile(user_id) -> PendingExile:
             return None
 
 
-def extend_exile_duration(exile_id, end_timestamp):
+def update_exile_end(exile_id, end_timestamp):
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -132,7 +132,8 @@ def extend_exile_duration(exile_id, end_timestamp):
         cursor.execute(query, params)
 
         return
-    
+
+
 #   exile_id, user_id, discord_id, reason, exile_status, start_timestamp, end_timestamp
 def get_user_exiles(user_id) -> list[Exile]:
     conn = DatabaseConnection()

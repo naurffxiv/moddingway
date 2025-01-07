@@ -16,6 +16,7 @@ from moddingway.util import (
     log_info_and_embed,
     send_dm,
     user_has_role,
+    timestamp_to_epoch,
 )
 
 settings = get_settings()
@@ -32,19 +33,16 @@ async def exile_user(
     if db_user:
         currentExile = exiles_database.get_user_active_exile(db_user.user_id)
         if not user_has_role(user, Role.VERIFIED) and currentExile:
-            logger.warning(currentExile.end_timestamp)
             new_endTimestamp = currentExile.end_timestamp + duration
-            logger.warning(new_endTimestamp)
-            exiles_database.extend_exile_duration(currentExile.exile_id, new_endTimestamp)
-            logger.info(f"Extended exile {currentExile.exile_id}")
+            exiles_database.update_exile_end(currentExile.exile_id, new_endTimestamp)
             log_info_and_add_field(
                 logging_embed,
                 logger,
                 "Result",
-                f"Exile extended until {new_endTimestamp}",
+                f"Exile extended until <t:{timestamp_to_epoch(new_endTimestamp)}>",
             )
             return "User exile extended"
-    
+
     if not user_has_role(user, Role.VERIFIED):
         error_message = "User is not currently verified, no action will be taken"
         log_info_and_add_field(
@@ -55,7 +53,7 @@ async def exile_user(
         )
         return error_message
     # look up user in DB
-    #db_user = users_database.get_user(user.id)
+    # db_user = users_database.get_user(user.id)
     if db_user is None:
         log_info_and_embed(
             logging_embed,
@@ -63,7 +61,6 @@ async def exile_user(
             f"User not found in database, creating new record",
         )
         db_user = users_database.add_user(user.id)
-
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -126,6 +123,12 @@ async def exile_user(
             logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
         )
 
+    log_info_and_add_field(
+        logging_embed,
+        logger,
+        "Expiration",
+        f"<t:{timestamp_to_epoch(end_timestamp)}:R>",
+    )
     log_info_and_add_field(
         logging_embed,
         logger,
@@ -229,9 +232,9 @@ async def get_user_exiles(user: discord.User) -> str:
         for exile in exile_list:
             exile_id = exile.exile_id
             exile_reason = exile.reason
-            exile_start_epoch = round(exile.start_timestamp.timestamp())
+            exile_start_epoch = timestamp_to_epoch(exile.start_timestamp)
             exile_end_epoch = (
-                round(exile.end_timestamp.timestamp()) if exile.exile_status else None
+                timestamp_to_epoch(exile.end_timestamp) if exile.exile_status else None
             )
             exile_start_date = f"<t:{exile_start_epoch}:F>"
             exile_end_date = (

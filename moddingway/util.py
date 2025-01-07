@@ -1,6 +1,6 @@
 import re
 from contextlib import asynccontextmanager
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from typing import Optional
 
 import discord
@@ -188,3 +188,9 @@ def calculate_time_delta(delta_string: Optional[str]) -> Optional[timedelta]:
 
 async def is_user_moderator(interaction: discord.Interaction):
     return user_has_role(interaction.user, Role.MOD)
+
+
+def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
+    if timestamp is None:
+        return None
+    return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
