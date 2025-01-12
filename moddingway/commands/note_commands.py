@@ -45,7 +45,7 @@ def create_note_commands(bot: Bot) -> None:
     @discord.app_commands.describe(user="User to add note to")
     async def add_note(
         interaction: discord.Interaction,
-        user: discord.Member,
+        user: discord.User,
         note: str,
     ):
         """Add a note to the user"""

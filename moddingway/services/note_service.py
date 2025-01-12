@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def add_note(
     logging_embed: discord.Embed,
-    user: discord.Member,
+    user: discord.User,
     note: str,
     author: discord.Member,
 ):
