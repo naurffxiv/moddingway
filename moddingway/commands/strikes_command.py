@@ -54,6 +54,7 @@ def create_strikes_commands(bot: Bot) -> None:
         severity: StrikeSeverity,
         reason: str,
     ):
+        """Add a strike to the user"""
         if user_has_role(user, Role.MOD):
             logger.warning(
                 f"{interaction.user.id} used the add strike command on {user.id}, it failed because targeted user is a mod."
@@ -63,7 +64,6 @@ def create_strikes_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-        """Add a strike to the user"""
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
                 interaction, user=user, reason=reason, severity=severity.name
