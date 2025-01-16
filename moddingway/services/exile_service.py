@@ -135,6 +135,22 @@ async def exile_user(
     )
 
 
+async def delete_exile_by_id(logging_embed: discord.Embed, exile_id: int):
+
+    result = exiles_database.delete_exile(exile_id)
+    if result:
+
+        log_info_and_add_field(
+            logging_embed, logger, "Result", f"Exile {exile_id} succesfully deleted"
+        )
+        return f"Exile {exile_id} succesfully deleted"
+    else:
+        log_info_and_add_field(
+            logging_embed, logger, "Result", f"Error with exile {exile_id} deletion"
+        )
+        return f"Error with exile {exile_id} deletion"
+
+
 async def unexile_user(
     logging_embed: discord.Embed, user: discord.Member
 ) -> Optional[str]:

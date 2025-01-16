@@ -176,3 +176,25 @@ def get_all_active_exiles() -> list[Exile]:
             return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
             return []
+
+
+def delete_exile(exile_id: int) -> bool:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        DELETE FROM exiles 
+        WHERE exileId = %s 
+        AND exileStatus != %s
+        RETURNING exileId
+        """
+
+        params = (
+            exile_id,
+            ExileStatus.TIMED_EXILED,
+        )
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        return res is not None
