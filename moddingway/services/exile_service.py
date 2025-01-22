@@ -135,6 +135,42 @@ async def exile_user(
     )
 
 
+async def delete_exile_by_id(logging_embed: discord.Embed, exile_id: int):
+
+    status = exiles_database.get_exile_status(exile_id)
+    if status == ExileStatus.TIMED_EXILED:
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "Result",
+            f"Selected exile is active, cannot be deleted",
+        )
+        return f"Selected exile is active, cannot be deleted"
+    elif status == ExileStatus.UNEXILED:
+        result = exiles_database.delete_exile(exile_id)
+        if result:
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"Exile {exile_id} successfully deleted",
+            )
+            return f"Exile {exile_id} successfully deleted"
+        else:
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"Error with exile {exile_id} deletion",
+            )
+            return f"Error with exile {exile_id} deletion"
+    elif not status:
+        log_info_and_add_field(
+            logging_embed, logger, "Result", f"Exile {exile_id} not found"
+        )
+        return f"Exile {exile_id} not found"
+
+
 async def unexile_user(
     logging_embed: discord.Embed, user: discord.Member
 ) -> Optional[str]:

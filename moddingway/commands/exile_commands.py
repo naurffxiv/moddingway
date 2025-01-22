@@ -12,6 +12,7 @@ from moddingway.services.exile_service import (
     get_active_exiles,
     get_user_exiles,
     unexile_user,
+    delete_exile_by_id,
 )
 from moddingway.settings import get_settings
 from moddingway.util import calculate_time_delta, is_user_moderator, user_has_role
@@ -159,3 +160,16 @@ def create_exile_commands(bot: Bot) -> None:
             msg = await get_active_exiles()
 
             response_message.set_string(msg)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    async def delete_exile(interaction: discord.Interaction, exile_id: int):
+        """Delete a past exile from the database."""
+
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction,
+                exile_id=exile_id,
+            ) as logging_embed:
+                result = await delete_exile_by_id(logging_embed, exile_id)
+                response_message.set_string(result)
