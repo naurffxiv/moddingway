@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timezone
+from typing import Optional
 
 from moddingway.enums import ExileStatus
 
@@ -176,3 +177,41 @@ def get_all_active_exiles() -> list[Exile]:
             return [Exile(*row) for row in res]  # Create a list of Exile objects
         else:
             return []
+
+
+def delete_exile(exile_id: int) -> bool:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        DELETE FROM exiles 
+        WHERE exileId = %s 
+        AND exileStatus != %s
+        RETURNING exileId
+        """
+
+        params = (
+            exile_id,
+            ExileStatus.TIMED_EXILED,
+        )
+
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        return res is not None
+
+
+def get_exile_status(exile_id: int) -> Optional[ExileStatus]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT exileStatus 
+        FROM exiles 
+        WHERE exileId = %s
+        """
+        params = (exile_id,)
+        cursor.execute(query, params)
+        res = cursor.fetchone()
+
+        return res[0] if res is not None else None
