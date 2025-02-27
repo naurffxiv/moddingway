@@ -25,7 +25,9 @@ def create_ban_commands(bot: Bot) -> None:
     )
     async def ban(
         interaction: discord.Interaction,
-        user: discord.User | discord.Member,
+        user: (
+            discord.User | discord.Member
+        ),  # Normally accepts members, need to accept users too in case we need to ban by id
         reason: str,
         delete_messages: bool = False,  # Default to false for no message deletion as we typically don't want to delete messages.
     ):

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def ban_member(
     user: discord.Member, reason: str, delete_messages: bool
 ) -> Optional[Tuple[bool, str]]:
-    """Executes ban of user.
+    """Executes ban of member.
 
      Args:
          user (discord.Member): The user being banned.
@@ -54,6 +54,18 @@ async def ban_user(
     reason: str,
     delete_messages: bool,
 ) -> Optional[Tuple[bool, str]]:
+    """Executes ban of user.
+
+     Args:
+         interaction (discord.Interaction): Interaction that initiated this event.
+         user (discord.Member): The user being banned.
+         reason (str): Reason for the ban.
+         delete_messages_flag (bool): Whether to delete the user's messages.
+
+    Returns:
+         bool: status of the ban
+         str: any errors that occurred
+    """
     if len(reason) >= 512:
         return (
             False,
