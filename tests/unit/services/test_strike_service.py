@@ -33,7 +33,8 @@ async def test_apply_punisment(
 ):
     mocked_user = mocker.Mock()
     mocked_db_user = create_db_user(get_strike_points=total_points)
-    mocked_ban = mocker.patch("moddingway.services.ban_service.ban_user")
+    mocked_ban_member = mocker.patch("moddingway.services.ban_service.ban_member")
+    mocked_ban_user = mocker.patch("moddingway.services.ban_service.ban_user")
     mocked_embed = mocker.Mock(spec=discord.Embed)
 
     spy_calculate_punishment = mocker.spy(strike_service, "_calculate_punishment")
@@ -44,13 +45,13 @@ async def test_apply_punisment(
         mocked_embed, mocked_user, mocked_db_user, previous_points
     )
     if total_points >= 15:
-        mocked_ban.assert_called_once_with(
+        mocked_ban_member.assert_called_once_with(
             mocked_user,
             mocker.ANY,
             False,
         )
     else:
-        mocked_ban.assert_not_called()
+        mocked_ban_user.assert_not_called()
         spy_calculate_punishment.assert_called_once_with(previous_points, total_points)
         punishment_days = spy_calculate_punishment.spy_return
         if punishment_days == 0:
