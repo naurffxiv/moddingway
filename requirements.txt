@@ -2,3 +2,4 @@ discord
 pydantic
 psycopg2
 black
+fastapi[standard]==0.115.11

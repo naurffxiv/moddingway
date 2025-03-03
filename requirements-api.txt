@@ -1,2 +1,0 @@
-fastapi[standard]==0.115.11
-pydantic
