@@ -62,5 +62,11 @@ CREATE TABLE IF NOT EXISTS roles (
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
+-- This can be removed after one deploy is run
+-- convert all existing indefinite exiles to 1 year exiles
+UPDATE exiles SET
+ exilestatus = 1,
+ endtimestamp = starttimestamp + INTERVAL '1 year'
+ WHERE exilestatus = 0
 
 COMMIT;
