@@ -29,6 +29,6 @@ database-clean:
 	docker exec postgres_db psql -f scripts/postgres/seed_data.sql -U moddingwayLocalDB moddingway
 
 api:
-	python -m fastapi dev moddingway_api/main.py
+	uvicorn moddingway_api.main:app --port 8000
 
 .PHONY: format stop install clean python-build python-run database-run
