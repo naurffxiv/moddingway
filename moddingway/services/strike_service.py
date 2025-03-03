@@ -156,7 +156,7 @@ async def _apply_punishment(
 
     if total_points >= 15:
         punishment = "Permanent ban"
-        await ban_service.ban_user(
+        await ban_service.ban_member(
             user,
             "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
             False,
