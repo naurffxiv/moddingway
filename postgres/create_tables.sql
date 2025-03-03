@@ -67,6 +67,6 @@ CREATE TABLE IF NOT EXISTS roles (
 UPDATE exiles SET
  exilestatus = 1,
  endtimestamp = starttimestamp + INTERVAL '1 year'
- WHERE exilestatus = 0
+ WHERE exilestatus = 0;
 
 COMMIT;
