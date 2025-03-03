@@ -31,4 +31,7 @@ database-clean:
 api:
 	uvicorn moddingway_api.main:app --port 8000
 
+api-reload:
+	uvicorn moddingway_api.main:app --port 8000 --reload
+
 .PHONY: format stop install clean python-build python-run database-run

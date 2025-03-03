@@ -61,4 +61,6 @@ By default, when you run the application either via python or docker, records in
 
 # API
 
-To get started with moddingway API development, install the necessary packages using `pip install -r requirements-api.txt`. From there, you can start the server by running `make api`. You can then view the swaggerdocs page hosted on `localhost:8000/docs` to view all current endpoints
+To get started with moddingway API development, install the necessary packages using `pip install -r requirements-api.txt`. From there, you can start the server by running `make api`. You can then view the swaggerdocs page hosted on `localhost:8000/docs` to view all current endpoints.
+
+Alternatively, if you want to have local changes reflected in realtime with your development API, you can run `make api-reload`
