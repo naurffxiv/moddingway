@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from moddingway_api.routes import user_router
 
+app = FastAPI(title="Moddingway API")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app.include_router(user_router, tags=["user"])
