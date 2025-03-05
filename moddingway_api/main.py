@@ -6,10 +6,6 @@ from fastapi import FastAPI
 from moddingway.database import DatabaseConnection
 from moddingway_api.routes import user_router
 
-app = FastAPI(title="Moddingway API")
-
-app.include_router(user_router, tags=["user"])
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,3 +22,8 @@ def create_db_connection():
 
 def configure_logging():
     logging.basicConfig()
+
+
+app = FastAPI(title="Moddingway API", lifespan=lifespan)
+
+app.include_router(user_router, tags=["user"])
