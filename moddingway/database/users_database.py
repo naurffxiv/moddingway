@@ -39,6 +39,36 @@ def get_user(discord_user_id: int) -> Optional[User]:
                 last_infraction_timestamp=res[6],
             )
 
+def get_users(limit:int, offset:int) -> list[User]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT * FROM users
+        LIMIT %s OFFSET %s;
+        """
+
+        params = (limit, offset)
+
+        cursor.execute(query, params)
+
+        res = cursor.fetchall()
+
+        if res:
+            return [
+                User(
+                    user_id=row[0],
+                    discord_user_id=row[1],
+                    discord_guild_id=row[2],
+                    is_mod=row[3],
+                    temporary_points=row[4],
+                    permanent_points=row[5],
+                    last_infraction_timestamp=row[6],
+                )
+                for row in res
+            ]
+        return []
+
 
 def add_user(discord_user_id: int) -> User:
     conn = DatabaseConnection()
@@ -104,3 +134,5 @@ def decrement_old_strike_points() -> int:
         cursor.execute(query)
 
         return cursor.rowcount
+    
+
