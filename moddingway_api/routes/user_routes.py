@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from fastapi_pagination import Page, paginate
+from fastapi_pagination import Page, paginate, create_page, Params
 
 from moddingway.database import users_database
 from moddingway_api.schemas.user_schema import User, UserPage
@@ -38,12 +38,12 @@ async def get_user_by_id(user_id: int) -> Optional[User]:
 
 
 @router.get("")
-async def get_users(page: int, size: int) -> Page[User]:
+async def get_users(page: int = 1, size: int = 50) -> UserPage:
 
     limit = size
     offset = (page-1) * size
-
     db_user_list = users_database.get_users(limit, offset)
+    db_user_count = users_database.get_user_count()
 
     user_list = [
         User(
@@ -53,6 +53,13 @@ async def get_users(page: int, size: int) -> Page[User]:
         )
         for db_user in db_user_list
     ]
-    
 
-    return paginate(user_list)
+    total_pages = (db_user_count + size - 1) // size
+    
+    return UserPage(
+        items=user_list,
+        total=db_user_count,
+        page=page,
+        size=size,
+        pages=total_pages
+    )

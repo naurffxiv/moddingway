@@ -136,3 +136,17 @@ def decrement_old_strike_points() -> int:
         return cursor.rowcount
     
 
+def get_user_count() -> int:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+
+        query = """
+            SELECT COUNT(*)
+            FROM users
+        """
+
+        cursor.execute(query)
+
+        result = cursor.fetchall()
+        return result[0][0]
