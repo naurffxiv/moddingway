@@ -1,8 +1,4 @@
-from typing import List
-
 from pydantic import BaseModel
-
-from .base_page import BasePage
 
 
 class User(BaseModel):
@@ -11,7 +7,3 @@ class User(BaseModel):
     userID: str
     isMod: bool
     strikePoints: int
-
-
-class UserPage(BasePage):
-    items: List[User]
