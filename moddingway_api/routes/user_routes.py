@@ -1,8 +1,7 @@
 from typing import Optional
-
 from fastapi import APIRouter
-from fastapi_pagination import Page, paginate, create_page, Params
-
+from moddingway_api.utils.paginate import parse_pagination_params, paginate
+from fastapi_pagination import Page
 from moddingway.database import users_database
 from moddingway_api.schemas.user_schema import User, UserPage
 
@@ -20,30 +19,15 @@ async def get_user_by_id(user_id: int) -> Optional[User]:
     )
     return user
 
-
-# @router.get("")
-# async def get_users(page: int = 1, size: int = 50) -> UserPage:
-#     # This code is meant to demonstrate a get response
-#     # feel free to modify it for actual purposes as necessary
-#     return UserPage(
-#         items=[
-#             User(userID=str(1), isMod=False, strikePoints=1),
-#             User(userID=str(2), isMod=False, strikePoints=0),
-#         ],
-#         total=2,
-#         page=1,
-#         size=50,
-#         pages=1,
-#     )
-
-
 @router.get("")
-async def get_users(page: int = 1, size: int = 50) -> UserPage:
+async def get_users() -> Page[User]:
 
+    page, size = parse_pagination_params()
     limit = size
     offset = (page-1) * size
+
     db_user_list = users_database.get_users(limit, offset)
-    db_user_count = users_database.get_user_count()
+    total_count = users_database.get_user_count()
 
     user_list = [
         User(
@@ -54,12 +38,4 @@ async def get_users(page: int = 1, size: int = 50) -> UserPage:
         for db_user in db_user_list
     ]
 
-    total_pages = (db_user_count + size - 1) // size
-    
-    return UserPage(
-        items=user_list,
-        total=db_user_count,
-        page=page,
-        size=size,
-        pages=total_pages
-    )
+    return paginate(user_list, length_function=lambda _: total_count)
