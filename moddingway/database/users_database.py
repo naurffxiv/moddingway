@@ -105,6 +105,7 @@ def decrement_old_strike_points() -> int:
 
         return cursor.rowcount
 
+
 def decrement_user_strike_points(user_id: int, point_amount: int):
     conn = DatabaseConnection()
 
