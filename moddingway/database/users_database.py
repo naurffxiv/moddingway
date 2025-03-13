@@ -104,3 +104,20 @@ def decrement_old_strike_points() -> int:
         cursor.execute(query)
 
         return cursor.rowcount
+
+
+def decrement_user_strike_points(user_id: int, point_amount: int):
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+            UPDATE users SET
+            temporarypoints = GREATEST(temporarypoints - %s, 0)
+            WHERE userID = %s
+        """
+
+        params = (
+            point_amount,
+            user_id,
+        )
+        cursor.execute(query, params)
