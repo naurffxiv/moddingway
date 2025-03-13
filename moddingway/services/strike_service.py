@@ -106,20 +106,32 @@ async def get_user_strikes(
     return result
 
 
+async def delete_strike(logging_embed: discord.Embed, strike_id: int) -> str:
+    deleted_strike = strikes_database.delete_strike(strike_id)
+
+    if deleted_strike is None:
+        return f"Strike not found, no change will be made"
+
+    user_id = deleted_strike[1]
+    severity = StrikeSeverity(deleted_strike[2])
+
+    users_database.decrement_user_strike_points(user_id, _get_severity_points(severity))
+
+    return f"Successfully deleted strike {strike_id}"
+
+
 def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
+    db_user.permanent_points = db_user.temporary_points + _get_severity_points(severity)
+
+
+def _get_severity_points(severity: StrikeSeverity) -> int:
     match severity:
         case StrikeSeverity.MINOR:
-            db_user.temporary_points = (
-                db_user.temporary_points + MINOR_INFRACTION_POINTS
-            )
+            return MINOR_INFRACTION_POINTS
         case StrikeSeverity.MODERATE:
-            db_user.temporary_points = (
-                db_user.temporary_points + MODERATE_INFRACTION_POINTS
-            )
+            return MODERATE_INFRACTION_POINTS
         case StrikeSeverity.SERIOUS:
-            db_user.permanent_points = (
-                db_user.permanent_points + SERIOUS_INFRACTION_POINTS
-            )
+            return SERIOUS_INFRACTION_POINTS
 
 
 def _calculate_punishment(previous_points: int, total_points: int) -> int:
