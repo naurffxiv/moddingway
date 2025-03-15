@@ -114,7 +114,6 @@ def create_exile_commands(bot: Bot) -> None:
             async with create_logging_embed(
                 interaction,
                 duration=format_time_string(duration_string),
-                expiration=end_timestamp,
             ) as logging_embed:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)
