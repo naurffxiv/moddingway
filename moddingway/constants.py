@@ -20,6 +20,7 @@ AUTOMOD_INACTIVITY = {
 }
 
 STICKY_ROLES = [
-    1309029459055214655,  # FRU Cleared
-    1318805592273322055,  # PtC Reloaded
+    # Extra roles that should be removed from users when they are exiled
+    # Right now there are no current roles that need to be removed other than verified
+    # Verified is covered in the main method
 ]
