@@ -114,15 +114,17 @@ async def delete_strike(logging_embed: discord.Embed, strike_id: int) -> str:
 
     user_id = deleted_strike[1]
     severity = StrikeSeverity(deleted_strike[2])
-    temp_points = 0
-    perm_points = 0
+    temporary_points_to_remove = 0
+    permanent_points_to_remove = 0
 
     if severity == StrikeSeverity.SERIOUS:
-        perm_points = _get_severity_points(severity)
+        permanent_points_to_remove = _get_severity_points(severity)
     else:
-        temp_points = _get_severity_points(severity)
+        temporary_points_to_remove = _get_severity_points(severity)
 
-    users_database.decrement_user_strike_points(user_id, temp_points, perm_points)
+    users_database.decrement_user_strike_points(
+        user_id, temporary_points_to_remove, permanent_points_to_remove
+    )
 
     return f"Successfully deleted strike {strike_id}"
 
