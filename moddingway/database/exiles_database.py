@@ -164,7 +164,7 @@ def get_all_active_exiles() -> list[Exile]:
         SELECT e.exileID, u.userID, u.discordUserID, e.reason, e.exileStatus, e.startTimestamp, e.endTimestamp
         FROM exiles e
         JOIN users u ON e.userID = u.userID
-        WHERE e.exileStatus = %s AND e.reason != 'roulette';
+        WHERE e.exileStatus = %s;
         """
 
         params = (ExileStatus.TIMED_EXILED,)
