@@ -129,8 +129,6 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-        start_timestamp = datetime.datetime.now(datetime.timezone.utc)
-        end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
                 interaction,
