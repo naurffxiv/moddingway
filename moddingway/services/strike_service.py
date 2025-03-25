@@ -88,7 +88,7 @@ async def get_user_strikes(
     strike_list = strikes_database.list_strikes(db_user.user_id)
 
     if len(strike_list) == 0:
-        return "No exiles found for user"
+        return "No strikes found for user"
 
     result = f"Strikes found for <@{user.id}>: [Temporary points: {db_user.temporary_points} | Permanent points: {db_user.permanent_points}]"
     for strike in strike_list:
@@ -114,8 +114,17 @@ async def delete_strike(logging_embed: discord.Embed, strike_id: int) -> str:
 
     user_id = deleted_strike[1]
     severity = StrikeSeverity(deleted_strike[2])
+    temporary_points_to_remove = 0
+    permanent_points_to_remove = 0
 
-    users_database.decrement_user_strike_points(user_id, _get_severity_points(severity))
+    if severity == StrikeSeverity.SERIOUS:
+        permanent_points_to_remove = _get_severity_points(severity)
+    else:
+        temporary_points_to_remove = _get_severity_points(severity)
+
+    users_database.decrement_user_strike_points(
+        user_id, temporary_points_to_remove, permanent_points_to_remove
+    )
 
     return f"Successfully deleted strike {strike_id}"
 
