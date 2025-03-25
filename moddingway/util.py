@@ -1,3 +1,4 @@
+import logging
 import re
 from contextlib import asynccontextmanager
 from datetime import timedelta, datetime, timezone
@@ -9,6 +10,7 @@ from moddingway.enums import Role
 from moddingway.settings import get_settings
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 class EmbedField(object):
@@ -194,3 +196,52 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
     if timestamp is None:
         return None
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
+
+
+# New utility functions for member events
+
+
+async def find_and_assign_role(member, role_enum):
+    """
+    Finds a role by enum and assigns it to a member.
+    Returns a tuple with (success_bool, message, role_object)
+    """
+    try:
+        # Find the role by name using the enum value
+        role = discord.utils.get(member.guild.roles, name=role_enum)
+
+        if role is None:
+            error_msg = f"Role '{role_enum}' not found in the server."
+            logger.error(error_msg)
+            return False, error_msg, None
+
+        # Assign the role to the member
+        await member.add_roles(role)
+        success_msg = f"Successfully assigned {role.name} role to {member.display_name}"
+        logger.info(success_msg)
+        return True, success_msg, role
+    except discord.Forbidden:
+        error_msg = (
+            f"Bot does not have permission to add roles to {member.display_name}"
+        )
+        logger.error(error_msg)
+        return False, error_msg, None
+    except Exception as e:
+        error_msg = f"Failed to assign role: {str(e)}"
+        logger.error(error_msg)
+        return False, error_msg, None
+
+
+async def get_log_channel(guild):
+    """
+    Get the logging channel and handle errors if it doesn't exist.
+    Returns the channel or None if not found.
+    """
+    log_channel = guild.get_channel(settings.logging_channel_id)
+
+    if log_channel is None:
+        logger.error(
+            f"Logging channel {settings.logging_channel_id} not found. Event will not be logged to Discord."
+        )
+
+    return log_channel
