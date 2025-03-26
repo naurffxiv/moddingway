@@ -197,9 +197,22 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
         return None
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
 
+##TODO: add this check every time we are using the logging_channel_id 
+async def get_log_channel(guild):
+    """
+    Get the logging channel and handle errors if it doesn't exist.
+    Returns the channel or None if not found.
+    """
+    log_channel = guild.get_channel(settings.logging_channel_id)
+
+    if log_channel is None:
+        logger.error(
+            f"Logging channel {settings.logging_channel_id} not found. Event will not be logged to Discord."
+        )
+
+    return log_channel
 
 # New utility functions for member events
-
 
 async def find_and_assign_role(member, role_enum):
     """
@@ -232,16 +245,4 @@ async def find_and_assign_role(member, role_enum):
         return False, error_msg, None
 
 
-async def get_log_channel(guild):
-    """
-    Get the logging channel and handle errors if it doesn't exist.
-    Returns the channel or None if not found.
-    """
-    log_channel = guild.get_channel(settings.logging_channel_id)
 
-    if log_channel is None:
-        logger.error(
-            f"Logging channel {settings.logging_channel_id} not found. Event will not be logged to Discord."
-        )
-
-    return log_channel
