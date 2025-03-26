@@ -139,14 +139,43 @@ async def unexile_user(
     logging_embed: discord.Embed, user: discord.Member
 ) -> Optional[str]:
     if not util.user_has_role(user, Role.EXILED):
-        error_message = "User is not currently exiled, no action will be taken"
-        log_info_and_add_field(
-            logging_embed,
-            logger,
-            "Error",
-            error_message,
+        # Check if user has NON_VERIFIED role
+        if util.user_has_role(user, Role.NON_VERIFIED):
+            error_message = (
+            "User has has Non-Verified role, will not add Verified role"
         )
-        return error_message
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"<@{user.id}> has Non-Verified role, will not add Verified role",
+            )
+            return error_message
+        
+        # Add verified role if not already verified
+        if not util.user_has_role(user, Role.VERIFIED):
+            await add_and_remove_role(user, Role.VERIFIED, Role.EXILED)
+            error_message = (
+            "User did not have Exiled role, was given the Verified role"
+        )
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"<@{user.id}> did not have Exiled role, was given the Verified role",
+            )
+            return error_message
+        else:
+            error_message = (
+            "User already has Verified role, no action needed"
+        )
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "Result",
+                f"<@{user.id}> already has Verified role, no action needed",
+            )
+            return error_message
 
     # unexile user
     await add_and_remove_role(user, Role.VERIFIED, Role.EXILED)

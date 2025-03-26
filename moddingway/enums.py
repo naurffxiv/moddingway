@@ -3,6 +3,7 @@ from enum import IntEnum, StrEnum
 
 class Role(StrEnum):
     EXILED = "Exiled"
+    NON_VERIFIED = "Non-Verified"
     VERIFIED = "Verified"
     MOD = "Mod"
 
