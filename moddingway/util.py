@@ -197,7 +197,8 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
         return None
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
 
-##TODO: add this check every time we are using the logging_channel_id 
+
+##TODO: add this check every time we are using the logging_channel_id
 async def get_log_channel(guild):
     """
     Get the logging channel and handle errors if it doesn't exist.
@@ -212,7 +213,9 @@ async def get_log_channel(guild):
 
     return log_channel
 
+
 # New utility functions for member events
+
 
 async def find_and_assign_role(member, role_enum):
     """
@@ -243,6 +246,3 @@ async def find_and_assign_role(member, role_enum):
         error_msg = f"Failed to assign role: {str(e)}"
         logger.error(error_msg)
         return False, error_msg, None
-
-
-

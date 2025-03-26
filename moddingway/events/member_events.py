@@ -10,7 +10,7 @@ from moddingway.util import (
     create_interaction_embed_context,
     user_has_role,
     find_and_assign_role,
-    get_log_channel
+    get_log_channel,
 )
 
 settings = get_settings()
@@ -24,12 +24,12 @@ async def on_member_join(member):
     """
     # First find and assign the role - this happens regardless of logging ability
     success, message, role = await find_and_assign_role(member, Role.NON_VERIFIED)
-    
+
     # Then get the logging channel for event logging
     log_channel = await get_log_channel(member.guild)
     if log_channel is None:
         return  # Exit early if no logging channel
-    
+
     # Create log embed
     async with create_interaction_embed_context(
         log_channel,
@@ -45,7 +45,7 @@ async def on_member_join(member):
                 "Result",
                 f"Successfully assigned <@&{role.id}> role to {member.display_name}",
             )
-            
+
             # Add additional field with account creation date
             account_age = datetime.now(timezone.utc) - member.created_at.replace(
                 tzinfo=timezone.utc
@@ -59,10 +59,4 @@ async def on_member_join(member):
             )
         else:
             # If role assignment failed, log the error
-            log_info_and_add_field(
-                embed,
-                logger,
-                "Error",
-                message
-            )
-            
+            log_info_and_add_field(embed, logger, "Error", message)
