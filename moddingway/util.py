@@ -198,7 +198,7 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
 
 
-##TODO: add this check every time we are using the logging_channel_id
+##TODO: MOD-166 add this check every time we are using the logging_channel_id
 async def get_log_channel(guild):
     """
     Get the logging channel and handle errors if it doesn't exist.
@@ -217,10 +217,19 @@ async def get_log_channel(guild):
 # New utility functions for member events
 
 
-async def find_and_assign_role(member, role_enum):
+async def find_and_assign_role(member: discord.Member, role_enum: Role) -> tuple[bool, str, Optional[discord.Role]]:
     """
     Finds a role by enum and assigns it to a member.
-    Returns a tuple with (success_bool, message, role_object)
+    
+    Args:
+        member: The member to assign the role to
+        role_enum: The role enum to find and assign
+        
+    Returns:
+        tuple containing:
+            - is_role_assigned: Whether the role was successfully assigned
+            - message: A descriptive message about the result
+            - role: The role object if found, None otherwise
     """
     try:
         # Find the role by name using the enum value
@@ -233,7 +242,7 @@ async def find_and_assign_role(member, role_enum):
 
         # Assign the role to the member
         await member.add_roles(role)
-        success_msg = f"Successfully assigned {role.name} role to {member.display_name}"
+        success_msg = f"Successfully assigned <@&{role.id}> role"
         logger.info(success_msg)
         return True, success_msg, role
     except discord.Forbidden:
