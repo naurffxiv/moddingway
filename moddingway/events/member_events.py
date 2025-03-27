@@ -27,13 +27,11 @@ async def on_member_join(member):
         member, Role.NON_VERIFIED
     )
 
-    # Log the join to console regardless of Discord logging success
     logger.info(f"Member joined: {member.display_name} ({member.id})")
 
-    # Try to get the logging channel for event logging
     log_channel = await get_log_channel(member.guild)
     if log_channel is None:
-        return  # Exit early if no logging channel
+        return
 
     # Try to create and send the embed
     try:
@@ -45,10 +43,7 @@ async def on_member_join(member):
             footer="Member Joined",
         ) as embed:
             if is_role_assigned:
-                # Use the message directly from find_and_assign_role which now includes the role mention
                 log_info_and_add_field(embed, logger, "Result", message)
-
-                # Add additional field with account creation date
                 account_age = datetime.now(timezone.utc) - member.created_at.replace(
                     tzinfo=timezone.utc
                 )
@@ -60,8 +55,6 @@ async def on_member_join(member):
                     f"{account_age_days} days (Created: {member.created_at.strftime('%Y-%m-%d')})",
                 )
             else:
-                # If role assignment failed, log the error message
                 log_info_and_add_field(embed, logger, "Error", message)
     except Exception as e:
-        # If anything fails with the embed or sending, log to console
         logger.error(f"Failed to log member join to Discord: {str(e)}")
