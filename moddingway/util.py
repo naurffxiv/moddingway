@@ -217,14 +217,16 @@ async def get_log_channel(guild):
 # New utility functions for member events
 
 
-async def find_and_assign_role(member: discord.Member, role_enum: Role) -> tuple[bool, str, Optional[discord.Role]]:
+async def find_and_assign_role(
+    member: discord.Member, role_enum: Role
+) -> tuple[bool, str, Optional[discord.Role]]:
     """
     Finds a role by enum and assigns it to a member.
-    
+
     Args:
         member: The member to assign the role to
         role_enum: The role enum to find and assign
-        
+
     Returns:
         tuple containing:
             - is_role_assigned: Whether the role was successfully assigned
