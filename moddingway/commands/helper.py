@@ -18,7 +18,7 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
     if interaction.command:
         fields = [EmbedField("Action", f"/{interaction.command.name}")]
     else:
-        # Maybe we pass something in eventually to help, for now fix crit
+        # TODO: MOD-169 pass something in for these situations
         fields = []
     # Dynamically add kwargs to fields
     if kwargs is not None:
