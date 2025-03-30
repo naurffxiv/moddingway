@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
-    fields = [EmbedField("Action", f"/{interaction.command.name}")]
+    if interaction.command:
+        fields = [EmbedField("Action", f"/{interaction.command.name}")]
+    else:
+        # TODO: MOD-169 pass something in for these situations
+        fields = []
     # Dynamically add kwargs to fields
     if kwargs is not None:
         for key, value in kwargs.items():
