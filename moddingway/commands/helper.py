@@ -37,11 +37,16 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case _:
                     fields.append(EmbedField(key.title(), value))
 
+    if interaction.command:
+        description = f"Used `{interaction.command.name}` command in {interaction.channel.mention}"
+    else:
+        # TODO: MOD-169 pass something in for these situations
+        description = "Command was run via a UI"
     return create_interaction_embed_context(
         interaction.guild.get_channel(settings.logging_channel_id),
         user=interaction.user,
         timestamp=interaction.created_at,
-        description=f"Used `{interaction.command.name}` command in {interaction.channel.mention}",
+        description=description,
         fields=fields,
     )
 
