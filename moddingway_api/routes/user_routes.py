@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from fastapi_pagination import Page
 from moddingway.database import users_database
@@ -12,12 +12,15 @@ router = APIRouter(prefix="/users")
 async def get_user_by_id(user_id: int) -> Optional[User]:
 
     db_user = users_database.get_user(user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
     user = User(
         userID = str(db_user.user_id),
         isMod = db_user.is_mod,
         strikePoints = db_user.get_strike_points()
     )
     return user
+
 
 @router.get("")
 async def get_users() -> Page[User]:
