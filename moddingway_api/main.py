@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from moddingway.database import DatabaseConnection
-from moddingway_api.routes import user_router
+from moddingway_api.routes import user_router, mod_router
 
 
 @asynccontextmanager
@@ -27,6 +27,6 @@ def configure_logging():
 app = FastAPI(title="Moddingway API", lifespan=lifespan)
 
 app.include_router(user_router, tags=["user"])
-
+app.include_router(mod_router, tags=["mod"])
 #this was required to run paginate() function in the route
 add_pagination(app)
