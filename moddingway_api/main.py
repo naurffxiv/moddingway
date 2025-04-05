@@ -25,6 +25,7 @@ def configure_logging():
 
 
 app = FastAPI(title="Moddingway API", lifespan=lifespan)
+add_pagination(app)
 
 app.include_router(user_router, tags=["user"])
 app.include_router(mod_router, tags=["mod"])
