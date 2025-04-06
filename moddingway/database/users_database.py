@@ -40,6 +40,37 @@ def get_user(discord_user_id: int) -> Optional[User]:
             )
 
 
+def get_users(limit: int, offset: int) -> list[User]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT * FROM users
+        LIMIT %s OFFSET %s;
+        """
+
+        params = (limit, offset)
+
+        cursor.execute(query, params)
+
+        res = cursor.fetchall()
+
+        if res:
+            return [
+                User(
+                    user_id=row[0],
+                    discord_user_id=row[1],
+                    discord_guild_id=row[2],
+                    is_mod=row[3],
+                    temporary_points=row[4],
+                    permanent_points=row[5],
+                    last_infraction_timestamp=row[6],
+                )
+                for row in res
+            ]
+        return []
+
+
 def add_user(discord_user_id: int) -> User:
     conn = DatabaseConnection()
 
@@ -106,6 +137,22 @@ def decrement_old_strike_points() -> int:
         return cursor.rowcount
 
 
+def get_user_count() -> int:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+
+        query = """
+            SELECT COUNT(*)
+            FROM users
+        """
+
+        cursor.execute(query)
+
+        result = cursor.fetchall()
+        return result[0][0]
+
+
 def decrement_user_strike_points(
     user_id: int, temporary_point_amount: int, permanent_point_amount: int
 ):
@@ -125,3 +172,52 @@ def decrement_user_strike_points(
             user_id,
         )
         cursor.execute(query, params)
+
+
+def get_mod_count() -> int:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+
+        query = """
+            SELECT COUNT(*)
+            FROM users
+            WHERE ismod = %s
+        """
+        params = (True,)
+        cursor.execute(query, params)
+
+        result = cursor.fetchall()
+        return result[0][0]
+
+
+def get_mods(limit: int, offset: int) -> list[User]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        SELECT * FROM users
+        WHERE ismod = %s
+        LIMIT %s OFFSET %s;
+        """
+
+        params = (True, limit, offset)
+
+        cursor.execute(query, params)
+
+        res = cursor.fetchall()
+
+        if res:
+            return [
+                User(
+                    user_id=row[0],
+                    discord_user_id=row[1],
+                    discord_guild_id=row[2],
+                    is_mod=row[3],
+                    temporary_points=row[4],
+                    permanent_points=row[5],
+                    last_infraction_timestamp=row[6],
+                )
+                for row in res
+            ]
+        return []
