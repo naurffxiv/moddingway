@@ -10,6 +10,7 @@ from moddingway.commands.helper import create_bot_errors
 from moddingway.commands.slowmode_commands import create_slowmode_commands
 from moddingway.commands.strikes_command import create_strikes_commands
 from moddingway.commands.note_commands import create_note_commands
+from moddingway.events.member_events import on_member_join
 from moddingway.settings import get_settings
 
 settings = get_settings()
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 class ModdingwayBot(Bot):
     async def setup_hook(self):
         self._register_commands()
+        self._register_events()
 
         guild = discord.Object(id=settings.guild_id)
         self.tree.copy_global_to(guild=guild)
@@ -38,3 +40,8 @@ class ModdingwayBot(Bot):
         create_note_commands(self)
         create_bot_errors(self)
         logger.info("Registering commands finished")
+
+    def _register_events(self):
+        logger.info("Registering event handlers")
+        self.event(on_member_join)
+        logger.info("Event handlers registered")

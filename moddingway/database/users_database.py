@@ -39,7 +39,8 @@ def get_user(discord_user_id: int) -> Optional[User]:
                 last_infraction_timestamp=res[6],
             )
 
-def get_users(limit:int, offset:int) -> list[User]:
+
+def get_users(limit: int, offset: int) -> list[User]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -134,7 +135,7 @@ def decrement_old_strike_points() -> int:
         cursor.execute(query)
 
         return cursor.rowcount
-    
+
 
 def get_user_count() -> int:
     conn = DatabaseConnection()
@@ -150,8 +151,47 @@ def get_user_count() -> int:
 
         result = cursor.fetchall()
         return result[0][0]
-    
-def get_mods(limit:int, offset:int) -> list[User]:
+
+
+def decrement_user_strike_points(
+    user_id: int, temporary_point_amount: int, permanent_point_amount: int
+):
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+            UPDATE users SET
+            temporarypoints = GREATEST(temporarypoints - %s, 0),
+            permanentPoints = GREATEST(permanentPoints - %s, 0)
+            WHERE userID = %s
+        """
+
+        params = (
+            temporary_point_amount,
+            permanent_point_amount,
+            user_id,
+        )
+        cursor.execute(query, params)
+
+
+def get_mod_count() -> int:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+
+        query = """
+            SELECT COUNT(*)
+            FROM users
+            WHERE ismod = %s
+        """
+        params = (True,)
+        cursor.execute(query, params)
+
+        result = cursor.fetchall()
+        return result[0][0]
+
+
+def get_mods(limit: int, offset: int) -> list[User]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -181,20 +221,3 @@ def get_mods(limit:int, offset:int) -> list[User]:
                 for row in res
             ]
         return []
-    
-
-def get_mod_count() -> int:
-    conn = DatabaseConnection()
-
-    with conn.get_cursor() as cursor:
-
-        query = """
-            SELECT COUNT(*)
-            FROM users
-            WHERE ismod = %s
-        """
-        params = (True,)
-        cursor.execute(query, params)
-
-        result = cursor.fetchall()
-        return result[0][0]

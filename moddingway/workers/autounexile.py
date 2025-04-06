@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 @tasks.loop(minutes=1.0)
 async def autounexile_users(self):
-    exiles = exiles_database.get_pending_unexiles()
+    try:
+        exiles = exiles_database.get_pending_unexiles()
+    except Exception:
+        logger.info("Failed to get pending exiles.")
+        return
 
     for exile in exiles:
         logger.info(f"Auto Unexile running on user id {exile.user_id}")

@@ -16,10 +16,11 @@ AUTOMOD_INACTIVITY = {
     1273263026744590468: 30,  # lfg
     1273261496968810598: 30,  # lfm
     1240356145311252615: 30,  # temporary
-    1301166606985990144: 7,  # scheduled pfs
+    1301166606985990144: 14,  # scheduled pfs
 }
 
 STICKY_ROLES = [
-    1309029459055214655,  # FRU Cleared
-    1318805592273322055,  # PtC Reloaded
+    # Extra roles that should be removed from users when they are exiled
+    # Right now there are no current roles that need to be removed other than verified
+    # Verified is covered in the main method
 ]
