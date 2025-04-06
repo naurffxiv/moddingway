@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from fastapi_pagination import Page
 from moddingway.database import users_database
-from moddingway_api.schemas.user_schema import User, UserPage
+from moddingway_api.schemas.user_schema import User
 
 router = APIRouter(prefix="/users")
 

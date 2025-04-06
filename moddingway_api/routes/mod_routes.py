@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from fastapi_pagination import Page
 from moddingway.database import users_database
-from moddingway_api.schemas.mod_schema import Mod, ModPage
+from moddingway_api.schemas.mod_schema import Mod
 
 router = APIRouter(prefix="/mods")
 
@@ -15,28 +15,22 @@ async def get_mod_by_id(mod_id: int) -> Optional[Mod]:
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     if db_user.is_mod:
-        mod = Mod(
-            modID = str(db_user.user_id)
-        )
+        mod = Mod(modID=str(db_user.user_id))
         return mod
     elif not db_user.is_mod:
         raise HTTPException(status_code=404, detail="Mod not found")
+
 
 @router.get("")
 async def get_mods() -> Page[Mod]:
 
     page, size = parse_pagination_params()
     limit = size
-    offset = (page-1) * size
+    offset = (page - 1) * size
 
     db_mod_list = users_database.get_mods(limit, offset)
     total_count = users_database.get_mod_count()
 
-    mod_list = [
-        Mod(
-            modID=str(db_mod.user_id)
-        )
-        for db_mod in db_mod_list
-    ]
+    mod_list = [Mod(modID=str(db_mod.user_id)) for db_mod in db_mod_list]
 
     return paginate(mod_list, length_function=lambda _: total_count)

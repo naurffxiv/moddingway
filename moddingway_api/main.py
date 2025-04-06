@@ -29,5 +29,3 @@ add_pagination(app)
 
 app.include_router(user_router, tags=["user"])
 app.include_router(mod_router, tags=["mod"])
-#this was required to run paginate() function in the route
-add_pagination(app)
