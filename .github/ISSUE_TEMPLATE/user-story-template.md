@@ -7,11 +7,6 @@ assignees: ''
 
 ---
 
-# User Story Template
-
-## Title
-[Short descriptive title of the user story]
-
 ## User Story
 As a [type of user],
 I want [goal/desire],
