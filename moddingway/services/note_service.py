@@ -1,7 +1,11 @@
 import discord
 import logging
 from moddingway.database import users_database
-from moddingway.util import log_info_and_embed, log_info_and_add_field
+from moddingway.util import (
+    log_info_and_embed,
+    log_info_and_add_field,
+    find_or_create_user,
+)
 from moddingway.database import notes_database, users_database
 from moddingway.database.models import Note
 from datetime import datetime
@@ -16,14 +20,7 @@ async def add_note(
     author: discord.Member,
 ):
     # find user in DB
-    db_user = users_database.get_user(user.id)
-    if db_user is None:
-        log_info_and_embed(
-            logging_embed,
-            logger,
-            "User not found in database, creating new record",
-        )
-        db_user = users_database.add_user(user.id)
+    db_user = await find_or_create_user(user.id, logging_embed)
 
     # create note
     note_timestamp = datetime.now()

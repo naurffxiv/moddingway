@@ -258,3 +258,46 @@ async def find_and_assign_role(
         error_msg = f"Failed to assign role: {str(e)}"
         logger.error(error_msg)
         return False, error_msg, None
+
+
+# Add this new method after the existing find_and_assign_role function
+
+
+async def find_or_create_user(
+    user_id: int, logging_embed: Optional[discord.Embed] = None
+):
+    """
+    Retrieve a user from the database or create a new record if not found.
+    Optionally logs the operation to the provided embed.
+
+    Args:
+        user_id: The Discord user ID
+        logging_embed: Optional embed to log information to
+
+    Returns:
+        User: The existing or newly created user record
+    """
+    from moddingway.database import users_database
+
+    db_user = users_database.get_user(user_id)
+    if db_user is None:
+        if logging_embed:
+            log_info_and_embed(
+                logging_embed,
+                logger,
+                "User not found in database, creating new record",
+            )
+        db_user = users_database.add_user(user_id)
+
+        # Check if user was actually created
+        if db_user is None:
+            logger.error(f"Failed to create user with ID {user_id}")
+            if logging_embed:
+                log_info_and_add_field(
+                    logging_embed,
+                    logger,
+                    "Error",
+                    f"Failed to create user with ID {user_id}",
+                )
+
+    return db_user
