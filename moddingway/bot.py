@@ -10,7 +10,7 @@ from moddingway.commands.helper import create_bot_errors
 from moddingway.commands.slowmode_commands import create_slowmode_commands
 from moddingway.commands.strikes_command import create_strikes_commands
 from moddingway.commands.note_commands import create_note_commands
-from moddingway.events.member_events import on_member_join
+from moddingway.events.member_events import register_events
 from moddingway.settings import get_settings
 
 settings = get_settings()
@@ -43,5 +43,5 @@ class ModdingwayBot(Bot):
 
     def _register_events(self):
         logger.info("Registering event handlers")
-        self.event(on_member_join)
+        register_events(self)
         logger.info("Event handlers registered")
