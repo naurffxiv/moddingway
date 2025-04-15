@@ -23,4 +23,6 @@ STICKY_ROLES = [
     # Extra roles that should be removed from users when they are exiled
     # Right now there are no current roles that need to be removed other than verified
     # Verified is covered in the main method
+    1253810157524094996,  # Glorp
+    1272364706241187870,  # Event
 ]
