@@ -12,7 +12,12 @@ from moddingway.constants import (
 from moddingway.database import strikes_database, users_database
 from moddingway.database.models import Strike, User
 from moddingway.enums import StrikeSeverity
-from moddingway.util import log_info_and_add_field, log_info_and_embed, send_dm
+from moddingway.util import (
+    log_info_and_add_field,
+    log_info_and_embed,
+    send_dm,
+    find_or_create_user,
+)
 
 from . import ban_service, exile_service
 
@@ -27,14 +32,7 @@ async def add_strike(
     author: discord.Member,
 ):
     # find user in DB
-    db_user = users_database.get_user(user.id)
-    if db_user is None:
-        log_info_and_embed(
-            logging_embed,
-            logger,
-            "User not found in database, creating new record",
-        )
-        db_user = users_database.add_user(user.id)
+    db_user = await find_or_create_user(user.id, logging_embed)
 
     # create strike
     strike_timestamp = datetime.now()
