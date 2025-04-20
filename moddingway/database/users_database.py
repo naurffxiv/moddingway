@@ -17,7 +17,7 @@ def get_user(discord_user_id: int) -> Optional[User]:
     with conn.get_cursor() as cursor:
         query = """
         SELECT
-        u.userid, u.discordUserId, u.discordGuildId, u.isMod, u.temporaryPoints, u.permanentPoints, u.lastInfractionTimestamp
+        u.userid, u.discordUserId, u.discordGuildId, u.isMod, u.temporaryPoints, u.permanentPoints, u.lastInfractionTimestamp, u.isBanned
         FROM users u
         where u.discorduserid = %s
         """
@@ -37,6 +37,7 @@ def get_user(discord_user_id: int) -> Optional[User]:
                 temporary_points=res[4],
                 permanent_points=res[5],
                 last_infraction_timestamp=res[6],
+                is_banned=res[7],
             )
 
 
@@ -95,6 +96,7 @@ def add_user(discord_user_id: int) -> User:
             is_mod=False,
             temporary_points=0,
             permanent_points=0,
+            is_banned=False,
         )
 
 
@@ -221,3 +223,26 @@ def get_mods(limit: int, offset: int) -> list[User]:
                 for row in res
             ]
         return []
+
+def update_user(user: User):
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+            UPDATE users
+            SET temporaryPoints = %s,
+            permanentPoints = %s,
+            lastInfractionTimestamp = %s,
+            isBanned = %s
+            WHERE userId = %s
+        """
+
+        params = (
+            user.temporary_points,
+            user.permanent_points,
+            user.last_infraction_timestamp,
+            user.is_banned,
+            user.user_id,
+        )
+
+        cursor.execute(query, params)

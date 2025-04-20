@@ -69,4 +69,9 @@ UPDATE exiles SET
  endtimestamp = starttimestamp + INTERVAL '1 year'
  WHERE exilestatus = 0;
 
+ALTER TABLE users
+ ADD COLUMN IF NOT EXISTS isBanned
+ BOOL NOT NULL default false;
+
+
 COMMIT;
