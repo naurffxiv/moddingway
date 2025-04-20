@@ -17,6 +17,7 @@ async def test_exile_user__unverified(mocker: MockerFixture, create_member):
         is_mod=False,
         temporary_points=0,
         permanent_points=0,
+        is_banned=False,
     )
     mocker.patch(
         "moddingway.database.users_database.get_user", return_value=mock_database_user
@@ -50,6 +51,7 @@ async def test_exile_user__verified_existing_user_dm_failed(
         is_mod=False,
         temporary_points=0,
         permanent_points=0,
+        is_banned=False,
     )
     mocker.patch(
         "moddingway.database.exiles_database.get_user_active_exile", return_value=None
