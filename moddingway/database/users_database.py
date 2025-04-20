@@ -224,6 +224,7 @@ def get_mods(limit: int, offset: int) -> list[User]:
             ]
         return []
 
+
 def update_user(user: User):
     conn = DatabaseConnection()
 
