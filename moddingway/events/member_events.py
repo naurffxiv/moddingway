@@ -1,8 +1,10 @@
 import logging
 from datetime import datetime, timezone
 
+from discord import Guild, User
 from discord.ext.commands import Bot
 
+from moddingway.database import users_database
 from moddingway.enums import Role
 from moddingway.settings import get_settings
 from moddingway.util import (
@@ -59,3 +61,26 @@ def register_events(bot: Bot):
                     log_info_and_add_field(embed, logger, "Error", message)
         except Exception as e:
             logger.error(f"Failed to log member join to Discord: {str(e)}")
+
+    @bot.event
+    async def on_member_ban(guild: Guild, user: User):
+        logger.info(f"Ban member {user.id}")
+
+        db_user = users_database.get_user(user.id)
+        if db_user is None:
+            db_user = users_database.add_user(user.id)
+
+        db_user.is_banned = True
+
+        users_database.update_user(db_user)
+
+    @bot.event
+    async def on_member_unban(guild: Guild, user: User):
+        logger.info(f"Unban member {user.id}")
+        db_user = users_database.get_user(user.id)
+        if db_user is None:
+            db_user = users_database.add_user(user.id)
+
+        db_user.is_banned = False
+
+        users_database.update_user(db_user)

@@ -16,6 +16,7 @@ class User(BaseModel):
     temporary_points: int
     permanent_points: int
     last_infraction_timestamp: Optional[datetime] = None
+    is_banned: bool
 
     def get_strike_points(self) -> int:
         return self.temporary_points + self.permanent_points
