@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS roles (
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
+-- This can be removed after one deploy is run
 ALTER TABLE users
  ADD COLUMN IF NOT EXISTS isBanned
  BOOL NOT NULL default false;
