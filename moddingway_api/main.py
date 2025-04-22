@@ -1,10 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
-
+import discord
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from moddingway.database import DatabaseConnection
-from moddingway_api.routes import user_router, mod_router
+from moddingway_api.routes import user_router, mod_router, banneduser_router
 
 
 @asynccontextmanager
@@ -29,3 +29,4 @@ add_pagination(app)
 
 app.include_router(user_router, tags=["user"])
 app.include_router(mod_router, tags=["mod"])
+app.include_router(banneduser_router, tags=["ban"])
