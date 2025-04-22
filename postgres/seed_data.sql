@@ -8,7 +8,7 @@ delete from users;
 
 -- seed users
 insert into users 
-(userid, discordUserID, discordguildid, ismod,isBanned)
+(userid, discordUserID, discordguildid, ismod, isBanned)
 OVERRIDING SYSTEM VALUE
 values
 (800001, '123456789987654321', '1172230157776466050', false, true),

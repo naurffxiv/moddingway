@@ -9,8 +9,14 @@ from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from moddingway.database import users_database
 
 
-router = APIRouter(prefix="/bannedusers")
+router = APIRouter(prefix="/bannedUsers")
 settings = get_settings()
+
+
+class BanRequest(BaseModel):
+    user_id: str  # discord user ID
+    reason: Optional[str] = "Banned via API"  # optional reason shown in audit
+    delete_message_days: Optional[int] = 0  # optional to delete message (0-7 days)
 
 
 @router.get("")
@@ -30,12 +36,6 @@ async def get_banned_users() -> Page[Banned]:
     return paginate(banned_list, length_function=lambda _: total_count)
 
 
-class BanRequest(BaseModel):
-    user_id: str  # discord user ID
-    reason: Optional[str] = "Banned via API"  # optional reason shown in audit
-    delete_message_days: Optional[int] = 0  # optional to delete message (0-7 days)
-
-
 @router.post("")
 async def ban_user(request: BanRequest):
     url = (
@@ -46,7 +46,7 @@ async def ban_user(request: BanRequest):
         "reason": request.reason,
         "delete_message_days": request.delete_message_days,
     }
-
+    # nb:Registration of banned user in the database is handled with event handler(member_events.py) which listens for ban events and updates the db.
     try:
         async with httpx.AsyncClient() as client:
             response = await client.put(url, headers=headers, json=body)
