@@ -19,6 +19,9 @@ class BanRequest(BaseModel):
     delete_message_days: Optional[int] = 0  # optional to delete message (0-7 days)
 
 
+authHeader = {"Authorization": f"Bot {settings.discord_token}"}
+
+
 @router.get("")
 async def get_banned_users() -> Page[Banned]:
 
@@ -41,7 +44,7 @@ async def ban_user(request: BanRequest):
     url = (
         f"https://discord.com/api/v10/guilds/{settings.guild_id}/bans/{request.user_id}"
     )
-    headers = {"Authorization": f"Bot {settings.discord_token}"}
+    headers = authHeader
     body = {
         "reason": request.reason,
         "delete_message_days": request.delete_message_days,
@@ -59,7 +62,7 @@ async def ban_user(request: BanRequest):
 @router.delete("")
 async def unban_user(user_id: str):
     url = f"https://discord.com/api/v10/guilds/{settings.guild_id}/bans/{user_id}"
-    headers = {"Authorization": f"Bot {settings.discord_token}"}
+    headers = authHeader
 
     # nb:Registration of unbanned user in the database is handled with event handler(member_events.py) which listens for unban events and updates the db.
     try:
