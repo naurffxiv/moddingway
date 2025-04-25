@@ -11,6 +11,7 @@ from moddingway.database import users_database
 
 router = APIRouter(prefix="/bannedUsers")
 settings = get_settings()
+authHeader = {"Authorization": f"Bot {settings.discord_token}"}
 
 
 class BanRequest(BaseModel):
@@ -41,7 +42,7 @@ async def ban_user(request: BanRequest):
     url = (
         f"https://discord.com/api/v10/guilds/{settings.guild_id}/bans/{request.user_id}"
     )
-    headers = {"Authorization": f"Bot {settings.discord_token}"}
+    headers = authHeader
     body = {
         "reason": request.reason,
         "delete_message_days": request.delete_message_days,
@@ -52,5 +53,20 @@ async def ban_user(request: BanRequest):
             response = await client.put(url, headers=headers, json=body)
             response.raise_for_status()  # will raise if ban fails
             return {"detail": f"User {request.user_id} has been banned"}
+    except (httpx.HTTPError, httpx.RequestError) as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@router.delete("")
+async def unban_user(user_id: str):
+    url = f"https://discord.com/api/v10/guilds/{settings.guild_id}/bans/{user_id}"
+    headers = authHeader
+
+    # nb:Registration of unbanned user in the database is handled with event handler(member_events.py) which listens for unban events and updates the db.
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url, headers=headers)
+            response.raise_for_status()  # will raise if ban fails
+            return {"detail": f"User {user_id} has been unbanned"}
     except (httpx.HTTPError, httpx.RequestError) as exc:
         raise HTTPException(status_code=503, detail=str(exc))
