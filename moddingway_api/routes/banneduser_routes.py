@@ -11,15 +11,13 @@ from moddingway.database import users_database
 
 router = APIRouter(prefix="/bannedUsers")
 settings = get_settings()
+authHeader = {"Authorization": f"Bot {settings.discord_token}"}
 
 
 class BanRequest(BaseModel):
     user_id: str  # discord user ID
     reason: Optional[str] = "Banned via API"  # optional reason shown in audit
     delete_message_days: Optional[int] = 0  # optional to delete message (0-7 days)
-
-
-authHeader = {"Authorization": f"Bot {settings.discord_token}"}
 
 
 @router.get("")
