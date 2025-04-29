@@ -16,6 +16,7 @@ from moddingway.util import (
     log_info_and_embed,
     send_dm,
     timestamp_to_epoch,
+    find_or_create_user,
 )
 from moddingway import util
 
@@ -52,13 +53,9 @@ async def exile_user(
             error_message,
         )
         return error_message
-    if db_user is None:
-        log_info_and_embed(
-            logging_embed,
-            logger,
-            f"User not found in database, creating new record",
-        )
-        db_user = users_database.add_user(user.id)
+
+    # Replace the manual user lookup and creation with the helper method
+    db_user = await find_or_create_user(user.id, logging_embed)
 
     # add exile entry into DB
     start_timestamp = datetime.datetime.now(datetime.timezone.utc)
