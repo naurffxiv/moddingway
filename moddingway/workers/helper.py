@@ -7,7 +7,11 @@ import discord
 from discord.utils import snowflake_time
 
 from moddingway.settings import get_settings
-from moddingway.util import UnableToNotify, create_interaction_embed_context, get_log_channel
+from moddingway.util import (
+    UnableToNotify,
+    create_interaction_embed_context,
+    get_log_channel,
+)
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

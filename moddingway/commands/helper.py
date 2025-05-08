@@ -8,7 +8,11 @@ import discord
 from discord.ext.commands import Bot
 
 from moddingway.settings import get_settings
-from moddingway.util import EmbedField, create_interaction_embed_context, get_log_channel
+from moddingway.util import (
+    EmbedField,
+    create_interaction_embed_context,
+    get_log_channel,
+)
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

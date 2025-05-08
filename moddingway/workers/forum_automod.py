@@ -4,7 +4,11 @@ from datetime import datetime, timezone
 from discord.ext import tasks
 
 from moddingway.settings import get_settings
-from moddingway.util import create_interaction_embed_context, send_chunked_message, get_log_channel
+from moddingway.util import (
+    create_interaction_embed_context,
+    send_chunked_message,
+    get_log_channel,
+)
 
 from .helper import automod_thread, create_automod_embed
 
