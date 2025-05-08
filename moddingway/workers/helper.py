@@ -7,7 +7,11 @@ import discord
 from discord.utils import snowflake_time
 
 from moddingway.settings import get_settings
-from moddingway.util import UnableToNotify, create_interaction_embed_context
+from moddingway.util import (
+    UnableToNotify,
+    create_interaction_embed_context,
+    get_log_channel,
+)
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -20,8 +24,9 @@ def create_autounexile_embed(
     exile_id: str,
     end_timestamp: str,
 ):
+
     return create_interaction_embed_context(
-        self.get_channel(settings.logging_channel_id),
+        get_log_channel(self.guild),
         user=user,
         timestamp=end_timestamp,
         description=f"<@{discord_id}>'s exile has timed out",
@@ -31,7 +36,7 @@ def create_autounexile_embed(
 
 def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: datetime):
     return create_interaction_embed_context(
-        self.get_channel(settings.logging_channel_id),
+        get_log_channel(self.guild),
         user=self.user,
         timestamp=timestamp,
         description=f"Successfully removed {num_removed} inactive thread(s) from <#{channel_id}>.\n{num_error} inactive thread(s) failed to be removed.",

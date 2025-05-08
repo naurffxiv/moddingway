@@ -200,7 +200,7 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
 
 # TODO: MOD-166 add this check every time we are using the logging_channel_id
 # Try to get the logging channel for event logging
-async def get_log_channel(guild):
+def get_log_channel(guild):
     """
     Get the logging channel and handle errors if it doesn't exist.
     Returns the channel or None if not found.
@@ -208,6 +208,7 @@ async def get_log_channel(guild):
     log_channel = guild.get_channel(settings.logging_channel_id)
 
     if log_channel is None:
+        logger = logging.getLogger(__name__)
         logger.error(
             f"Logging channel {settings.logging_channel_id} not found. Event will not be logged to Discord."
         )
@@ -258,5 +259,5 @@ async def find_and_assign_role(
         error_msg = f"Failed to assign role: {str(e)}"
         logger.error(error_msg)
         return False, error_msg, None
-    
-    #Adding to test script
+
+    # Adding to test script

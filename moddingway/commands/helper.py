@@ -8,7 +8,11 @@ import discord
 from discord.ext.commands import Bot
 
 from moddingway.settings import get_settings
-from moddingway.util import EmbedField, create_interaction_embed_context
+from moddingway.util import (
+    EmbedField,
+    create_interaction_embed_context,
+    get_log_channel,
+)
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -43,7 +47,7 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         # TODO: MOD-169 pass something in for these situations
         description = "Command was run via a UI"
     return create_interaction_embed_context(
-        interaction.guild.get_channel(settings.logging_channel_id),
+        get_log_channel(interaction.guild),
         user=interaction.user,
         timestamp=interaction.created_at,
         description=description,
