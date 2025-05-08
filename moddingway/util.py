@@ -198,9 +198,8 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
 
 
-# TODO: MOD-166 add this check every time we are using the logging_channel_id
 # Try to get the logging channel for event logging
-async def get_log_channel(guild):
+def get_log_channel(guild):
     """
     Get the logging channel and handle errors if it doesn't exist.
     Returns the channel or None if not found.
