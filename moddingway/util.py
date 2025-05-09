@@ -258,3 +258,5 @@ async def find_and_assign_role(
         error_msg = f"Failed to assign role: {str(e)}"
         logger.error(error_msg)
         return False, error_msg, None
+    
+    #Adding to test script
