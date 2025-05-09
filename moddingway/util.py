@@ -216,6 +216,7 @@ def get_log_channel(guild):
 
 # New utility functions for member events
 
+
 async def find_and_assign_role(
     member: discord.Member, role_enum: Role
 ) -> tuple[bool, str, Optional[discord.Role]]:

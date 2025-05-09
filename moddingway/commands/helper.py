@@ -47,7 +47,6 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         # TODO: MOD-169 pass something in for these situations
         description = "Command was run via a UI"
 
-
     return create_interaction_embed_context(
         get_log_channel(interaction.guild),
         user=interaction.user,
@@ -55,6 +54,7 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
         description=description,
         fields=fields,
     )
+
 
 def create_bot_errors(bot: Bot) -> None:
     @bot.tree.error
