@@ -24,9 +24,8 @@ def create_autounexile_embed(
     exile_id: str,
     end_timestamp: str,
 ):
-    log_channel = get_log_channel(self.guild)
     return create_interaction_embed_context(
-        log_channel,
+        get_log_channel(self.guild),
         user=user,
         timestamp=end_timestamp,
         description=f"<@{discord_id}>'s exile has timed out",
@@ -35,9 +34,8 @@ def create_autounexile_embed(
 
 
 def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: datetime):
-    log_channel = get_log_channel(self.guild)
     return create_interaction_embed_context(
-        log_channel,
+        get_log_channel(self.guild),
         user=self.user,
         timestamp=timestamp,
         description=f"Successfully removed {num_removed} inactive thread(s) from <#{channel_id}>.\n{num_error} inactive thread(s) failed to be removed.",

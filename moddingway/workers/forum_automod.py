@@ -72,9 +72,8 @@ async def autodelete_threads(self):
                 )
         except Exception as e:
             logger.error(e, exc_info=e)
-            log_channel = await get_log_channel(self.guild)
             async with create_interaction_embed_context(
-                log_channel,
+                get_log_channel(self.guild),
                 user=self.user,
                 timestamp=datetime.now(timezone.utc),
                 description=f"Automod task failed to process channel <#{channel_id}>: {e}",
