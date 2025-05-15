@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 	temporaryPoints INT  not null default 0,
 	permanentPoints INT  not null default 0,
 	lastInfractionTimestamp TIMESTAMP,
+	isBanned BOOL NOT NULL default false,
 	PRIMARY KEY(userID),
 	UNIQUE(discordUserID, discordGuildID)
 );
