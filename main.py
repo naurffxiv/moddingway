@@ -11,9 +11,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Configure logging
-    logging.basicConfig(level=settings.log_level,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[logging.StreamHandler()])
+    logging.basicConfig(level=settings.log_level)
 
     intents = discord.Intents.default()
     intents.members = True
