@@ -257,3 +257,13 @@ async def find_and_assign_role(
         error_msg = f"Failed to assign role: {str(e)}"
         logger.error(error_msg)
         return False, error_msg, None
+
+
+def create_logging_embed(
+    title: str, description: str, color: discord.Color = discord.Color.blurple()
+) -> discord.Embed:
+    embed = discord.Embed(
+        title=title, description=description, color=color, timestamp=datetime.utcnow()
+    )
+    embed.set_footer(text="Moderation Log")
+    return embed
