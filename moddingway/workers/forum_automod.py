@@ -4,7 +4,11 @@ from datetime import datetime, timezone
 from discord.ext import tasks
 
 from moddingway.settings import get_settings
-from moddingway.util import create_interaction_embed_context, send_chunked_message
+from moddingway.util import (
+    create_interaction_embed_context,
+    send_chunked_message,
+    get_log_channel,
+)
 
 from .helper import automod_thread, create_automod_embed
 
@@ -33,7 +37,7 @@ async def autodelete_threads(self):
                 logger.error("Forum channel not found.")
                 continue
 
-            async for thread in channel.archived_threads(limit=None):
+            for thread in channel.archived_threads(limit=None):
                 num_removed, num_errors = await automod_thread(
                     thread,
                     duration,
@@ -69,7 +73,7 @@ async def autodelete_threads(self):
         except Exception as e:
             logger.error(e, exc_info=e)
             async with create_interaction_embed_context(
-                self.get_channel(settings.logging_channel_id),
+                get_log_channel(self.guild),
                 user=self.user,
                 timestamp=datetime.now(timezone.utc),
                 description=f"Automod task failed to process channel <#{channel_id}>: {e}",
