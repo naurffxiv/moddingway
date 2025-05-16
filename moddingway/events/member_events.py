@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timezone
-import discord
 
 from discord import Guild, User
 from discord.ext.commands import Bot
@@ -13,7 +12,6 @@ from moddingway.util import (
     find_and_assign_role,
     get_log_channel,
     log_info_and_add_field,
-    create_logging_embed,
 )
 
 settings = get_settings()
@@ -34,7 +32,7 @@ def register_events(bot: Bot):
 
         logger.info(f"Member joined: {member.display_name} ({member.id})")
 
-        log_channel = get_log_channel(member.guild)
+        log_channel = await get_log_channel(member.guild)
         if log_channel is None:
             return
 
@@ -76,16 +74,6 @@ def register_events(bot: Bot):
 
         users_database.update_user(db_user)
 
-        # Addition of logging embed
-        log_channel = get_log_channel(guild)
-        if log_channel:
-            embed = create_logging_embed(
-                title="Member Banned",
-                description=f"**User:** {user.mention} (`{user.id}`)",
-                color=discord.Color.red(),
-            )
-            await log_channel.send(embed=embed)
-
     @bot.event
     async def on_member_unban(guild: Guild, user: User):
         logger.info(f"Unban member {user.id}")
@@ -96,13 +84,3 @@ def register_events(bot: Bot):
         db_user.is_banned = False
 
         users_database.update_user(db_user)
-
-        # Addition of logging embed
-        log_channel = get_log_channel(guild)
-        if log_channel:
-            embed = create_logging_embed(
-                title="Member Unbanned",
-                description=f"**User:** {user.mention} (`{user.id}`)",
-                color=discord.Color.green(),
-            )
-            await log_channel.send(embed=embed)
