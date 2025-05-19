@@ -18,3 +18,8 @@ class StrikeSeverity(IntEnum):
     MINOR = 1
     MODERATE = 2
     SERIOUS = 3
+
+class UserRole(IntEnum):
+    SYSADMIN = 3
+    MOD = 2
+    USER = 1
