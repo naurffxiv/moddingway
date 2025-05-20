@@ -261,3 +261,13 @@ async def find_and_assign_role(
         return False, error_msg, None
 
     # Adding to test script
+
+
+def create_logging_embed(
+    title: str, description: str, color: discord.Color = discord.Color.blurple()
+) -> discord.Embed:
+    embed = discord.Embed(
+        title=title, description=description, color=color, timestamp=datetime.utcnow()
+    )
+    embed.set_footer(text="Moderation Log")
+    return embed
