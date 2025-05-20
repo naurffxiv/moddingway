@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timezone
+import discord
 
 from discord import Guild, User
 from discord.ext.commands import Bot
@@ -32,7 +33,7 @@ def register_events(bot: Bot):
 
         logger.info(f"Member joined: {member.display_name} ({member.id})")
 
-        log_channel = await get_log_channel(member.guild)
+        log_channel = get_log_channel(member.guild)
         if log_channel is None:
             return
 
@@ -74,6 +75,27 @@ def register_events(bot: Bot):
 
         users_database.update_user(db_user)
 
+        # Addition of logging embed
+        log_channel = get_log_channel(guild)
+
+        if log_channel is None:
+            return
+        try:
+            async with create_interaction_embed_context(
+                log_channel,
+                user=None,
+                description=f"{user.mention} was banned",
+                timestamp=datetime.now(timezone.utc),
+                footer="Member Banned",
+            ) as embed:
+                log_info_and_add_field(embed, logger, "Action", "/ban")
+                log_info_and_add_field(embed, logger, "User", user.mention)
+                log_info_and_add_field(
+                    embed, logger, "Result", f"Successfully banned {user.mention}"
+                )
+        except Exception as e:
+            logger.error(f"Failed to log ban event: {str(e)}")
+
     @bot.event
     async def on_member_unban(guild: Guild, user: User):
         logger.info(f"Unban member {user.id}")
@@ -84,3 +106,25 @@ def register_events(bot: Bot):
         db_user.is_banned = False
 
         users_database.update_user(db_user)
+
+        # Addition of logging embed
+        log_channel = get_log_channel(guild)
+
+        if log_channel is None:
+            return
+
+        try:
+            async with create_interaction_embed_context(
+                log_channel,
+                user=None,
+                description=f"{user.mention} was unbanned",
+                timestamp=datetime.now(timezone.utc),
+                footer="Member Unbanned",
+            ) as embed:
+                log_info_and_add_field(embed, logger, "Action", "unban")
+                log_info_and_add_field(embed, logger, "User", user.mention)
+                log_info_and_add_field(
+                    embed, logger, "Result", f"Successfully unbanned {user.mention}"
+                )
+        except Exception as e:
+            logger.error(f"Failed to log unban event: {str(e)}")
