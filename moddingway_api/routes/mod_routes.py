@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from fastapi_pagination import Page
 from moddingway.database import users_database
+from moddingway.enums import UserRole
 from moddingway_api.schemas.mod_schema import Mod
 
 router = APIRouter(prefix="/mods")
@@ -14,10 +15,10 @@ async def get_mod_by_id(mod_id: int) -> Optional[Mod]:
     db_user = users_database.get_user(mod_id)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    if db_user.is_mod:
+    if db_user.get_is_mod():
         mod = Mod(modID=str(db_user.user_id))
         return mod
-    elif not db_user.is_mod:
+    else:
         raise HTTPException(status_code=404, detail="Mod not found")
 
 

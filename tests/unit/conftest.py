@@ -1,13 +1,13 @@
 import datetime
-from typing import List
+from typing import List, Optional
+
+import discord
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-# from datetime import datetime
-from typing import Optional
 from moddingway import enums
-from moddingway.database.models import User, Strike
-import discord
+from moddingway.database.models import User
+from moddingway.enums import UserRole
 
 DEFAULT_DATETIME_NOW = datetime.datetime(
     2019, 11, 19, 8, 0, 0, tzinfo=datetime.timezone.utc
@@ -77,7 +77,7 @@ def create_db_user(mocker: MockerFixture):
         user_id: Optional[int] = None,
         discord_user_id: Optional[str] = None,
         discord_guild_id: Optional[str] = None,
-        is_mod: Optional[bool] = None,
+        user_role: Optional[UserRole] = None,
         temporary_points: Optional[int] = None,
         permanent_points: Optional[int] = None,
         last_infraction_timestamp: Optional[datetime.datetime] = None,
@@ -88,7 +88,7 @@ def create_db_user(mocker: MockerFixture):
             user_id=user_id,
             discord_user_id=discord_user_id,
             discord_guild_id=discord_guild_id,
-            is_mod=is_mod,
+            user_role=user_role,
             temporary_points=temporary_points,
             permanent_points=permanent_points,
             last_infraction_timestamp=last_infraction_timestamp,
