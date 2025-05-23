@@ -24,6 +24,7 @@ def create_autounexile_embed(
     exile_id: str,
     end_timestamp: str,
 ):
+
     return create_interaction_embed_context(
         get_log_channel(self.guild),
         user=user,

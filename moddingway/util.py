@@ -198,6 +198,7 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
     return round(timestamp.replace(tzinfo=timezone.utc).timestamp())
 
 
+# TODO: MOD-166 add this check every time we are using the logging_channel_id
 # Try to get the logging channel for event logging
 def get_log_channel(guild):
     """
@@ -207,6 +208,7 @@ def get_log_channel(guild):
     log_channel = guild.get_channel(settings.logging_channel_id)
 
     if log_channel is None:
+        logger = logging.getLogger(__name__)
         logger.error(
             f"Logging channel {settings.logging_channel_id} not found. Event will not be logged to Discord."
         )
@@ -258,12 +260,4 @@ async def find_and_assign_role(
         logger.error(error_msg)
         return False, error_msg, None
 
-
-def create_logging_embed(
-    title: str, description: str, color: discord.Color = discord.Color.blurple()
-) -> discord.Embed:
-    embed = discord.Embed(
-        title=title, description=description, color=color, timestamp=datetime.utcnow()
-    )
-    embed.set_footer(text="Moderation Log")
-    return embed
+    # Adding to test script
