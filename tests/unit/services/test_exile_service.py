@@ -1,9 +1,12 @@
-from pytest_mock.plugin import MockerFixture
-from moddingway.database.models import User
-from moddingway.services import exile_service
 from datetime import timedelta
-from moddingway import enums
+
 import pytest
+from pytest_mock.plugin import MockerFixture
+
+from moddingway import enums
+from moddingway.database.models import User
+from moddingway.enums import UserRole
+from moddingway.services import exile_service
 
 
 @pytest.mark.asyncio
@@ -14,7 +17,7 @@ async def test_exile_user__unverified(mocker: MockerFixture, create_member):
         user_id=1,
         discord_user_id="12345",
         discord_guild_id="1",
-        is_mod=False,
+        user_role=UserRole.USER,
         temporary_points=0,
         permanent_points=0,
         is_banned=False,
@@ -48,7 +51,7 @@ async def test_exile_user__verified_existing_user_dm_failed(
         user_id=1,
         discord_user_id="12345",
         discord_guild_id="1",
-        is_mod=False,
+        user_role=UserRole.USER,
         temporary_points=0,
         permanent_points=0,
         is_banned=False,
