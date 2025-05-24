@@ -24,6 +24,6 @@ class User(BaseModel):
 
     def has_mod_permissions(self) -> bool:
         return self.user_role == UserRole.MOD or self.user_role == UserRole.SYSADMIN
-    
+
     def has_sysadmin_permissions(self) -> bool:
-        return self.user_role ==  UserRole.SYSADMIN
+        return self.user_role == UserRole.SYSADMIN
