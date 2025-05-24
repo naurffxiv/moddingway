@@ -15,7 +15,7 @@ async def get_mod_by_id(mod_id: int) -> Optional[Mod]:
     db_user = users_database.get_user(mod_id)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    if db_user.get_is_mod():
+    if db_user.has_mod_permissions():
         mod = Mod(modID=str(db_user.user_id))
         return mod
     else:

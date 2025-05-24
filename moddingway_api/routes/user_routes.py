@@ -19,7 +19,7 @@ async def get_user_by_id(user_id: int) -> Optional[User]:
         raise HTTPException(status_code=404, detail="User not found")
     user = User(
         userID=str(db_user.user_id),
-        isMod=db_user.get_is_mod(),
+        isMod=db_user.has_mod_permissions(),
         strikePoints=db_user.get_strike_points(),
     )
     return user
@@ -38,7 +38,7 @@ async def get_users() -> Page[User]:
     user_list = [
         User(
             userID=str(db_user.user_id),
-            isMod=db_user.get_is_mod(),
+            isMod=db_user.has_mod_permissions(),
             strikePoints=db_user.get_strike_points(),
         )
         for db_user in db_user_list
