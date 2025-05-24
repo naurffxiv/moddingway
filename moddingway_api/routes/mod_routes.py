@@ -1,10 +1,11 @@
 from typing import Optional
+
 from fastapi import APIRouter, HTTPException
-from moddingway_api.utils.paginate import parse_pagination_params, paginate
 from fastapi_pagination import Page
+
 from moddingway.database import users_database
-from moddingway.enums import UserRole
 from moddingway_api.schemas.mod_schema import Mod
+from moddingway_api.utils.paginate import paginate, parse_pagination_params
 
 router = APIRouter(prefix="/mods")
 
