@@ -63,6 +63,17 @@ CREATE TABLE IF NOT EXISTS roles (
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
+CREATE TABLE IF NOT EXISTS forms (
+	formID INT GENERATED ALWAYS AS IDENTITY,
+	userID INT NOT null,
+	reason TEXT,
+	approval BOOL,
+	approvedByUserID INT,
+	createdTimestamp TIMESTAMP,
+	PRIMARY KEY(formID),
+	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
+);
+
 -- This can be removed after one deploy is run
 ALTER TABLE users
  ADD COLUMN IF NOT EXISTS isBanned
