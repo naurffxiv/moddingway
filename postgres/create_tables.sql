@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
 	userID INT GENERATED ALWAYS AS IDENTITY,
 	discordUserID VARCHAR(20) NOT NULL,
 	discordGuildID VARCHAR(20) NOT NULL,
-	isMod BOOL NOT NULL,
+	userRole SMALLINT NOT NULL default 1,
 	temporaryPoints INT  not null default 0,
 	permanentPoints INT  not null default 0,
 	lastInfractionTimestamp TIMESTAMP,
@@ -75,9 +75,24 @@ CREATE TABLE IF NOT EXISTS forms (
 );
 
 -- This can be removed after one deploy is run
-ALTER TABLE users
- ADD COLUMN IF NOT EXISTS isBanned
- BOOL NOT NULL default false;
 
+-- Messy setup that allows us to do conditional logic in this postgres call
+DO
+$do$
+BEGIN
+   IF exists (SELECT 1 	FROM information_schema.columns WHERE table_name='users' AND column_name='ismod') THEN
+		-- add role column
+   		alter table users add userRole SMALLINT NOT NULL default 1;
+
+		-- set current mods to mod role
+		update users set
+			userRole = 2
+			where ismod;
+	
+		-- remove old column
+		alter table users drop column ismod;
+   END IF;
+END;
+$do$;
 
 COMMIT;

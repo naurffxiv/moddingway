@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from moddingway.enums import UserRole
 from moddingway.settings import get_settings
 
 from . import DatabaseConnection
@@ -17,7 +18,7 @@ def get_user(discord_user_id: int) -> Optional[User]:
     with conn.get_cursor() as cursor:
         query = """
         SELECT
-        u.userid, u.discordUserId, u.discordGuildId, u.isMod, u.temporaryPoints, u.permanentPoints, u.lastInfractionTimestamp, u.isBanned
+        u.userid, u.discordUserId, u.discordGuildId, u.userRole, u.temporaryPoints, u.permanentPoints, u.lastInfractionTimestamp, u.isBanned
         FROM users u
         where u.discorduserid = %s
         """
@@ -33,7 +34,7 @@ def get_user(discord_user_id: int) -> Optional[User]:
                 user_id=res[0],
                 discord_user_id=res[1],
                 discord_guild_id=res[2],
-                is_mod=res[3],
+                user_role=res[3],
                 temporary_points=res[4],
                 permanent_points=res[5],
                 last_infraction_timestamp=res[6],
@@ -62,7 +63,7 @@ def get_users(limit: int, offset: int) -> list[User]:
                     user_id=row[0],
                     discord_user_id=row[1],
                     discord_guild_id=row[2],
-                    is_mod=row[3],
+                    user_role=row[3],
                     temporary_points=row[4],
                     permanent_points=row[5],
                     last_infraction_timestamp=row[6],
@@ -78,8 +79,8 @@ def add_user(discord_user_id: int) -> User:
 
     with conn.get_cursor() as cursor:
         query = """
-            INSERT INTO users (discordUserId, discordGuildId, isMod)
-            VALUES (%s, %s, false)
+            INSERT INTO users (discordUserId, discordGuildId)
+            VALUES (%s, %s)
             RETURNING userId
         """
 
@@ -94,7 +95,7 @@ def add_user(discord_user_id: int) -> User:
             user_id=res[0],
             discord_user_id=str(discord_user_id),
             discord_guild_id=str(settings.guild_id),
-            is_mod=False,
+            user_role=UserRole.USER,
             temporary_points=0,
             permanent_points=0,
             is_banned=False,
@@ -185,9 +186,9 @@ def get_mod_count() -> int:
         query = """
             SELECT COUNT(*)
             FROM users
-            WHERE ismod = %s
+            WHERE user_role = %s
         """
-        params = (True,)
+        params = (2,)
         cursor.execute(query, params)
 
         result = cursor.fetchall()
@@ -200,11 +201,11 @@ def get_mods(limit: int, offset: int) -> list[User]:
     with conn.get_cursor() as cursor:
         query = """
         SELECT * FROM users
-        WHERE ismod = %s
+        WHERE user_role = %s
         LIMIT %s OFFSET %s;
         """
 
-        params = (True, limit, offset)
+        params = (2, limit, offset)
 
         cursor.execute(query, params)
 
@@ -216,7 +217,7 @@ def get_mods(limit: int, offset: int) -> list[User]:
                     user_id=row[0],
                     discord_user_id=row[1],
                     discord_guild_id=row[2],
-                    is_mod=row[3],
+                    user_role=row[3],
                     temporary_points=row[4],
                     permanent_points=row[5],
                     last_infraction_timestamp=row[6],
@@ -272,7 +273,7 @@ def get_banned_users(limit: int, offset: int) -> list[User]:
                     user_id=row[0],
                     discord_user_id=row[1],
                     discord_guild_id=row[2],
-                    is_mod=row[3],
+                    user_role=row[3],
                     temporary_points=row[4],
                     permanent_points=row[5],
                     last_infraction_timestamp=row[6],
