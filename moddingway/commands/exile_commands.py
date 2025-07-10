@@ -144,17 +144,17 @@ def create_exile_commands(bot: Bot) -> None:
                     error_message or f"Successfully exiled {user.mention}"
                 )
 
-    @bot.tree.command()
-    @discord.app_commands.checks.cooldown(
-        1, 86400, key=lambda i: (i.guild_id, i.user.id)
-    )
-    async def roulette(interaction: discord.Interaction):
-        """Test your luck, fail and be exiled..."""
-        await interaction.response.send_message(
-            f"Are you sure you want to do this? You have a 1/6 chance in being exiled for up to 24 hours.",
-            view=RouletteDeleteView(interaction=interaction, timeout=30),
-            ephemeral=True,
-        )
+    # @bot.tree.command()
+    # @discord.app_commands.checks.cooldown(
+    #     1, 86400, key=lambda i: (i.guild_id, i.user.id)
+    # )
+    # async def roulette(interaction: discord.Interaction):
+    #     """Test your luck, fail and be exiled..."""
+    #     await interaction.response.send_message(
+    #         f"Are you sure you want to do this? You have a 1/6 chance in being exiled for up to 24 hours.",
+    #         view=RouletteDeleteView(interaction=interaction, timeout=30),
+    #         ephemeral=True,
+    #     )
 
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
