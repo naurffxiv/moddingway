@@ -8,7 +8,7 @@ from moddingway.services import note_service
 def create_warning_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
-    @discord.app_commands.describe(user="User to add note to")
+    @discord.app_commands.describe(user="User to give warning to")
     async def warn(
         interaction: discord.Interaction,
         user: discord.User,

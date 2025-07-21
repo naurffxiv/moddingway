@@ -33,7 +33,7 @@ def add_note(note: Note) -> int:
     with conn.get_cursor() as cursor:
         query = """
             INSERT INTO notes
-            (userID, isWarning,note, createdTimestamp, createdBy, lastEditedTimestamp, lastEditedBy)
+            (userID, isWarning, note, createdTimestamp, createdBy, lastEditedTimestamp, lastEditedBy)
             VALUES
             (%s, %s, %s, %s, %s, %s, %s)
             RETURNING noteId
