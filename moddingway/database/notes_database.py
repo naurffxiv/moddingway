@@ -8,6 +8,7 @@ from datetime import datetime
 @dataclass
 class NoteDisplay:
     note_id: int
+    is_warning: bool
     content: str
     created_by: int
     last_editor: int
@@ -16,7 +17,11 @@ class NoteDisplay:
 def convert_row_to_note_display(row: tuple) -> NoteDisplay:
     try:
         return NoteDisplay(
-            note_id=row[0], content=row[1], created_by=row[2], last_editor=row[3]
+            note_id=row[0],
+            is_warning=row[1],
+            content=row[2],
+            created_by=row[3],
+            last_editor=row[4],
         )
     except:
         return None
@@ -28,14 +33,15 @@ def add_note(note: Note) -> int:
     with conn.get_cursor() as cursor:
         query = """
             INSERT INTO notes
-            (userID, note, createdTimestamp, createdBy, lastEditedTimestamp, lastEditedBy)
+            (userID, isWarning, note, createdTimestamp, createdBy, lastEditedTimestamp, lastEditedBy)
             VALUES
-            (%s, %s, %s, %s, %s, %s)
+            (%s, %s, %s, %s, %s, %s, %s)
             RETURNING noteId
         """
 
         params = (
             note.user_id,
+            note.is_warning,
             note.note,
             note.created_timestamp,
             note.created_by,
@@ -54,7 +60,7 @@ def list_notes(user_id: int) -> List[NoteDisplay]:
 
     with conn.get_cursor() as cursor:
         query = """
-        select n.noteid, n.note, n.createdby, n.lastEditedBy  
+        select n.noteid, n.isWarning, n.note, n.createdby, n.lastEditedBy  
         from notes n
         join users u on u.userID = n.userID
         where u.userId = %s
@@ -74,7 +80,7 @@ def get_note(note_id: int) -> NoteDisplay:
 
     with conn.get_cursor() as cursor:
         query = """
-        select n.noteid, n.note, n.createdby , n.lastEditedBy  
+        select n.noteid, n.isWarning, n.note, n.createdby , n.lastEditedBy  
         from notes n
         join users u on u.userID = n.userID
         where n.noteid = %s
@@ -121,3 +127,23 @@ def update_note(
         rows_affected = cursor.rowcount
 
         return rows_affected == 1
+
+
+def list_warnings(user_id: int) -> List[NoteDisplay]:
+    conn = DatabaseConnection()
+
+    with conn.get_cursor() as cursor:
+        query = """
+        select n.noteid, n.isWarning, n.note, n.createdby, n.lastEditedBy  
+        from notes n
+        join users u on u.userID = n.userID
+        where u.userId = %s and n.isWarning = true
+        order by n.createdtimestamp asc
+        """
+
+        params = (user_id,)
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        return [convert_row_to_note_display(row) for row in rows]

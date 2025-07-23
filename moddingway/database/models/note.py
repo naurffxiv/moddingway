@@ -6,6 +6,7 @@ from datetime import datetime
 class Note(BaseModel):
     note_id: Optional[int] = None
     user_id: int
+    is_warning: bool
     note: str
     created_timestamp: datetime
     created_by: str
