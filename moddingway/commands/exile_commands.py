@@ -23,6 +23,68 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
+class RouletteDeleteView(discord.ui.View):
+    def __init__(self, interaction: discord.Interaction, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_interaction = interaction
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.success)
+    async def confirm_button_callback(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        self.clear_items()
+        await self.original_interaction.edit_original_response(view=self)
+
+        safety_options = [True, True, True, True, True, False]
+        exile_duration_options = [1, 6, 12, 18, 24]
+        safety_choice = choice(safety_options)
+        duration_choice = choice(exile_duration_options)
+        duration_string = f"{duration_choice}hour"
+
+        if safety_choice:
+            await interaction.response.send_message(
+                f"<@{interaction.user.id}> has tested their luck and lives another day...",
+                ephemeral=False,
+            )
+            return
+        if user_has_role(interaction.user, Role.MOD):
+            await interaction.response.send_message(
+                f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s).",
+                ephemeral=False,
+            )
+            return
+        async with create_response_context(interaction, False) as response_message:
+            async with create_logging_embed(
+                interaction,
+                duration=format_time_string(duration_string),
+            ) as logging_embed:
+                reason = "roulette"
+                exile_duration = calculate_time_delta(duration_string)
+                error_message = await exile_user(
+                    logging_embed, interaction.user, exile_duration, reason
+                )
+
+                if error_message:
+                    logger.error(f"An error occurred: {error_message}")
+                    response_message.set_string(
+                        "An error occurred while processing the command."
+                    )
+                    return
+                else:
+                    response_message.set_string(
+                        f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s)."
+                    )
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+    async def cancel_button_callback(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        self.clear_items()
+        await self.original_interaction.edit_original_response(view=self)
+        async with create_response_context(interaction) as response_message:
+            response_message.set_string("Roulette cancelled")
+
+
 def create_exile_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
@@ -68,8 +130,6 @@ def create_exile_commands(bot: Bot) -> None:
                 ephemeral=True,
             )
             return
-        start_timestamp = datetime.datetime.now(datetime.timezone.utc)
-        end_timestamp = start_timestamp + exile_duration
         async with create_response_context(interaction) as response_message:
             async with create_logging_embed(
                 interaction,
@@ -91,48 +151,11 @@ def create_exile_commands(bot: Bot) -> None:
     )
     async def roulette(interaction: discord.Interaction):
         """Test your luck, fail and be exiled..."""
-        safety_options = [True, True, True, True, True, False]
-        exile_duration_options = [1, 6, 12, 18, 24]
-        safety_choice = choice(safety_options)
-        duration_choice = choice(exile_duration_options)
-        duration_string = f"{duration_choice}hour"
-        start_timestamp = datetime.datetime.now(datetime.timezone.utc)
-        end_timestamp = start_timestamp + calculate_time_delta(duration_string)
-
-        if safety_choice:
-            await interaction.response.send_message(
-                f"<@{interaction.user.id}> has tested their luck and lives another day...",
-                ephemeral=False,
-            )
-            return
-        if user_has_role(interaction.user, Role.MOD):
-            await interaction.response.send_message(
-                f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s).",
-                ephemeral=False,
-            )
-            return
-        async with create_response_context(interaction, False) as response_message:
-            async with create_logging_embed(
-                interaction,
-                duration=format_time_string(duration_string),
-                expiration=end_timestamp,
-            ) as logging_embed:
-                reason = "roulette"
-                exile_duration = calculate_time_delta(duration_string)
-                error_message = await exile_user(
-                    logging_embed, interaction.user, exile_duration, reason
-                )
-
-                if error_message:
-                    logger.error(f"An error occurred: {error_message}")
-                    response_message.set_string(
-                        "An error occurred while processing the command."
-                    )
-                    return
-                else:
-                    response_message.set_string(
-                        f"<@{interaction.user.id}> has tested their luck and has utterly failed! <@{interaction.user.id}> has been sent into exile for {duration_choice} hour(s)."
-                    )
+        await interaction.response.send_message(
+            f"Are you sure you want to do this? You have a 1/6 chance in being exiled for up to 24 hours.",
+            view=RouletteDeleteView(interaction=interaction, timeout=30),
+            ephemeral=True,
+        )
 
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)

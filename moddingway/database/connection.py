@@ -48,7 +48,7 @@ class DatabaseConnection:
                 script = fd.read()
                 cursor.execute(script)
 
-    # TODO: properly spin down DB connection on exit
-
     def get_cursor(self) -> cursor:
+        if self._connection.closed:
+            self.connect()
         return self._connection.cursor()

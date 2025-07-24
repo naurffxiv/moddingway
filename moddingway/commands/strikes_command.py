@@ -12,6 +12,38 @@ from .helper import create_logging_embed, create_response_context
 logger = logging.getLogger(__name__)
 
 
+class StrikeDeleteView(discord.ui.View):
+    def __init__(
+        self, strike_id: int, interaction: discord.Interaction, *args, **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.strike_id = strike_id
+        self.original_interaction = interaction
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.success)
+    async def confirm_button_callback(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        self.clear_items()
+        await self.original_interaction.edit_original_response(view=self)
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                self.original_interaction, strike_id=self.strike_id
+            ) as logging_embed:
+                msg = await strike_service.delete_strike(logging_embed, self.strike_id)
+
+                response_message.set_string(msg)
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+    async def cancel_button_callback(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        self.clear_items()
+        await self.original_interaction.edit_original_response(view=self)
+        async with create_response_context(interaction) as response_message:
+            response_message.set_string("Strike deletion cancelled")
+
+
 def create_strikes_commands(bot: Bot) -> None:
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
@@ -53,3 +85,15 @@ def create_strikes_commands(bot: Bot) -> None:
             strike_details = await strike_service.get_user_strikes(user)
 
             response_message.set_string(strike_details)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    @discord.app_commands.describe(strike_id="id of the strike you are deleting")
+    async def delete_strike(interaction: discord.Interaction, strike_id: int):
+        await interaction.response.send_message(
+            f"Are you sure you want to delete this strike?",
+            view=StrikeDeleteView(
+                strike_id=strike_id, interaction=interaction, timeout=30
+            ),
+            ephemeral=True,
+        )

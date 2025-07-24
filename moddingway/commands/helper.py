@@ -8,14 +8,22 @@ import discord
 from discord.ext.commands import Bot
 
 from moddingway.settings import get_settings
-from moddingway.util import EmbedField, create_interaction_embed_context
+from moddingway.util import (
+    EmbedField,
+    create_interaction_embed_context,
+    get_log_channel,
+)
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
 def create_logging_embed(interaction: discord.Interaction, **kwargs):
-    fields = [EmbedField("Action", f"/{interaction.command.name}")]
+    if interaction.command:
+        fields = [EmbedField("Action", f"/{interaction.command.name}")]
+    else:
+        # TODO: MOD-169 pass something in for these situations
+        fields = []
     # Dynamically add kwargs to fields
     if kwargs is not None:
         for key, value in kwargs.items():
@@ -33,11 +41,16 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case _:
                     fields.append(EmbedField(key.title(), value))
 
+    if interaction.command:
+        description = f"Used `{interaction.command.name}` command in {interaction.channel.mention}"
+    else:
+        # TODO: MOD-169 pass something in for these situations
+        description = "Command was run via a UI"
     return create_interaction_embed_context(
-        interaction.guild.get_channel(settings.logging_channel_id),
+        get_log_channel(interaction.guild),
         user=interaction.user,
         timestamp=interaction.created_at,
-        description=f"Used `{interaction.command.name}` command in {interaction.channel.mention}",
+        description=description,
         fields=fields,
     )
 

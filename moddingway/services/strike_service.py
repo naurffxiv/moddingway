@@ -88,7 +88,7 @@ async def get_user_strikes(
     strike_list = strikes_database.list_strikes(db_user.user_id)
 
     if len(strike_list) == 0:
-        return "No exiles found for user"
+        return "No strikes found for user"
 
     result = f"Strikes found for <@{user.id}>: [Temporary points: {db_user.temporary_points} | Permanent points: {db_user.permanent_points}]"
     for strike in strike_list:
@@ -106,6 +106,29 @@ async def get_user_strikes(
     return result
 
 
+async def delete_strike(logging_embed: discord.Embed, strike_id: int) -> str:
+    deleted_strike = strikes_database.delete_strike(strike_id)
+
+    if deleted_strike is None:
+        return f"Strike not found, no change will be made"
+
+    user_id = deleted_strike[1]
+    severity = StrikeSeverity(deleted_strike[2])
+    temporary_points_to_remove = 0
+    permanent_points_to_remove = 0
+
+    if severity == StrikeSeverity.SERIOUS:
+        permanent_points_to_remove = _get_severity_points(severity)
+    else:
+        temporary_points_to_remove = _get_severity_points(severity)
+
+    users_database.decrement_user_strike_points(
+        user_id, temporary_points_to_remove, permanent_points_to_remove
+    )
+
+    return f"Successfully deleted strike {strike_id}"
+
+
 def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
     match severity:
         case StrikeSeverity.MINOR:
@@ -120,6 +143,16 @@ def _apply_strike_point_penalty(db_user: User, severity: StrikeSeverity):
             db_user.permanent_points = (
                 db_user.permanent_points + SERIOUS_INFRACTION_POINTS
             )
+
+
+def _get_severity_points(severity: StrikeSeverity) -> int:
+    match severity:
+        case StrikeSeverity.MINOR:
+            return MINOR_INFRACTION_POINTS
+        case StrikeSeverity.MODERATE:
+            return MODERATE_INFRACTION_POINTS
+        case StrikeSeverity.SERIOUS:
+            return SERIOUS_INFRACTION_POINTS
 
 
 def _calculate_punishment(previous_points: int, total_points: int) -> int:
@@ -156,7 +189,7 @@ async def _apply_punishment(
 
     if total_points >= 15:
         punishment = "Permanent ban"
-        await ban_service.ban_user(
+        await ban_service.ban_member(
             user,
             "Your strike were severe or frequent to be removed from NA Ultimate Raiding - FFXIV",
             False,

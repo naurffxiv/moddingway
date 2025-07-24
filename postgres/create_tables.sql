@@ -4,10 +4,11 @@ CREATE TABLE IF NOT EXISTS users (
 	userID INT GENERATED ALWAYS AS IDENTITY,
 	discordUserID VARCHAR(20) NOT NULL,
 	discordGuildID VARCHAR(20) NOT NULL,
-	isMod BOOL NOT NULL,
+	userRole SMALLINT NOT NULL default 1,
 	temporaryPoints INT  not null default 0,
 	permanentPoints INT  not null default 0,
 	lastInfractionTimestamp TIMESTAMP,
+	isBanned BOOL NOT NULL default false,
 	PRIMARY KEY(userID),
 	UNIQUE(discordUserID, discordGuildID)
 );
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS exiles (
 	startTimestamp TIMESTAMP,
 	endTimestamp TIMESTAMP,
 	exileStatus INT NOT NULL,
-	PRIMARY KEY(exileID), 
+	PRIMARY KEY(exileID),
 	CONSTRAINT fk_user FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
@@ -88,7 +89,7 @@ CREATE TABLE IF NOT EXISTS forms (
 -- 		update users set
 -- 			userRole = 2
 -- 			where ismod;
-	
+
 -- 		-- remove old column
 -- 		alter table users drop column ismod;
 --    END IF;
@@ -106,6 +107,5 @@ BEGIN
    END IF;
 END;
 $do$;
-
 
 COMMIT;

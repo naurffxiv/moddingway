@@ -58,3 +58,9 @@ If you want to run the app in a container, you run the application via `make pyt
 
 ### Reseeding the Database
 By default, when you run the application either via python or docker, records in the database will persist. If you want to reset the database, you can do so by running `make database-clean` while the postgres container is running on your machine. If the database container is not found by the command, you can first start it by running `make database-run`
+
+# API
+
+To get started with moddingway API development, install the necessary packages using `pip install -r requirements.txt`. From there, you can start the server by running `make api`. You can then view the swaggerdocs page hosted on `localhost:8000/docs` to view all current endpoints.
+
+Alternatively, if you want to have local changes reflected in realtime with your development API, you can run `make api-reload`
