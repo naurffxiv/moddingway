@@ -10,10 +10,10 @@ install:
 clean:
 	docker image prune -a
 
-python-build:
+build:
 	docker compose build python-app
 
-python-run:
+run:
 	docker compose down python-app-local
 	docker compose up python-app-local --build
 
@@ -34,4 +34,4 @@ api:
 api-reload:
 	uvicorn moddingway_api.main:app --port 8000 --reload
 
-.PHONY: format stop install clean python-build python-run database-run
+.PHONY: format stop install clean build run database-run
