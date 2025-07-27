@@ -3,7 +3,7 @@ import logging
 from discord.ext import tasks
 
 from moddingway.database import exiles_database
-from moddingway.enums import ExileStatus
+from moddingway.constants import ExileStatus
 from moddingway.services.exile_service import unexile_user
 from moddingway.settings import get_settings
 

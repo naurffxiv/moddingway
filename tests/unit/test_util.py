@@ -4,7 +4,7 @@ from typing import List
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from moddingway import enums, util
+from moddingway import constants, util
 
 single_line_case = ("short message", 100, ["short message"])
 medium_len_case = (
@@ -56,15 +56,15 @@ def test_calculate_time_delta(input, expect):
 @pytest.mark.parametrize(
     "input_roles,role,expected_result",
     [
-        ([], enums.Role.VERIFIED, False),
-        ([enums.Role.MOD], enums.Role.VERIFIED, False),
-        ([enums.Role.VERIFIED], enums.Role.VERIFIED, True),
-        ([enums.Role.MOD, enums.Role.VERIFIED], enums.Role.VERIFIED, True),
+        ([], constants.Role.VERIFIED, False),
+        ([constants.Role.MOD], constants.Role.VERIFIED, False),
+        ([constants.Role.VERIFIED], constants.Role.VERIFIED, True),
+        ([constants.Role.MOD, constants.Role.VERIFIED], constants.Role.VERIFIED, True),
     ],
 )
 def test_user_has_role(
-    input_roles: List[enums.Role],
-    role: enums.Role,
+    input_roles: List[constants.Role],
+    role: constants.Role,
     expected_result: bool,
     create_member,
 ):
@@ -77,10 +77,10 @@ def test_user_has_role(
 
 @pytest.mark.asyncio
 async def test_add_and_remove_role(create_member):
-    role_to_add = enums.Role.EXILED
-    role_to_remove = enums.Role.VERIFIED
+    role_to_add = constants.Role.EXILED
+    role_to_remove = constants.Role.VERIFIED
 
-    mocked_member = create_member(roles=[enums.Role.VERIFIED])
+    mocked_member = create_member(roles=[constants.Role.VERIFIED])
 
     await util.add_and_remove_role(mocked_member, role_to_add, role_to_remove)
 

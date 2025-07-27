@@ -3,7 +3,7 @@ import logging
 import discord
 from discord.ext.commands import Bot
 
-from moddingway.enums import Role
+from moddingway.constants import Role
 from moddingway.services.ban_service import ban_member, ban_user
 from moddingway.settings import get_settings
 from moddingway.util import is_user_moderator, user_has_role

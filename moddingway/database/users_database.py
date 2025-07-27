@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from moddingway.enums import UserRole
+from moddingway.constants import UserRole
 from moddingway.settings import get_settings
 
 from . import DatabaseConnection

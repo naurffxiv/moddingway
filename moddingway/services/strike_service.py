@@ -11,7 +11,7 @@ from moddingway.constants import (
 )
 from moddingway.database import strikes_database, users_database
 from moddingway.database.models import Strike, User
-from moddingway.enums import StrikeSeverity
+from moddingway.constants import StrikeSeverity
 from moddingway.util import log_info_and_add_field, log_info_and_embed, send_dm
 
 from . import ban_service, exile_service

@@ -3,6 +3,9 @@ import os
 from .constants import AUTOMOD_INACTIVITY, STICKY_ROLES
 from pydantic import BaseModel
 from ast import literal_eval
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Settings(BaseModel):
