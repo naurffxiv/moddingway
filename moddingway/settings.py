@@ -4,6 +4,7 @@ from .constants import AUTOMOD_INACTIVITY, STICKY_ROLES
 from pydantic import BaseModel
 from ast import literal_eval
 
+
 class Settings(BaseModel):
     """Class for keeping track of settings"""
 
