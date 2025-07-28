@@ -1,3 +1,32 @@
+from enum import IntEnum, StrEnum
+
+
+# Class Constants
+class Role(StrEnum):
+    EXILED = "Exiled"
+    NON_VERIFIED = "Non-Verified"
+    VERIFIED = "Verified"
+    MOD = "Mod"
+
+
+class ExileStatus(IntEnum):
+    TIMED_EXILED = 1
+    UNEXILED = 2
+    UNKNOWN = 3
+
+
+class StrikeSeverity(IntEnum):
+    MINOR = 1
+    MODERATE = 2
+    SERIOUS = 3
+
+
+class UserRole(IntEnum):
+    SYSADMIN = 3
+    MOD = 2
+    USER = 1
+
+
 # Strikes constants
 MINOR_INFRACTION_POINTS = 1
 MODERATE_INFRACTION_POINTS = 3

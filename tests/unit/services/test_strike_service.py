@@ -2,7 +2,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 from moddingway.database.models import Strike
 from moddingway.services import strike_service, ban_service, exile_service
-from moddingway import enums
+from moddingway import constants
 from typing import List
 import discord
 from datetime import timedelta
@@ -72,7 +72,7 @@ async def test_apply_punisment(
         (
             "1",
             "1",
-            [("1", enums.StrikeSeverity.MINOR, "test", "1")],
+            [("1", constants.StrikeSeverity.MINOR, "test", "1")],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
             "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | REASON: test"
             "\nTotal Points: 1",
@@ -81,8 +81,8 @@ async def test_apply_punisment(
             "1",
             "3",
             [
-                ("1", enums.StrikeSeverity.MINOR, "test", "1"),
-                ("2", enums.StrikeSeverity.MODERATE, "test2", "3"),
+                ("1", constants.StrikeSeverity.MINOR, "test", "1"),
+                ("2", constants.StrikeSeverity.MODERATE, "test2", "3"),
             ],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
             "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | REASON: test"
@@ -156,7 +156,7 @@ async def test_add_strike(
     await strike_service.add_strike(
         logging_embed=mocked_logging_embed,
         user=mocked_user,
-        severity=enums.StrikeSeverity.MODERATE,
+        severity=constants.StrikeSeverity.MODERATE,
         reason="test",
         author=mocked_author,
     )
@@ -165,7 +165,7 @@ async def test_add_strike(
 
     mocked_strike_class.assert_called_with(
         user_id=mocked_user.id,
-        severity=enums.StrikeSeverity.MODERATE,
+        severity=constants.StrikeSeverity.MODERATE,
         reason="test",
         created_timestamp=mocker.ANY,
         created_by=str(mocked_author.id),

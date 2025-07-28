@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 
-from moddingway.enums import Role
+from moddingway.constants import Role
 from moddingway.settings import get_settings
 
 settings = get_settings()

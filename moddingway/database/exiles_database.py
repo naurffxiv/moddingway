@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from moddingway.enums import ExileStatus
+from moddingway.constants import ExileStatus
 
 from . import DatabaseConnection
 from .models import Exile, PendingExile

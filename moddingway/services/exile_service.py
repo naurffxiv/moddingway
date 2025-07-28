@@ -8,7 +8,7 @@ import discord
 
 from moddingway.database import exiles_database, users_database, roles_database
 from moddingway.database.models import Exile
-from moddingway.enums import ExileStatus, Role
+from moddingway.constants import ExileStatus, Role
 from moddingway.settings import get_settings
 from moddingway.util import (
     add_and_remove_role,

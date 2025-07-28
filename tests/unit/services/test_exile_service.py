@@ -3,9 +3,9 @@ from datetime import timedelta
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from moddingway import enums
+from moddingway import constants
 from moddingway.database.models import User
-from moddingway.enums import UserRole
+from moddingway.constants import UserRole
 from moddingway.services import exile_service
 
 
@@ -68,7 +68,7 @@ async def test_exile_user__verified_existing_user_dm_failed(
     exile_id = 4001
     mocker.patch("moddingway.database.exiles_database.add_exile", return_value=exile_id)
 
-    mocked_member = create_member(roles=[enums.Role.VERIFIED], allows_dms=False)
+    mocked_member = create_member(roles=[constants.Role.VERIFIED], allows_dms=False)
     mocked_logging_embed = mocker.Mock()
 
     # Act

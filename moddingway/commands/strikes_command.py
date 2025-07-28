@@ -3,7 +3,7 @@ import logging
 import discord
 from discord.ext.commands import Bot
 
-from moddingway.enums import Role, StrikeSeverity
+from moddingway.constants import Role, StrikeSeverity
 from moddingway.services import strike_service
 from moddingway.util import is_user_moderator, user_has_role
 
