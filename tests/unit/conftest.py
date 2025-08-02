@@ -5,9 +5,9 @@ import discord
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from moddingway import enums
+from moddingway import constants
 from moddingway.database.models import User
-from moddingway.enums import UserRole
+from moddingway.constants import UserRole
 
 DEFAULT_DATETIME_NOW = datetime.datetime(
     2019, 11, 19, 8, 0, 0, tzinfo=datetime.timezone.utc
@@ -23,7 +23,7 @@ def mock_datetime_now(mocker: MockerFixture, monkeypatch):
 
 @pytest.fixture
 def create_role(mocker: MockerFixture):
-    def __create_role(name: enums.Role):
+    def __create_role(name: constants.Role):
         mocked_role = mocker.Mock()
         # name is used specifically in the Mock constructor
         # we need to configure it outside the constructor
@@ -38,9 +38,9 @@ def create_role(mocker: MockerFixture):
 def naur_guild(mocker: MockerFixture, create_role):
     return mocker.Mock(
         roles=[
-            create_role(enums.Role.MOD),
-            create_role(enums.Role.VERIFIED),
-            create_role(enums.Role.EXILED),
+            create_role(constants.Role.MOD),
+            create_role(constants.Role.VERIFIED),
+            create_role(constants.Role.EXILED),
         ]
     )
 
@@ -48,7 +48,7 @@ def naur_guild(mocker: MockerFixture, create_role):
 @pytest.fixture
 def create_member(mocker: MockerFixture, naur_guild, create_role):
     def __create_member(
-        roles: List[enums.Role] = [enums.Role.VERIFIED],
+        roles: List[constants.Role] = [constants.Role.VERIFIED],
         allows_dms: bool = True,
         id: Optional[int] = None,
     ):

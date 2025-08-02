@@ -5,7 +5,7 @@ from discord import Guild, User
 from discord.ext.commands import Bot
 
 from moddingway.database import users_database
-from moddingway.enums import Role
+from moddingway.constants import Role
 from moddingway.settings import get_settings
 from moddingway.util import (
     create_interaction_embed_context,

@@ -1,7 +1,7 @@
 import discord
 import logging
 from moddingway.database import users_database
-from moddingway.util import log_info_and_embed, log_info_and_add_field
+from moddingway.util import log_info_and_embed, log_info_and_add_field, send_dm
 from moddingway.database import notes_database, users_database
 from moddingway.database.models import Note
 from datetime import datetime
@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 async def add_note(
     logging_embed: discord.Embed,
     user: discord.User,
-    note: str,
+    note_text: str,
     author: discord.Member,
+    is_warning=False,
 ):
     # find user in DB
     db_user = users_database.get_user(user.id)
@@ -29,12 +30,28 @@ async def add_note(
     note_timestamp = datetime.now()
     note = Note(
         user_id=db_user.user_id,
-        note=note,
+        is_warning=is_warning,
+        note=note_text,
         created_timestamp=note_timestamp,
         created_by=str(author.id),
         last_edited_timestamp=note_timestamp,
         last_edited_by=str(author.id),
     )
+    ### ADD ERROR HANDLING TO DM
+    if is_warning:
+        try:
+            await send_dm(
+                member=user,
+                messageContent=f"You have been issued a warning from NA Ultimate Raiding - FFXIV:\n{note_text}",
+            )
+        except Exception as e:
+            log_info_and_add_field(
+                logging_embed,
+                logger,
+                "DM Status",
+                f"Failed to send DM to warned user, {e}",
+            )
+
     note.note_id = notes_database.add_note(note)
     logging_embed.set_footer(text=f"Note ID: {note.note_id}")
 
@@ -51,6 +68,9 @@ async def get_note_by_id(
 ) -> str:
     db_note = notes_database.get_note(note_id)
     if db_note:
+        db_note.content = (
+            f"[warning] {db_note.content}" if db_note.is_warning else db_note.content
+        )
         return f"\n* ID: {db_note.note_id} | Note: {db_note.content} | Note Creator: <@{db_note.created_by}> | Last Editor: <@{db_note.last_editor}>"
     else:
         return
@@ -67,11 +87,39 @@ async def get_user_notes(
 
     if len(note_list) == 0:
         return f"No notes found for user <@{user.id}>"
+
     result = f"Notes found for <@{user.id}>:"
     for note in note_list:
+        # Add [warning] prefix if it's a warning
+        note_content = f"[warning] {note.content}" if note.is_warning else note.content
+
         result = (
             result
-            + f"\n* ID: {note.note_id} | Note Creator: <@{note.created_by}> | Last Editor: <@{note.last_editor}> | Note: {note.content}"
+            + f"\n* ID: {note.note_id} | Note Creator: <@{note.created_by}> | Last Editor: <@{note.last_editor}> | Note: {note_content}"
+        )
+
+    return result
+
+
+async def get_user_warnings(
+    user: discord.User,
+) -> str:
+    db_user = users_database.get_user(user.id)
+    if db_user is None:
+        return "User not found in database"
+
+    note_list = notes_database.list_warnings(db_user.user_id)
+
+    if len(note_list) == 0:
+        return f"No warnings found for user <@{user.id}>"
+    result = f"Warnings found for <@{user.id}>:"
+    for note in note_list:
+        # Add [warning] prefix if it's a warning
+        note_content = f"[warning] {note.content}" if note.is_warning else note.content
+
+        result = (
+            result
+            + f"\n* ID: {note.note_id} | Note Creator: <@{note.created_by}> | Last Editor: <@{note.last_editor}> | Note: {note_content}"
         )
 
     return result

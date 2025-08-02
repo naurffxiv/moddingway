@@ -5,7 +5,7 @@ from random import choice
 import discord
 from discord.ext.commands import Bot
 
-from moddingway.enums import Role
+from moddingway.constants import Role
 from moddingway.services.exile_service import (
     exile_user,
     format_time_string,

@@ -10,6 +10,7 @@ from moddingway.commands.helper import create_bot_errors
 from moddingway.commands.slowmode_commands import create_slowmode_commands
 from moddingway.commands.strikes_command import create_strikes_commands
 from moddingway.commands.note_commands import create_note_commands
+from moddingway.commands.warning_commands import create_warning_commands
 from moddingway.events.member_events import register_events
 from moddingway.settings import get_settings
 
@@ -39,6 +40,7 @@ class ModdingwayBot(Bot):
         create_strikes_commands(self)
         create_note_commands(self)
         create_bot_errors(self)
+        create_warning_commands(self)
         logger.info("Registering commands finished")
 
     def _register_events(self):
