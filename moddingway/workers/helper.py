@@ -34,8 +34,6 @@ def create_autounexile_embed(
     )
 
 
-
-
 def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: datetime):
     return create_interaction_embed_context(
         get_log_channel(self.guild),
