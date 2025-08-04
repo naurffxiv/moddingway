@@ -200,12 +200,12 @@ def timestamp_to_epoch(timestamp: Optional[datetime]) -> Optional[int]:
 
 # TODO: MOD-166 add this check every time we are using the logging_channel_id
 # Try to get the logging channel for event logging
-def get_log_channel(guild):
+def get_log_channel(self):
     """
     Get the logging channel and handle errors if it doesn't exist.
     Returns the channel or None if not found.
     """
-    log_channel = guild.get_channel(settings.logging_channel_id)
+    log_channel = self.get_channel(settings.logging_channel_id)
 
     if log_channel is None:
         logger = logging.getLogger(__name__)
