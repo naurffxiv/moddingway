@@ -26,12 +26,14 @@ def create_autounexile_embed(
 ):
 
     return create_interaction_embed_context(
-        get_log_channel(self.guild),
+        get_log_channel(self),
         user=user,
         timestamp=end_timestamp,
         description=f"<@{discord_id}>'s exile has timed out",
         footer=f"Exile ID: {exile_id}",
     )
+
+
 
 
 def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: datetime):
