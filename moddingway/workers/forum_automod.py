@@ -37,7 +37,7 @@ async def autodelete_threads(self):
                 logger.error("Forum channel not found.")
                 continue
 
-            for thread in channel.archived_threads(limit=None):
+            async for thread in channel.archived_threads(limit=None):
                 num_removed, num_errors = await automod_thread(
                     thread,
                     duration,
@@ -73,7 +73,7 @@ async def autodelete_threads(self):
         except Exception as e:
             logger.error(e, exc_info=e)
             async with create_interaction_embed_context(
-                get_log_channel(self.guild),
+                get_log_channel(self),
                 user=self.user,
                 timestamp=datetime.now(timezone.utc),
                 description=f"Automod task failed to process channel <#{channel_id}>: {e}",

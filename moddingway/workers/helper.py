@@ -36,7 +36,7 @@ def create_autounexile_embed(
 
 def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: datetime):
     return create_interaction_embed_context(
-        get_log_channel(self.guild),
+        get_log_channel(self),
         user=self.user,
         timestamp=timestamp,
         description=f"Successfully removed {num_removed} inactive thread(s) from <#{channel_id}>.\n{num_error} inactive thread(s) failed to be removed.",
