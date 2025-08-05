@@ -49,3 +49,4 @@ AUTOMOD_INACTIVITY = {
 }
 
 STICKY_ROLES = []
+# Extra roles that should be removed from users when they are exiled
