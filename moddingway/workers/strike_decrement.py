@@ -1,7 +1,5 @@
 import logging
 
-from datetime import datetime
-
 from discord.ext import tasks
 
 from moddingway.database import users_database

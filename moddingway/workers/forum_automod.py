@@ -22,13 +22,13 @@ async def autodelete_threads(self):
 
     guild = self.get_guild(settings.guild_id)
     if guild is None:
-        logger.error(" Guild not found.")
+        logger.error("Guild not found.")
         logger.info(f"Ended forum automod worker task with errors")
         return
 
     notifying_channel = guild.get_channel(settings.notify_channel_id)
     if notifying_channel is None:
-        logger.error(" Notifying channel not found.")
+        logger.error("Notifying channel not found.")
         logger.info(f"Ended forum automod worker task with errors")
         return
 
