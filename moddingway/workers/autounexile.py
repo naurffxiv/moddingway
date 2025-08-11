@@ -20,8 +20,10 @@ async def autounexile_users(self):
         exiles = exiles_database.get_pending_unexiles()
     except Exception:
         logger.info("[unexile] Failed to get pending exiles.")
-        logger.info(f"[unexile] Ended auto unexile worker task with errors "
-                    f"- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
+        logger.info(
+            f"[unexile] Ended auto unexile worker task with errors "
+            f"- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
+        )
         return
 
     for exile in exiles:
@@ -31,7 +33,7 @@ async def autounexile_users(self):
             member = self.get_guild(settings.guild_id).get_member(exile.discord_id)
 
             async with create_autounexile_embed(
-                    self, member, exile.discord_id, exile.exile_id, exile.end_timestamp
+                self, member, exile.discord_id, exile.exile_id, exile.end_timestamp
             ) as autounexile_embed:
                 if member is None:
                     error_message = f"<@{exile.discord_id}> was not found in the server"
@@ -46,12 +48,16 @@ async def autounexile_users(self):
                 f"[unxile] Auto Unexile failed, updating exile status of exile "
                 f"{exile.exile_id}, user {exile.discord_id} to unknown"
             )
-            logger.info(f"[unexile] Ended auto unexile worker task with errors "
-                        f"- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
+            logger.info(
+                f"[unexile] Ended auto unexile worker task with errors "
+                f"- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
+            )
             exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNKNOWN)
 
 
 @autounexile_users.before_loop
 async def before_autounexile_users():
-    logger.info(f"[unexile] auto unexile worker started,"
-                f" task running every 1 minute - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
+    logger.info(
+        f"[unexile] auto unexile worker started,"
+        f" task running every 1 minute - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
+    )
