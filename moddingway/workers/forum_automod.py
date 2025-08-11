@@ -18,24 +18,18 @@ logger = logging.getLogger(__name__)
 
 @tasks.loop(hours=24)
 async def autodelete_threads(self):
-    logger.info(
-        f"[automod] Started forum automod worker task - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-    )
+    logger.info(f"Started forum automod worker task")
 
     guild = self.get_guild(settings.guild_id)
     if guild is None:
-        logger.error("[automod] Guild not found.")
-        logger.info(
-            f"[automod] Ended forum automod worker task with errors - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-        )
+        logger.error(" Guild not found.")
+        logger.info(f"Ended forum automod worker task with errors")
         return
 
     notifying_channel = guild.get_channel(settings.notify_channel_id)
     if notifying_channel is None:
-        logger.error("[automod] Notifying channel not found.")
-        logger.info(
-            f"[automod] Ended forum automod worker task with errors - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-        )
+        logger.error(" Notifying channel not found.")
+        logger.info(f"Ended forum automod worker task with errors")
         return
 
     for channel_id, duration in settings.automod_inactivity.items():
@@ -44,10 +38,8 @@ async def autodelete_threads(self):
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:
-                logger.error("[automod] Forum channel not found.")
-                logger.info(
-                    f"[automod] Ended forum automod worker task with errors - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-                )
+                logger.error("Forum channel not found.")
+                logger.info(f"Ended forum automod worker task with errors")
                 continue
 
             async for thread in channel.archived_threads(limit=None):
@@ -68,7 +60,7 @@ async def autodelete_threads(self):
 
             if num_removed > 0 or num_errors > 0:
                 logger.info(
-                    f"[automod] Removed a total of {num_removed} threads from channel {channel_id}. {num_errors} failed removals."
+                    f"Removed a total of {num_removed} threads from channel {channel_id}. {num_errors} failed removals."
                 )
                 async with create_automod_embed(
                     self,
@@ -81,7 +73,7 @@ async def autodelete_threads(self):
 
             else:
                 logger.info(
-                    f"[automod] No threads were marked for deletion in channel {channel_id}."
+                    f"No threads were marked for deletion in channel {channel_id}."
                 )
         except Exception as e:
             logger.error(e, exc_info=e)
@@ -94,14 +86,9 @@ async def autodelete_threads(self):
                 pass
             continue
 
-    logger.info(
-        f"[automod] Completed forum automod worker task - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-    )
+    logger.info(f"Completed forum automod worker task")
 
 
 @autodelete_threads.before_loop
 async def before_autodelete_threads():
-    logger.info(
-        f"[automod] forum automod worker started,"
-        f" task running every 24 hours - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"
-    )
+    logger.info(f"Forum Automod started, task running every 24 hours.")
