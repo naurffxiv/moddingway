@@ -134,6 +134,7 @@ def decrement_old_strike_points() -> int:
             lastinfractiontimestamp = lastinfractiontimestamp + INTERVAL '90 day'
             WHERE temporarypoints  > 0
             AND lastinfractiontimestamp < current_date - INTERVAL '90 day'
+            AND isBanned = false
         """
 
         cursor.execute(query)
