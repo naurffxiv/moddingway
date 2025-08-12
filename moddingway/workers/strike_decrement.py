@@ -14,3 +14,8 @@ async def decrement_strikes(self):
         logger.info(f"Finished decrementing old strikes, updated {row_count} users")
     except Exception as e:
         logger.error("Error when decrementing old user strikes", exc_info=e)
+
+
+@decrement_strikes.before_loop
+async def before_decrement_strikes():
+    logger.info(f"Strike Decrement started, task running every 24 hours.")
