@@ -18,18 +18,18 @@ logger = logging.getLogger(__name__)
 
 @tasks.loop(hours=24)
 async def autodelete_threads(self):
-    logger.info(f"Started forum automod worker task")
+    logger.info(f"Started forum automod worker task.")
 
     guild = self.get_guild(settings.guild_id)
     if guild is None:
         logger.error("Guild not found.")
-        logger.info(f"Ended forum automod worker task with errors")
+        logger.info(f"Ended forum automod worker task with errors.")
         return
 
     notifying_channel = guild.get_channel(settings.notify_channel_id)
     if notifying_channel is None:
         logger.error("Notifying channel not found.")
-        logger.info(f"Ended forum automod worker task with errors")
+        logger.info(f"Ended forum automod worker task with errors.")
         return
 
     for channel_id, duration in settings.automod_inactivity.items():
@@ -39,7 +39,7 @@ async def autodelete_threads(self):
             channel = guild.get_channel(channel_id)
             if channel is None:
                 logger.error("Forum channel not found.")
-                logger.info(f"Ended forum automod worker task with errors")
+                logger.info(f"Ended forum automod worker task with errors.")
                 continue
 
             async for thread in channel.archived_threads(limit=None):
@@ -86,7 +86,7 @@ async def autodelete_threads(self):
                 pass
             continue
 
-    logger.info(f"Completed forum automod worker task")
+    logger.info(f"Completed forum automod worker task.")
 
 
 @autodelete_threads.before_loop
