@@ -48,5 +48,8 @@ AUTOMOD_INACTIVITY = {
     1301166606985990144: 14,  # scheduled pfs
 }
 
-STICKY_ROLES = []
-# Extra roles that should be removed from users when they are exiled
+STICKY_ROLES = [
+    # Extra roles that should be removed from users when they are exiled
+    1253810157524094996,  # Glorp
+    1272364706241187870,  # Event Ping
+]
