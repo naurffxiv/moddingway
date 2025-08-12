@@ -57,6 +57,7 @@ class RouletteDeleteView(discord.ui.View):
             async with create_logging_embed(
                 interaction,
                 duration=format_time_string(duration_string),
+                custom_response=f"User <@{interaction.user.id}> was exiled due to a lost roulette.",
             ) as logging_embed:
                 reason = "roulette"
                 exile_duration = calculate_time_delta(duration_string)
