@@ -32,7 +32,9 @@ async def autounexile_users(self):
                 self, member, exile.discord_id, exile.exile_id, exile.end_timestamp
             ) as autounexile_embed:
                 if member is None:
-                    error_message = f"<@{exile.discord_id}> was not found in the server."
+                    error_message = (
+                        f"<@{exile.discord_id}> was not found in the server."
+                    )
                     logger.error(f"{error_message}")
                     raise Exception(error_message)
 
