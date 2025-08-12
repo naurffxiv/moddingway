@@ -18,7 +18,9 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-def create_logging_embed(interaction: discord.Interaction, **kwargs):
+def create_logging_embed(
+    interaction: discord.Interaction, custom_response: str | None = None, **kwargs
+):
     if interaction.command:
         fields = [EmbedField("Action", f"/{interaction.command.name}")]
     else:
@@ -41,7 +43,10 @@ def create_logging_embed(interaction: discord.Interaction, **kwargs):
                 case _:
                     fields.append(EmbedField(key.title(), value))
 
-    if interaction.command:
+    # Set description to custom_response for non-command interaction logging_embeds
+    if custom_response is not None:
+        description = custom_response
+    elif interaction.command:
         description = f"Used `{interaction.command.name}` command in {interaction.channel.mention}"
     else:
         # TODO: MOD-169 pass something in for these situations
