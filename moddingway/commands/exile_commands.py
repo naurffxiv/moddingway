@@ -46,6 +46,7 @@ class RouletteDeleteView(discord.ui.View):
         safety_choice = choice(safety_options)
         duration_choice = choice(exile_duration_options)
         duration_string = f"{duration_choice}hour"
+        reason = "lost roulette"
 
         if safety_choice:
             await interaction.response.send_message(
@@ -62,9 +63,12 @@ class RouletteDeleteView(discord.ui.View):
         async with create_response_context(interaction, False) as response_message:
             async with create_logging_embed(
                 interaction,
+                action="/roulette",
                 duration=format_time_string(duration_string),
+                custom_response=f"User <@{interaction.user.id}> lost a roulette in {interaction.channel.mention} and was exiled.",
+                reason=reason,
             ) as logging_embed:
-                reason = "roulette"
+
                 exile_duration = calculate_time_delta(duration_string)
                 error_message = await exile_user(
                     logging_embed, interaction.user, exile_duration, reason
