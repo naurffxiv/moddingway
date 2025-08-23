@@ -15,7 +15,13 @@ from moddingway.services.exile_service import (
     delete_exile_by_id,
 )
 from moddingway.settings import get_settings
-from moddingway.util import calculate_time_delta, is_user_moderator, user_has_role
+from moddingway.util import (
+    calculate_time_delta,
+    is_user_moderator,
+    user_has_role,
+    log_info_and_add_field,
+)
+from moddingway.workers.autounexile import autounexile_users
 
 from .helper import create_logging_embed, create_response_context
 
@@ -196,3 +202,16 @@ def create_exile_commands(bot: Bot) -> None:
             ) as logging_embed:
                 result = await delete_exile_by_id(logging_embed, exile_id)
                 response_message.set_string(result)
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    async def run_auto_unexile(interaction: discord.Interaction):
+        """Run the auto unexile task manually."""
+
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction,
+            ) as logging_embed:
+                result = await autounexile_users(bot)
+                log_info_and_add_field(logging_embed, logger, "Result", result)
+            response_message.set_string(result)

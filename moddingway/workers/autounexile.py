@@ -43,3 +43,5 @@ async def autounexile_users(self):
                 f"Auto Unexile failed, updating exile status of exile {exile.exile_id}, user {exile.discord_id} to unknown"
             )
             exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNKNOWN)
+
+    return f"Auto Unexile task completed."
