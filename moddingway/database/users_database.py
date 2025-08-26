@@ -187,7 +187,7 @@ def get_mod_count() -> int:
         query = """
             SELECT COUNT(*)
             FROM users
-            WHERE user_role = %s
+            WHERE userrole = %s
         """
         params = (2,)
         cursor.execute(query, params)
@@ -202,7 +202,7 @@ def get_mods(limit: int, offset: int) -> list[User]:
     with conn.get_cursor() as cursor:
         query = """
         SELECT * FROM users
-        WHERE user_role = %s
+        WHERE userrole = %s
         LIMIT %s OFFSET %s;
         """
 
@@ -222,6 +222,7 @@ def get_mods(limit: int, offset: int) -> list[User]:
                     temporary_points=row[4],
                     permanent_points=row[5],
                     last_infraction_timestamp=row[6],
+                    is_banned=row[7],
                 )
                 for row in res
             ]
