@@ -8,6 +8,7 @@ from moddingway.util import (
     create_interaction_embed_context,
     send_chunked_message,
     get_log_channel,
+    log_info_and_embed,
 )
 
 from .helper import automod_thread, create_automod_embed
@@ -85,8 +86,8 @@ async def autodelete_threads(self):
             ):
                 pass
             continue
-
     logger.info(f"Completed forum automod worker task.")
+    return f"Forum automod task completed."
 
 
 @autodelete_threads.before_loop

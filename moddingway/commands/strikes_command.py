@@ -5,7 +5,8 @@ from discord.ext.commands import Bot
 
 from moddingway.constants import Role, StrikeSeverity
 from moddingway.services import strike_service
-from moddingway.util import is_user_moderator, user_has_role
+from moddingway.util import is_user_moderator, user_has_role, log_info_and_add_field
+from moddingway.workers.strike_decrement import decrement_strikes
 
 from .helper import create_logging_embed, create_response_context
 
@@ -97,3 +98,16 @@ def create_strikes_commands(bot: Bot) -> None:
             ),
             ephemeral=True,
         )
+
+    @bot.tree.command()
+    @discord.app_commands.check(is_user_moderator)
+    async def run_strike_decrement(interaction: discord.Interaction):
+        """Run the strike decrement task manually."""
+
+        async with create_response_context(interaction) as response_message:
+            async with create_logging_embed(
+                interaction,
+            ) as logging_embed:
+                result = await decrement_strikes(bot)
+                log_info_and_add_field(logging_embed, logger, "Result", result)
+            response_message.set_string(result)
