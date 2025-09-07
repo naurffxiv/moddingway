@@ -20,12 +20,7 @@ Postgres-related information is configured in the environment variables instead 
 - POSTGRES_DB
 - POSTGRES_USER
 - POSTGRES_PASSWORD
-- DEBUG
-- GUILD_ID
-- MOD_LOGGING_CHANNEL_ID
-- INACTIVE_FORUM_CHANNEL_ID
-- INACTIVE_FORUM_DURATION
-- NOTIFY_CHANNEL_ID
+- MODDINGWAY_ENVIRONMENT
 
 
 Defaults are also set for `POSTGRES_PORT` (5432) and `POSTGRES_DB` (moddingway) if those two are not set.
@@ -46,6 +41,12 @@ When you first are setting up the application, copy the file titled `.env_exampl
 In addition, you will need to give yourself the `Mod` role in order to properly run all moderation commands.
 
 We recommend getting a [virtual environment](https://docs.python.org/3/library/venv.html) set up for python before you start development. All required packages to run the application are defined in `requirements.txt`
+
+## Make Commands
+We are utilizing a Makefile to simplify common commands you might use when running the application.
+* `make run` This will stop the existing Moddingway Docker container (if running), rebuild the container, and launch the application. This is the most common command you will use for development.
+* `make database-run` This will launch the containerized Postgres database. The container uses values defined in the .env file to define the database username, password, and database name. The tables will be automatically configured when you first run the bot, or set up seed data
+* `make database-clean` This command deletes all data in the database, re-created the tables, and then set up some example data in the database
 
 ## Testing
 This application uses pytest to run automated unit tests. To install pytest, run `pip install pytest`. To confirm that pytest installed properly, run the command `pytest --version` and you should get an output like `pytest 8.3.4`. If you get an error related to the command being missing, you must either add the pytest install to your path, or you can replace all instances of `pytest` in suggested commands with `python -m pytest`. Alternatively, most IDEs support running tests directly in the IDE with pytest.
