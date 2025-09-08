@@ -12,6 +12,8 @@ Postgres-related information is configured in the environment variables instead 
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 - POSTGRES_DB
+- INACTIVE_FORUM_CHANNEL_ID
+- INACTIVE_FORUM_DURATION
 
 #### Release
 - DISCORD_TOKEN
