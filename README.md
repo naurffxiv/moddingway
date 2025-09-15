@@ -49,6 +49,9 @@ We are utilizing a Makefile to simplify common commands you might use when runni
 * `make run` This will stop the existing Moddingway Docker container (if running), rebuild the container, and launch the application. This is the most common command you will use for development.
 * `make database-run` This will launch the containerized Postgres database. The container uses values defined in the .env file to define the database username, password, and database name. The tables will be automatically configured when you first run the bot, or set up seed data
 * `make database-clean` This command deletes all data in the database, re-created the tables, and then set up some example data in the database
+* `api-reload` This will start up the moddingway API. It runs with a reload flag set up, so you will not need to relaunch the command after making a code change
+* `format` This will run our linter over all python files. This is required for pull requests to be merged.
+* `clean` This command removes unused docker images that you have previously built. Primarily, this is used to reclaim back disk space from docker.
 
 ## Testing
 This application uses pytest to run automated unit tests. To install pytest, run `pip install pytest`. To confirm that pytest installed properly, run the command `pytest --version` and you should get an output like `pytest 8.3.4`. If you get an error related to the command being missing, you must either add the pytest install to your path, or you can replace all instances of `pytest` in suggested commands with `python -m pytest`. Alternatively, most IDEs support running tests directly in the IDE with pytest.
