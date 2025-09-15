@@ -42,7 +42,7 @@ When you first are setting up the application, copy the file titled `.env_exampl
 
 In addition, you will need to give yourself the `Mod` role in order to properly run all moderation commands.
 
-We recommend getting a [virtual environment](https://docs.python.org/3/library/venv.html) set up for python before you start development. All required packages to run the application are defined in `requirements.txt`
+An optional step for development is getting a [virtual environment](https://docs.python.org/3/library/venv.html) set up for python before you start development. All required packages to run the application are defined in `requirements.txt`
 
 ## Make Commands
 We are utilizing a Makefile to simplify common commands you might use when running the application.
