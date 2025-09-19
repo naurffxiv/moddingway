@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_forum_commands(bot: Bot) -> None:
+
     @bot.tree.command()
     @discord.app_commands.check(is_user_moderator)
     async def run_automod(interaction: discord.Interaction):
