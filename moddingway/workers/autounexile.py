@@ -49,6 +49,8 @@ async def autounexile_users(self):
             logger.info(f"Ended auto unexile worker task with errors.")
             exiles_database.update_exile_status(exile.exile_id, ExileStatus.UNKNOWN)
 
+    return f"Auto Unexile task completed."
+
 
 @autounexile_users.before_loop
 async def before_autounexile_users():
