@@ -18,7 +18,7 @@ run:
 	docker compose up python-app-local --build
 
 database-run:
-	docker compose -f postgres.yml up -d
+	docker compose -f postgres.yml up -d postgres_local
 
 database-clean:
 	docker exec postgres_db rm scripts -r -f
@@ -27,6 +27,17 @@ database-clean:
 	docker exec postgres_db psql -f scripts/postgres/drop_all_tables.sql -U moddingwayLocalDB moddingway
 	docker exec postgres_db psql -f scripts/postgres/create_tables.sql -U moddingwayLocalDB moddingway
 	docker exec postgres_db psql -f scripts/postgres/seed_data.sql -U moddingwayLocalDB moddingway
+
+database-run-ephemeral:
+	docker compose -f postgres.yml up -d postgres_ephemeral
+
+database-clean-ephemeral:
+	docker exec postgres_db_ephemeral rm scripts -r -f
+	docker exec postgres_db_ephemeral mkdir scripts
+	docker cp postgres postgres_db_ephemeral:scripts
+	docker exec postgres_db_ephemeral psql -f scripts/postgres/drop_all_tables.sql -U moddingwayLocalDB moddingway
+	docker exec postgres_db_ephemeral psql -f scripts/postgres/create_tables.sql -U moddingwayLocalDB moddingway
+	docker exec postgres_db_ephemeral psql -f scripts/postgres/seed_data.sql -U moddingwayLocalDB moddingway
 
 api:
 	uvicorn moddingway_api.main:app --port 8000
