@@ -51,9 +51,7 @@ def local() -> Settings:
         logging_channel_id=int(os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)),
         log_level=logging.DEBUG,
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
-        postgres_port=os.environ.get(
-            "POSTGRES_PORT", "5433"
-        ),  # Define Port as 5432 for persistent data mode, or 5433 for ephemeral
+        postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         automod_inactivity=automod_inactivity,
         notify_channel_id=os.environ.get(
             "NOTIFY_CHANNEL_ID", os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)

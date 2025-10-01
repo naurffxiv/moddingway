@@ -18,6 +18,7 @@ run:
 	docker compose up python-app-local --build
 
 database-run:
+	docker compose -f postgres.yml down
 	docker compose -f postgres.yml up -d postgres_local
 
 database-clean:
@@ -29,6 +30,7 @@ database-clean:
 	docker exec postgres_db psql -f scripts/postgres/seed_data.sql -U moddingwayLocalDB moddingway
 
 database-run-ephemeral:
+	docker compose -f postgres.yml down
 	docker compose -f postgres.yml up -d postgres_ephemeral
 
 database-clean-ephemeral:
