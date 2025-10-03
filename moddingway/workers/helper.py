@@ -77,3 +77,41 @@ async def automod_thread(
     except Exception as e:
         logger.error(f"Unexpected error for thread {thread.id}: {e}", exc_info=e)
         return num_removed, num_errors + 1
+
+
+async def automod_event_thread(
+    thread: discord.Thread,
+    duration: int,
+    num_removed: int,
+    num_errors: int,
+    user_id: str,
+):
+    if thread.flags.pinned:
+        # skip the for loop if the thread is pinned
+        return num_removed, num_errors
+    if thread.owner.id != user_id:
+        return num_removed, num_errors
+    # check if starter message was deleted
+    starter_message = None
+    try:
+        starter_message = await thread.fetch_message(thread.id)
+        await asyncio.sleep(1)
+    except discord.NotFound:
+        pass
+    except Exception as e:
+        logger.error(e, exc_info=e)
+
+    now = datetime.now(timezone.utc)
+    last_post = thread.last_message_id
+    time_since = now - snowflake_time(last_post)
+    if starter_message is not None and time_since < timedelta(days=duration):
+        return num_removed, num_errors
+
+    # delete thread
+    try:
+        await thread.delete()
+        logger.info(f"Thread {thread.id} has been deleted successfully")
+        return num_removed + 1, num_errors
+    except Exception as e:
+        logger.error(f"Unexpected error for thread {thread.id}: {e}", exc_info=e)
+        return num_removed, num_errors + 1

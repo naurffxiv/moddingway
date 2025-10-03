@@ -23,7 +23,9 @@ services:
       PGUSER: ${POSTGRES_USER}
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: ${POSTGRES_DB}
-
+      PTC_EVENT_FORUM_ID: ${PTC_EVENT_FORUM_ID}
+      PTC_EVENT_FORUM_DURATION: ${PTC_EVENT_FORUM_DURATION}
+      EVENT_BOT_ID : ${EVENT_BOT_ID}
   python-app-local:
     extends:
       service: python-app
