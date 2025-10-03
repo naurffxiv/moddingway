@@ -33,7 +33,7 @@ def register_events(bot: Bot):
 
         logger.info(f"Member joined: {member.display_name} ({member.id})")
 
-        log_channel = await get_log_channel(member.guild)
+        log_channel = get_log_channel(member.guild)
         if log_channel is None:
             return
 
