@@ -4,7 +4,12 @@ import discord
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from moddingway.database import DatabaseConnection
-from moddingway_api.routes import user_router, mod_router, banneduser_router, banform_router
+from moddingway_api.routes import (
+    user_router,
+    mod_router,
+    banneduser_router,
+    banform_router,
+)
 
 
 @asynccontextmanager

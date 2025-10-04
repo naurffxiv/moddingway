@@ -9,8 +9,9 @@ settings = get_settings()
 
 logger = logging.getLogger(__name__)
 
+
 def get_ban_forms(limit: int, offset: int) -> list[BanForm]:
-    conn=DatabaseConnection()
+    conn = DatabaseConnection()
 
     with conn.get_cursor as cursor:
         query = """
@@ -22,12 +23,12 @@ def get_ban_forms(limit: int, offset: int) -> list[BanForm]:
         cursor.execute(query, params)
 
         res = cursor.fetchall()
-        
+
         if res:
-            return[
+            return [
                 BanForm(
                     form_id=row[0],
-                    user_id = row[1],
+                    user_id=row[1],
                     reason=row[2],
                     approval=row[3],
                     approved_by=row[4],
@@ -36,6 +37,7 @@ def get_ban_forms(limit: int, offset: int) -> list[BanForm]:
                 for row in res
             ]
         return []
+
 
 def get_ban_form(form_id: int) -> Optional[BanForm]:
     conn = DatabaseConnection()
@@ -56,14 +58,15 @@ def get_ban_form(form_id: int) -> Optional[BanForm]:
 
         if res:
             return BanForm(
-                    form_id=res[0],
-                    user_id = res[1],
-                    reason=res[2],
-                    approval=res[3],
-                    approved_by=res[4],
-                    submission_timestamp=res[5],
-                )
-        
+                form_id=res[0],
+                user_id=res[1],
+                reason=res[2],
+                approval=res[3],
+                approved_by=res[4],
+                submission_timestamp=res[5],
+            )
+
+
 def get_form_count() -> int:
     conn = DatabaseConnection()
 
@@ -78,6 +81,7 @@ def get_form_count() -> int:
 
         result = cursor.fetchall()
         return result[0][0]
+
 
 def add_form(form: BanForm) -> int:
     conn = DatabaseConnection()
@@ -99,8 +103,9 @@ def add_form(form: BanForm) -> int:
         res = cursor.fetchone()
 
         return res[0]
-    
-def update_form(form_id, approval, approved_by) -> tuple[bool,int]:
+
+
+def update_form(form_id, approval, approved_by) -> tuple[bool, int]:
     conn = DatabaseConnection()
 
     with conn.get_cursor() as cursor:
@@ -128,9 +133,9 @@ def update_form(form_id, approval, approved_by) -> tuple[bool,int]:
         res = cursor.fetchone()
 
         return res
-    
 
-# used to get discordUserId to unban user when banform approved    
+
+# used to get discordUserId to unban user when banform approved
 def get_user_from_form(form_id) -> str:
     conn = DatabaseConnection()
 
