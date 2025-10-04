@@ -1,6 +1,6 @@
 import logging
 import os
-from .constants import AUTOMOD_INACTIVITY, STICKY_ROLES, AUTOMOD_EVENT_INACTIVITY
+from .constants import AUTOMOD_INACTIVITY, STICKY_ROLES
 from pydantic import BaseModel
 from ast import literal_eval
 
@@ -21,8 +21,8 @@ class Settings(BaseModel):
     postgres_username: str = os.environ.get("POSTGRES_USER")
     postgres_password: str = os.environ.get("POSTGRES_PASSWORD")
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
-    automod_event_inactivity: dict[int, int]
     event_bot_id: int
+    event_forum_id: int
     sticky_roles: list[
         int
     ]  # roles that grant access to channels that should be stripped/restored on exile/unexile
@@ -37,21 +37,21 @@ def prod() -> Settings:
         postgres_host=os.environ.get("POSTGRES_HOST"),
         postgres_port=os.environ.get("POSTGRES_PORT"),
         automod_inactivity=AUTOMOD_INACTIVITY,
-        automod_event_inactivity=AUTOMOD_EVENT_INACTIVITY,
         event_bot_id=579155972115660803,  # Raid-Helper#3806
+        event_forum_id=1419357090841104544,  # PtC event forum
         sticky_roles=STICKY_ROLES,
     )
 
 
 def local() -> Settings:
+    automod_inactivity = {}
+
     inactive_forum_channel_id = os.environ.get("INACTIVE_FORUM_CHANNEL_ID")
     inactive_forum_duration = os.environ.get("INACTIVE_FORUM_DURATION")
     if inactive_forum_channel_id is not None and inactive_forum_duration is not None:
-        automod_inactivity = {
-            int(inactive_forum_channel_id): int(inactive_forum_duration)
-        }
-    else:
-        automod_inactivity = {}
+        automod_inactivity[int(inactive_forum_channel_id)] = int(
+            inactive_forum_duration
+        )
 
     inactive_event_forum_channel_id = os.environ.get("PTC_EVENT_FORUM_ID")
     inactive_event_forum_duration = os.environ.get("PTC_EVENT_FORUM_DURATION")
@@ -59,11 +59,9 @@ def local() -> Settings:
         inactive_event_forum_channel_id is not None
         and inactive_event_forum_duration is not None
     ):
-        automod_event_inactivity = {
-            int(inactive_event_forum_channel_id): int(inactive_event_forum_duration)
-        }
-    else:
-        automod_event_inactivity = {}
+        automod_inactivity[int(inactive_event_forum_channel_id)] = int(
+            inactive_event_forum_duration
+        )
 
     return Settings(
         guild_id=int(os.environ.get("GUILD_ID", 0)),
@@ -72,8 +70,8 @@ def local() -> Settings:
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         automod_inactivity=automod_inactivity,
-        automod_event_inactivity=automod_event_inactivity,
         event_bot_id=int(os.environ.get("EVENT_BOT_ID", 0)),
+        event_forum_id=os.environ.get("PTC_EVENT_FORUM_ID", 0),
         notify_channel_id=os.environ.get(
             "NOTIFY_CHANNEL_ID", os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
         ),
