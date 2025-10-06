@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 @tasks.loop(hours=24)
 async def autodelete_threads(self):
     logger.info(f"Started forum automod worker task.")
-    logger.info(settings.automod_inactivity)
     guild = self.get_guild(settings.guild_id)
     if guild is None:
         logger.error("Guild not found.")
