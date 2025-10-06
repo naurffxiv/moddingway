@@ -47,9 +47,11 @@ An optional step for development is getting a [virtual environment](https://docs
 ## Make Commands
 We are utilizing a Makefile to simplify common commands you might use when running the application.
 * `make run` This will stop the existing Moddingway Docker container (if running), rebuild the container, and launch the application. This is the most common command you will use for development.
-* `make database-run` This will launch the containerized Postgres database. The container uses values defined in the .env file to define the database username, password, and database name. The tables will be automatically configured when you first run the bot, or set up seed data
-* `make database-clean` This command deletes all data in the database, re-created the tables, and then set up some example data in the database
-* `api-reload` This will start up the moddingway API. It runs with a reload flag set up, so you will not need to relaunch the command after making a code change
+* `make database-run` This will launch the containerized Postgres persistent database. The container uses values defined in the .env file to define the database username, password, and database name. The tables will be automatically configured when you first run the bot, or set up seed data. Data persists between container restarts.
+* `make database-clean` This command deletes all data in the database, re-create the tables, and then set up some example data in the persistent database.
+* `make database-run-ephemeral` This will launch the containerized Postgres temporary database for testing purposes. The container uses values defined in the .env file to define the database username, password, and database name. The tables will be automatically configured when you first run the bot, or set up seed data. Data does not persist between container restarts.
+* `make database-clean-ephemeral` This command deletes all data in the temporary database, re-create the tables, and then set up some example data in the temporary database.
+* `api-reload` This will start up the moddingway API. It runs with a reload flag set up, so you will not need to relaunch the command after making a code change.
 * `format` This will run our linter over all python files. This is required for pull requests to be merged.
 * `clean` This command removes unused docker images that you have previously built. Primarily, this is used to reclaim back disk space from docker.
 
