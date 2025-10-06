@@ -46,6 +46,7 @@ AUTOMOD_INACTIVITY = {
     1273261496968810598: 30,  # lfm
     1240356145311252615: 30,  # temporary
     1301166606985990144: 14,  # scheduled pfs
+    1419357090841104544: 3,  # PtC event forum
 }
 
 STICKY_ROLES = [
