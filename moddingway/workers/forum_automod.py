@@ -8,6 +8,7 @@ from moddingway.util import (
     create_interaction_embed_context,
     send_chunked_message,
     get_log_channel,
+    log_info_and_embed,
 )
 
 from .helper import automod_thread, create_automod_embed
@@ -18,31 +19,38 @@ logger = logging.getLogger(__name__)
 
 @tasks.loop(hours=24)
 async def autodelete_threads(self):
+    logger.info(f"Started forum automod worker task.")
     guild = self.get_guild(settings.guild_id)
     if guild is None:
         logger.error("Guild not found.")
+        logger.info(f"Ended forum automod worker task with errors.")
         return
 
     notifying_channel = guild.get_channel(settings.notify_channel_id)
     if notifying_channel is None:
         logger.error("Notifying channel not found.")
+        logger.info(f"Ended forum automod worker task with errors.")
         return
 
     for channel_id, duration in settings.automod_inactivity.items():
         num_removed = 0
         num_errors = 0
+        user_id = None
         try:
             channel = guild.get_channel(channel_id)
             if channel is None:
                 logger.error("Forum channel not found.")
+                logger.info(f"Ended forum automod worker task with errors.")
                 continue
-
+            if channel_id == settings.event_forum_id:
+                user_id = settings.event_bot_id
             async for thread in channel.archived_threads(limit=None):
                 num_removed, num_errors = await automod_thread(
                     thread,
                     duration,
                     num_removed,
                     num_errors,
+                    user_id,
                 )
 
             for thread in channel.threads:
@@ -51,6 +59,7 @@ async def autodelete_threads(self):
                     duration,
                     num_removed,
                     num_errors,
+                    user_id,
                 )
 
             if num_removed > 0 or num_errors > 0:
@@ -80,3 +89,10 @@ async def autodelete_threads(self):
             ):
                 pass
             continue
+    logger.info(f"Completed forum automod worker task.")
+    return f"Forum automod task completed."
+
+
+@autodelete_threads.before_loop
+async def before_autodelete_threads():
+    logger.info(f"Forum Automod started, task running every 24 hours.")

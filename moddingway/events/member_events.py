@@ -76,7 +76,7 @@ def register_events(bot: Bot):
         users_database.update_user(db_user)
 
         # Addition of logging embed
-        log_channel = get_log_channel(guild)
+        log_channel = await get_log_channel(guild)
 
         if log_channel is None:
             return
@@ -108,7 +108,7 @@ def register_events(bot: Bot):
         users_database.update_user(db_user)
 
         # Addition of logging embed
-        log_channel = get_log_channel(guild)
+        log_channel = await get_log_channel(guild)
 
         if log_channel is None:
             return

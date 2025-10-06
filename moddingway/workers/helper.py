@@ -48,11 +48,14 @@ async def automod_thread(
     duration: int,
     num_removed: int,
     num_errors: int,
+    user_id: Optional[int] = None,
 ):
     if thread.flags.pinned:
         # skip the for loop if the thread is pinned
         return num_removed, num_errors
 
+    if user_id is not None and thread.owner.id != user_id:
+        return num_removed, num_errors
     # check if starter message was deleted
     starter_message = None
     try:
