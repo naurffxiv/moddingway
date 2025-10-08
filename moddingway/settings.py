@@ -46,22 +46,23 @@ def prod() -> Settings:
 def local() -> Settings:
     automod_inactivity = {}
 
-    inactive_forum_channel_id = os.environ.get("INACTIVE_FORUM_CHANNEL_ID")
-    inactive_forum_duration = os.environ.get("INACTIVE_FORUM_DURATION")
-    if inactive_forum_channel_id is not None and inactive_forum_duration is not None:
+    inactive_forum_channel_id = os.environ.get("INACTIVE_FORUM_CHANNEL_ID", "")
+    inactive_forum_duration = os.environ.get("INACTIVE_FORUM_DURATION", "")
+    if inactive_forum_channel_id != "" and inactive_forum_duration != "":
         automod_inactivity[int(inactive_forum_channel_id)] = int(
             inactive_forum_duration
         )
 
-    inactive_event_forum_channel_id = os.environ.get("PTC_EVENT_FORUM_ID")
-    inactive_event_forum_duration = os.environ.get("PTC_EVENT_FORUM_DURATION")
-    if (
-        inactive_event_forum_channel_id is not None
-        and inactive_event_forum_duration is not None
-    ):
+    inactive_event_forum_channel_id = os.environ.get("PTC_EVENT_FORUM_ID", "")
+    inactive_event_forum_duration = os.environ.get("PTC_EVENT_FORUM_DURATION", "")
+    if inactive_event_forum_channel_id != "" and inactive_event_forum_duration != "":
         automod_inactivity[int(inactive_event_forum_channel_id)] = int(
             inactive_event_forum_duration
         )
+
+    notify_channel_id = os.environ.get("NOTIFY_CHANNEL_ID", "")
+    if notify_channel_id == "":
+        notify_channel_id = os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
 
     return Settings(
         guild_id=int(os.environ.get("GUILD_ID", 0)),
@@ -70,11 +71,9 @@ def local() -> Settings:
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),
         automod_inactivity=automod_inactivity,
-        event_bot_id=int(os.environ.get("EVENT_BOT_ID", 0)),
-        event_forum_id=os.environ.get("PTC_EVENT_FORUM_ID", 0),
-        notify_channel_id=os.environ.get(
-            "NOTIFY_CHANNEL_ID", os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
-        ),
+        event_bot_id=_check_env_convert("EVENT_BOT_ID"),
+        event_forum_id=_check_env_convert("PTC_EVENT_FORUM_ID"),
+        notify_channel_id=notify_channel_id,
         sticky_roles=literal_eval(os.environ.get("STICKY_ROLE_ARRAY", "None")) or [],
     )
 
@@ -88,3 +87,15 @@ def get_settings() -> Settings:
         return prod()
     else:
         return local()
+
+
+def _check_env_convert(key: str, default: int = 0) -> int:
+    value_str = os.environ.get(key)
+
+    if value_str is None or value_str == "":
+        return default
+
+    try:
+        return int(value_str)
+    except ValueError:
+        logger.info(f"ENV {key} is not set to {value_str}, returning {default}.")
