@@ -125,7 +125,12 @@ async def send_chunked_message(channel: discord.abc.GuildChannel, message_conten
         await channel.send(chunk)
 
 
-async def send_dm(logging_embed: discord.Embed, member: discord.Member, messageContent: str, context: str,):
+async def send_dm(
+    logging_embed: discord.Embed,
+    member: discord.Member,
+    messageContent: str,
+    context: str,
+):
     try:
         channel = await member.create_dm()
         await channel.send(content=messageContent)
@@ -133,9 +138,13 @@ async def send_dm(logging_embed: discord.Embed, member: discord.Member, messageC
         # Check if error has a code
         if hasattr(e, "code") and isinstance(getattr(e, "code"), int):
             code = getattr(e, "code")
-            template = ERROR_MESSAGES.get(code) # Check if Error Code is present in constants.py
+            template = ERROR_MESSAGES.get(
+                code
+            )  # Check if Error Code is present in constants.py
             if template:
-                formatted = template.format(user=getattr(member, "id", member), context=context)
+                formatted = template.format(
+                    user=getattr(member, "id", member), context=context
+                )
                 log_info_and_add_field(logging_embed, logger, "DM Status", formatted)
                 return
 
@@ -146,7 +155,6 @@ async def send_dm(logging_embed: discord.Embed, member: discord.Member, messageC
             "DM Status",
             f"Failed to send DM to <@{member.id}> for {context}, {e}",
         )
-            
 
 
 async def add_and_remove_role(

@@ -61,7 +61,9 @@ def create_ban_commands(bot: Bot) -> None:
                         logging_embed, interaction, user, reason, delete_messages
                     )
                 else:
-                    ban_success, error = await ban_member(logging_embed, user, reason, delete_messages)
+                    ban_success, error = await ban_member(
+                        logging_embed, user, reason, delete_messages
+                    )
                 if ban_success:
                     success_str = f"Successfully banned {user.mention}."
                     logging_embed.add_field(

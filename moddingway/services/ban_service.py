@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 async def ban_member(
-    logging_embed: discord.Embed, user: discord.Member, reason: str, delete_messages: bool
+    logging_embed: discord.Embed,
+    user: discord.Member,
+    reason: str,
+    delete_messages: bool,
 ) -> Optional[Tuple[bool, str]]:
     """Executes ban of member.
 
@@ -93,7 +96,9 @@ async def ban_user(
         )
 
 
-async def ban_dm(logging_embed: discord.Embed, user: discord.User | discord.Member, reason) -> Optional[str]:
+async def ban_dm(
+    logging_embed: discord.Embed, user: discord.User | discord.Member, reason
+) -> Optional[str]:
     # Calculate the timestamp for 30 days from now
     appeal_deadline = int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp())
     await send_dm(
@@ -106,4 +111,4 @@ async def ban_dm(logging_embed: discord.Embed, user: discord.User | discord.Memb
         f"If you believe this ban was issued in error you can reach out to the Moderation Team. Otherwise, you may appeal this ban starting on <t:{appeal_deadline}:F>.\n\n"
         "Please note that any further attempts to rejoin the server will be met with a permanent ban.\n\n",
         context="Ban",
-        )
+    )

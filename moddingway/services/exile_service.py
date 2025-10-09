@@ -189,7 +189,7 @@ async def unexile_user(
         logging_embed,
         user,
         f"You have been un-exiled from NA Ultimate Raiding - FFXIV.",
-        context="Un-Exile"
+        context="Un-Exile",
     )
 
     # update exile record
