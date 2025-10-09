@@ -96,9 +96,11 @@ async def get_user_strikes(
         strike_severity = StrikeSeverity(strike[1])
         strike_reason = strike[2]
         strike_created_by = strike[3]
+        strike_created_at = strike[4]
+        strike_created_at_ts = int(strike_created_at.timestamp())
         result = (
             result
-            + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | REASON: {strike_reason}"
+            + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | START DATE: <t:{strike_created_at_ts}:F> | REASON: {strike_reason}"
         )
 
     result = result + f"\nTotal Points: {db_user.get_strike_points()}"
@@ -156,7 +158,6 @@ def _get_severity_points(severity: StrikeSeverity) -> int:
 
 
 def _calculate_punishment(previous_points: int, total_points: int) -> int:
-
     punishment_days = 0
     jumped_multiple_thresholds = False
 
