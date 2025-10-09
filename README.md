@@ -14,6 +14,10 @@ Postgres-related information is configured in the environment variables instead 
 - POSTGRES_DB
 - INACTIVE_FORUM_CHANNEL_ID
 - INACTIVE_FORUM_DURATION
+- NOTIFY_CHANNEL_ID
+- PTC_EVENT_FORUM_ID
+- PTC_EVENT_FORUM_DURATION
+- EVENT_BOT_ID
 
 #### Release
 - DISCORD_TOKEN
