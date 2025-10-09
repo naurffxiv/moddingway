@@ -100,7 +100,7 @@ async def get_user_strikes(
         strike_created_at_ts = int(strike_created_at.timestamp())
         result = (
             result
-            + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | START DATE: <t:{strike_created_at_ts}:F> | REASON: {strike_reason}"
+            + f"\n* ID: {strike_id} | SEVERITY: {strike_severity} | Moderator: <@{strike_created_by}> | DATE ISSUED: <t:{strike_created_at_ts}:F> | REASON: {strike_reason}"
         )
 
     result = result + f"\nTotal Points: {db_user.get_strike_points()}"

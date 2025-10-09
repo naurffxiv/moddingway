@@ -82,7 +82,7 @@ async def test_apply_punisment(
                 )
             ],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
-            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756684800:F> | REASON: test"
+            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | DATE ISSUED: <t:1756684800:F> | REASON: test"
             "\nTotal Points: 1",
         ),
         (
@@ -105,8 +105,8 @@ async def test_apply_punisment(
                 ),
             ],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
-            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756684800:F> | REASON: test"
-            "\n* ID: 2 | SEVERITY: 2 | Moderator: <@3> | START DATE: <t:1756771200:F> | REASON: test2"
+            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | DATE ISSUED: <t:1756684800:F> | REASON: test"
+            "\n* ID: 2 | SEVERITY: 2 | Moderator: <@3> | DATE ISSUED: <t:1756771200:F> | REASON: test2"
             "\nTotal Points: 3",
         ),
     ],
