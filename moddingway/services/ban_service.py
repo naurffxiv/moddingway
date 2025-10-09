@@ -12,11 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 async def ban_member(
-    user: discord.Member, reason: str, delete_messages: bool
+    logging_embed: discord.Embed, user: discord.Member, reason: str, delete_messages: bool
 ) -> Optional[Tuple[bool, str]]:
     """Executes ban of member.
 
      Args:
+         logging_embed (discord.Embed): Passes embed for use in error handling.
          user (discord.Member): The user being banned.
          reason (str): Reason for the ban.
          delete_messages_flag (bool): Whether to delete the user's messages.
@@ -31,7 +32,7 @@ async def ban_member(
             f"Unable to ban {user.mention}: reason is too long (above 512 characters). Please shorten the ban reason.",
         )
 
-    dm_failed_message = await ban_dm(user, reason)
+    dm_failed_message = await ban_dm(logging_embed, user, reason)
 
     try:
         # 604800 seconds is the maximum value for delete_message_seconds, and is equivalent to 7 days.
@@ -49,6 +50,7 @@ async def ban_member(
 
 
 async def ban_user(
+    logging_embed: discord.Embed,
     interaction: discord.Interaction,
     user: discord.User,
     reason: str,
@@ -57,6 +59,7 @@ async def ban_user(
     """Executes ban of user.
 
      Args:
+         logging_embed (discord.Embed): Passes embed for use in error handling.
          interaction (discord.Interaction): Interaction that initiated this event.
          user (discord.Member): The user being banned.
          reason (str): Reason for the ban.
@@ -72,7 +75,7 @@ async def ban_user(
             f"Unable to ban {user.mention}: reason is too long (above 512 characters). Please shorten the ban reason.",
         )
 
-    dm_failed_message = await ban_dm(user, reason)
+    dm_failed_message = await ban_dm(logging_embed, user, reason)
 
     try:
         # 604800 seconds is the maximum value for delete_message_seconds, and is equivalent to 7 days.
@@ -90,20 +93,17 @@ async def ban_user(
         )
 
 
-async def ban_dm(user: discord.User | discord.Member, reason) -> Optional[str]:
+async def ban_dm(logging_embed: discord.Embed, user: discord.User | discord.Member, reason) -> Optional[str]:
     # Calculate the timestamp for 30 days from now
     appeal_deadline = int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp())
-    try:
-        await send_dm(
-            user,
-            f"Hello {user.display_name},\n\n"
-            "You are being informed that you have been **banned** from **NA Ultimate Raiding - FFXIV**.\n\n"
-            "**Reason for the ban:**\n"
-            f"> {reason}\n\n"
-            f"If you believe this ban was issued in error you can reach out to the Moderation Team. Otherwise, you may appeal this ban starting on <t:{appeal_deadline}:F>.\n\n"
-            "Please note that any further attempts to rejoin the server will be met with a permanent ban.\n\n",
+    await send_dm(
+        logging_embed,
+        user,
+        f"Hello {user.display_name},\n\n"
+        "You are being informed that you have been **banned** from **NA Ultimate Raiding - FFXIV**.\n\n"
+        "**Reason for the ban:**\n"
+        f"> {reason}\n\n"
+        f"If you believe this ban was issued in error you can reach out to the Moderation Team. Otherwise, you may appeal this ban starting on <t:{appeal_deadline}:F>.\n\n"
+        "Please note that any further attempts to rejoin the server will be met with a permanent ban.\n\n",
+        context="Ban",
         )
-    except Exception as e:
-        err = f"Failed to send DM to {user.mention}: {e}"
-        logger.error(err)
-        return err

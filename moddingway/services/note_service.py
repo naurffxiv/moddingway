@@ -37,20 +37,14 @@ async def add_note(
         last_edited_timestamp=note_timestamp,
         last_edited_by=str(author.id),
     )
-    ### ADD ERROR HANDLING TO DM
+    # message user if note is warning
     if is_warning:
-        try:
-            await send_dm(
-                member=user,
-                messageContent=f"You have been issued a warning from NA Ultimate Raiding - FFXIV:\n{note_text}",
-            )
-        except Exception as e:
-            log_info_and_add_field(
-                logging_embed,
-                logger,
-                "DM Status",
-                f"Failed to send DM to warned user, {e}",
-            )
+        await send_dm(
+            logging_embed,
+            user,
+            messageContent=f"You have been issued a warning from NA Ultimate Raiding - FFXIV:\n{note_text}",
+            context="Note",
+        )
 
     note.note_id = notes_database.add_note(note)
     logging_embed.set_footer(text=f"Note ID: {note.note_id}")

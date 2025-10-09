@@ -50,18 +50,18 @@ def create_ban_commands(bot: Bot) -> None:
 
         """Ban the specified user."""
         async with create_response_context(interaction) as response_message:
-            if isinstance(user, discord.User):
-                ban_success, error = await ban_user(
-                    interaction, user, reason, delete_messages
-                )
-            else:
-                ban_success, error = await ban_member(user, reason, delete_messages)
             async with create_logging_embed(
                 interaction,
                 user=user,
                 reason=reason,
                 delete_messages=delete_messages,
             ) as logging_embed:
+                if isinstance(user, discord.User):
+                    ban_success, error = await ban_user(
+                        logging_embed, interaction, user, reason, delete_messages
+                    )
+                else:
+                    ban_success, error = await ban_member(logging_embed, user, reason, delete_messages)
                 if ban_success:
                     success_str = f"Successfully banned {user.mention}."
                     logging_embed.add_field(
