@@ -37,7 +37,7 @@ def list_strikes(user_id: int) -> List[tuple]:
 
     with conn.get_cursor() as cursor:
         query = """
-        select s.strikeid, s.severity, s.reason, s.createdby  
+        select s.strikeid, s.severity, s.reason, s.createdby, s.createdtimestamp
         from strikes s
         join users u on u.userID = s.userID
         where u.userId = %s
