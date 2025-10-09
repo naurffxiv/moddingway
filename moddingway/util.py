@@ -138,11 +138,11 @@ async def send_dm(
         # Check if error has a code
         if hasattr(e, "code") and isinstance(getattr(e, "code"), int):
             code = getattr(e, "code")
-            template = ERROR_MESSAGES.get(
+            error_template_msg = ERROR_MESSAGES.get(
                 code
             )  # Check if Error Code is present in constants.py
-            if template:
-                formatted = template.format(
+            if error_template_msg:
+                formatted = error_template_msggit .format(
                     user=getattr(member, "id", member), context=context
                 )
                 log_info_and_add_field(logging_embed, logger, "DM Status", formatted)
