@@ -5,7 +5,7 @@ from moddingway.services import strike_service, ban_service, exile_service
 from moddingway import constants
 from typing import List
 import discord
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta, timezone
 
 
 @pytest.mark.parametrize(
@@ -72,9 +72,17 @@ async def test_apply_punisment(
         (
             "1",
             "1",
-            [("1", constants.StrikeSeverity.MINOR, "test", "1", datetime(2025, 9, 1))],
+            [
+                (
+                    "1",
+                    constants.StrikeSeverity.MINOR,
+                    "test",
+                    "1",
+                    datetime(2025, 9, 1, tzinfo=timezone.utc),
+                )
+            ],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
-            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756699200:F> | REASON: test"
+            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756684800:F> | REASON: test"
             "\nTotal Points: 1",
         ),
         (
@@ -86,19 +94,19 @@ async def test_apply_punisment(
                     constants.StrikeSeverity.MINOR,
                     "test",
                     "1",
-                    datetime(2025, 9, 1),
+                    datetime(2025, 9, 1, tzinfo=timezone.utc),
                 ),
                 (
                     "2",
                     constants.StrikeSeverity.MODERATE,
                     "test2",
                     "3",
-                    datetime(2025, 9, 2),
+                    datetime(2025, 9, 2, tzinfo=timezone.utc),
                 ),
             ],
             "Strikes found for <@1>: [Temporary points: None | Permanent points: None]"
-            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756699200:F> | REASON: test"
-            "\n* ID: 2 | SEVERITY: 2 | Moderator: <@3> | START DATE: <t:1756785600:F> | REASON: test2"
+            "\n* ID: 1 | SEVERITY: 1 | Moderator: <@1> | START DATE: <t:1756684800:F> | REASON: test"
+            "\n* ID: 2 | SEVERITY: 2 | Moderator: <@3> | START DATE: <t:1756771200:F> | REASON: test2"
             "\nTotal Points: 3",
         ),
     ],
