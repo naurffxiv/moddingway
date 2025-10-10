@@ -111,15 +111,12 @@ async def exile_user(
         )
 
     # message user
-    try:
-        await send_dm(
-            user,
-            f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\nExile expiration: <t:{timestamp}:R>",
-        )
-    except Exception as e:
-        log_info_and_add_field(
-            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
-        )
+    await send_dm(
+        logging_embed,
+        user,
+        f"You are being exiled from NA Ultimate Raiding - FFXIV.\n**Reason:** {reason}\nExile expiration: <t:{timestamp}:R>",
+        context="Exile",
+    )
 
     log_info_and_add_field(
         logging_embed,
@@ -188,15 +185,12 @@ async def unexile_user(
     await add_and_remove_role(user, Role.VERIFIED, Role.EXILED)
 
     # message user
-    try:
-        await send_dm(
-            user,
-            f"You have been un-exiled from NA Ultimate Raiding - FFXIV.",
-        )
-    except Exception as e:
-        log_info_and_add_field(
-            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
-        )
+    await send_dm(
+        logging_embed,
+        user,
+        f"You have been un-exiled from NA Ultimate Raiding - FFXIV.",
+        context="Un-Exile",
+    )
 
     # update exile record
     db_user = users_database.get_user(user.id)

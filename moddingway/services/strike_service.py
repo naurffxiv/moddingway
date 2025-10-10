@@ -67,15 +67,12 @@ async def add_strike(
     logging_embed.add_field(name="Punishment", value=punishment)
 
     # message user
-    try:
-        await send_dm(
-            user,
-            f"Your actions in NA Ultimate Raiding - FFXIV resulted in a strike against your account. This may result in punishment depending on the frequency or severity of your strikes.\n**Reason:** {reason}",
-        )
-    except Exception as e:
-        log_info_and_add_field(
-            logging_embed, logger, "DM Status", f"Failed to send DM to exiled user, {e}"
-        )
+    await send_dm(
+        logging_embed,
+        user,
+        f"Your actions in NA Ultimate Raiding - FFXIV resulted in a strike against your account. This may result in punishment depending on the frequency or severity of your strikes.\n**Reason:** {reason}",
+        context="Strike",
+    )
 
 
 async def get_user_strikes(

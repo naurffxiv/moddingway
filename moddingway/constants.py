@@ -54,3 +54,11 @@ STICKY_ROLES = [
     1253810157524094996,  # Glorp
     1272364706241187870,  # Event Ping
 ]
+
+# Central location for custom Error Messages for better mod readability
+ERROR_MESSAGES = {
+    # Error Messages should have <@{user}> and {context} variables
+    # <@{user}> displays the user effected
+    # {context} gives context to where the error originated
+    50007: "Failed to send DM to <@{user}> for {context}: user has DMs disabled or blocked the bot (error code: 50007).",
+}

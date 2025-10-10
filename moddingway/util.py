@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 
-from moddingway.constants import Role
+from moddingway.constants import Role, ERROR_MESSAGES
 from moddingway.settings import get_settings
 
 settings = get_settings()
@@ -125,9 +125,36 @@ async def send_chunked_message(channel: discord.abc.GuildChannel, message_conten
         await channel.send(chunk)
 
 
-async def send_dm(member: discord.Member, messageContent: str):
-    channel = await member.create_dm()
-    await channel.send(content=messageContent)
+async def send_dm(
+    logging_embed: discord.Embed,
+    member: discord.Member,
+    messageContent: str,
+    context: str,
+):
+    try:
+        channel = await member.create_dm()
+        await channel.send(content=messageContent)
+    except Exception as e:
+        # Check if error has a code
+        if hasattr(e, "code") and isinstance(getattr(e, "code"), int):
+            code = getattr(e, "code")
+            error_template_msg = ERROR_MESSAGES.get(
+                code
+            )  # Check if Error Code is present in constants.py
+            if error_template_msg:
+                formatted = error_template_msggit.format(
+                    user=getattr(member, "id", member), context=context
+                )
+                log_info_and_add_field(logging_embed, logger, "DM Status", formatted)
+                return
+
+        # Fallback to base error logging
+        log_info_and_add_field(
+            logging_embed,
+            logger,
+            "DM Status",
+            f"Failed to send DM to <@{member.id}> for {context}, {e}",
+        )
 
 
 async def add_and_remove_role(
