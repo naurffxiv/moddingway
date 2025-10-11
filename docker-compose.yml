@@ -28,6 +28,7 @@ services:
       PTC_EVENT_FORUM_ID: ${PTC_EVENT_FORUM_ID}
       PTC_EVENT_FORUM_DURATION: ${PTC_EVENT_FORUM_DURATION}
       EVENT_BOT_ID : ${EVENT_BOT_ID}
+      EVENT_WARN_CHANNEL: ${EVENT_WARN_CHANNEL}
   python-app-local:
     extends:
       service: python-app

@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime, timezone
 import discord
+import asyncio, re
 
-from discord import Guild, User
+from discord import Guild, User, Thread
 from discord.ext.commands import Bot
 
 from moddingway.database import users_database
@@ -128,3 +129,71 @@ def register_events(bot: Bot):
                 )
         except Exception as e:
             logger.error(f"Failed to log unban event: {str(e)}")
+
+    @bot.event
+    async def on_thread_create(thread: Thread):
+        # Handle new threads created in the event forum by raid-helper.
+        INITIAL_DELAY = 0.5
+        WARNING_THRESHOLD = 86400  # 24 hours
+
+        # Only process threads from raid-helper in the event forum
+        if (
+            thread.parent_id != settings.event_forum_id
+            or thread.owner_id != settings.event_bot_id
+        ):
+            return
+
+        try:
+            # Raidhelper bot sends a dummy message first then edits later so we are using sleep to get edited version because on_message_edit event listens for all message edits in the server
+            await asyncio.sleep(INITIAL_DELAY)
+
+            # Fetch the thread's initial message
+            try:
+                message = await thread.fetch_message(thread.id)
+            except Exception as e:
+                logger.error(f"Failed to fetch message in event thread f{thread.id}")
+
+            if not message or not message.content:
+                logger.error(f"No message content found in event thread {thread.id}")
+                return
+            logger.info(message.content)
+            # Extract timestamp from Discord's timestamp format
+            date_pattern = re.compile(r"<t:(\d+):F>")
+            date_match = date_pattern.search(message.content)
+
+            if not date_match:
+                logger.error(f"No timestamp found in thread {thread.id}")
+                return
+
+            timestamp = int(date_match.group(1))
+            current_timestamp = int(datetime.now().timestamp())
+            time_difference = timestamp - current_timestamp
+
+            # Extract leader username
+            user_pattern = re.compile(r"<@[0-9]+>")
+            user_match = user_pattern.search(message.content)
+
+            if user_match and time_difference <= WARNING_THRESHOLD:
+                try:
+                    warn_channel = await bot.fetch_channel(
+                        settings.event_warn_channel_id
+                    )
+                    await warn_channel.send(
+                        content=f"{user_match.group(0)} Warning: The event you have scheduled starts in less than 24 hours!"
+                    )
+                    logger.info(
+                        f"Sent warning for thread {thread.id} (starts in {time_difference}s)"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to send warning message in event channel {warn_channel.id}"
+                    )
+            else:
+                hours = time_difference // 3600
+                logger.info(f"Event in thread {thread.id} starts in {hours} hours")
+
+        except Exception as e:
+            logger.error(
+                f"Unexpected error processing event thread {thread.id}: {e}",
+                exc_info=True,
+            )
