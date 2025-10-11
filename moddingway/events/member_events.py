@@ -173,9 +173,11 @@ def register_events(bot: Bot):
             user_pattern = re.compile(r"<@[0-9]+>")
             user_match = user_pattern.search(message.content)
 
-            warn_channel = await bot.fetch_channel(settings.event_warn_channel_id)
             if user_match and time_difference <= WARNING_THRESHOLD:
                 try:
+                    warn_channel = await bot.fetch_channel(
+                        settings.event_warn_channel_id
+                    )
                     await warn_channel.send(
                         content=f"{user_match.group(0)} Warning: The event you have scheduled starts in less than 24 hours!"
                     )
