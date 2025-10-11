@@ -156,30 +156,35 @@ def register_events(bot: Bot):
             if not message or not message.content:
                 logger.error(f"No message content found in event thread {thread.id}")
                 return
-
+            logger.info(message.content)
             # Extract timestamp from Discord's timestamp format
-            pattern = re.compile(r"<t:(\d+):F>")
-            match = pattern.search(message.content)
+            date_pattern = re.compile(r"<t:(\d+):F>")
+            date_match = date_pattern.search(message.content)
 
-            if not match:
+            if not date_match:
                 logger.error(f"No timestamp found in thread {thread.id}")
                 return
 
-            timestamp = int(match.group(1))
+            timestamp = int(date_match.group(1))
             current_timestamp = int(datetime.now().timestamp())
             time_difference = timestamp - current_timestamp
 
-            if time_difference <= WARNING_THRESHOLD:
+            # Extract leader username
+            user_pattern = re.compile(r"<@[0-9]+>")
+            user_match = user_pattern.search(message.content)
+
+            warn_channel = await bot.fetch_channel(settings.event_warn_channel_id)
+            if user_match and time_difference <= WARNING_THRESHOLD:
                 try:
-                    await thread.send(
-                        content="Warning: The event you have scheduled starts in less than 24 hours!"
+                    await warn_channel.send(
+                        content=f"{user_match.group(0)} Warning: The event you have scheduled starts in less than 24 hours!"
                     )
                     logger.info(
                         f"Sent warning for thread {thread.id} (starts in {time_difference}s)"
                     )
                 except Exception as e:
                     logger.error(
-                        f"Failed to send warning message in event thread {thread.id}"
+                        f"Failed to send warning message in event channel {warn_channel.id}"
                     )
             else:
                 hours = time_difference // 3600

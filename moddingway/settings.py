@@ -23,6 +23,7 @@ class Settings(BaseModel):
     automod_inactivity: dict[int, int]  # key: channel id, value: inactive limit (days)
     event_bot_id: int
     event_forum_id: int
+    event_warn_channel_id: int
     sticky_roles: list[
         int
     ]  # roles that grant access to channels that should be stripped/restored on exile/unexile
@@ -39,6 +40,7 @@ def prod() -> Settings:
         automod_inactivity=AUTOMOD_INACTIVITY,
         event_bot_id=579155972115660803,  # Raid-Helper#3806
         event_forum_id=1419357090841104544,  # PtC event forum
+        event_warn_channel_id=1426273165491048538,  # event warn channel
         sticky_roles=STICKY_ROLES,
     )
 
@@ -73,6 +75,7 @@ def local() -> Settings:
         automod_inactivity=automod_inactivity,
         event_bot_id=_check_env_convert("EVENT_BOT_ID"),
         event_forum_id=_check_env_convert("PTC_EVENT_FORUM_ID"),
+        event_warn_channel_id=_check_env_convert("EVENT_WARN_CHANNEL"),
         notify_channel_id=notify_channel_id,
         sticky_roles=literal_eval(os.environ.get("STICKY_ROLE_ARRAY", "None")) or [],
     )
