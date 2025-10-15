@@ -14,6 +14,7 @@ class Settings(BaseModel):
     discord_token: str = os.environ.get("DISCORD_TOKEN")
     log_level: int = logging.INFO
     logging_channel_id: int
+    ban_appeal_channel_id: int
     notify_channel_id: int
     postgres_host: str
     postgres_port: str
@@ -33,6 +34,7 @@ def prod() -> Settings:
     return Settings(
         guild_id=1172230157776466050,
         logging_channel_id=1172324840947056681,  # mod-reports
+        ban_appeal_channel_id=1427894869929758811,
         notify_channel_id=1279952544235524269,  # bot-channel
         log_level=logging.INFO,
         postgres_host=os.environ.get("POSTGRES_HOST"),
@@ -66,9 +68,14 @@ def local() -> Settings:
     if notify_channel_id == "":
         notify_channel_id = os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
 
+    ban_appeal_channel_id = os.environ.get("BAN_APPEAL_CHANNEL_ID", "")
+    if ban_appeal_channel_id == "":
+        ban_appeal_channel_id = os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)
+
     return Settings(
         guild_id=int(os.environ.get("GUILD_ID", 0)),
         logging_channel_id=int(os.environ.get("MOD_LOGGING_CHANNEL_ID", 0)),
+        ban_appeal_channel_id=ban_appeal_channel_id,
         log_level=logging.DEBUG,
         postgres_host=os.environ.get("POSTGRES_HOST", "localhost"),
         postgres_port=os.environ.get("POSTGRES_PORT", "5432"),

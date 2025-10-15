@@ -9,6 +9,10 @@ class Role(StrEnum):
     MOD = "Mod"
 
 
+class RoleIDs(IntEnum):
+    MOD = 1239623392676548740
+
+
 class ExileStatus(IntEnum):
     TIMED_EXILED = 1
     UNEXILED = 2
