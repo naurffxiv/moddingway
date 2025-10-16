@@ -41,6 +41,7 @@ THRESHOLDS_PUNISHMENT = [
     (3, 1),
 ]
 
+# Thread automod
 AUTOMOD_INACTIVITY = {
     1273263026744590468: 30,  # lfg
     1273261496968810598: 30,  # lfm
@@ -48,6 +49,9 @@ AUTOMOD_INACTIVITY = {
     1301166606985990144: 14,  # scheduled pfs
     1419357090841104544: 3,  # PtC event forum
 }
+
+# Specific channel message automod
+CHANNEL_AUTOMOD_INACTIVITY = {1239984646318456914: 150}  # pf-recruitment, 150 minutes
 
 STICKY_ROLES = [
     # Extra roles that should be removed from users when they are exiled

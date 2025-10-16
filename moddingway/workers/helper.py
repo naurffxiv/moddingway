@@ -24,7 +24,6 @@ def create_autounexile_embed(
     exile_id: str,
     end_timestamp: str,
 ):
-
     return create_interaction_embed_context(
         get_log_channel(self),
         user=user,
@@ -40,6 +39,17 @@ def create_automod_embed(self, channel_id, num_removed, num_error, timestamp: da
         user=self.user,
         timestamp=timestamp,
         description=f"Successfully removed {num_removed} inactive thread(s) from <#{channel_id}>.\n{num_error} inactive thread(s) failed to be removed.",
+    )
+
+
+def create_channel_automod_embed(
+    self, channel_id, num_removed, num_error, timestamp: datetime
+):
+    return create_interaction_embed_context(
+        get_log_channel(self),
+        user=self.user,
+        timestamp=timestamp,
+        description=f"Successfully removed {num_removed} old message(s) from <#{channel_id}>.\n{num_error} old messages(s) failed to be removed.",
     )
 
 
@@ -80,3 +90,37 @@ async def automod_thread(
     except Exception as e:
         logger.error(f"Unexpected error for thread {thread.id}: {e}", exc_info=e)
         return num_removed, num_errors + 1
+
+
+async def automod_channel(
+    messages,
+    duration: int,
+):
+    num_removed = 0
+    num_errors = 0
+
+    async for message in messages:
+        # Skip any pinned messages
+        if message.pinned:
+            print(f"{message.id} is pinned and will be skipped")
+            continue
+
+        # Delete message if older than 150 minutes
+        now = datetime.now(timezone.utc)
+        time_since = now - snowflake_time(message.id)
+        if time_since > timedelta(minutes=duration):
+            print(f"{message.id} sent {time_since}")
+            try:
+                await message.delete()
+                logger.info(f"Message {message.id} has been deleted successfully")
+                num_removed += 1
+                await asyncio.sleep(1)
+            except Exception as e:
+                logger.error(
+                    f"Unexpected error for message {message.id}: {e}", exc_info=e
+                )
+                num_errors += 1
+        else:
+            print(f"{message.id} sent {time_since}")
+
+    return num_removed, num_errors
