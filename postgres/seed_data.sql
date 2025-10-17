@@ -38,7 +38,7 @@ insert into commands
 values
 (true, 234, 'this has a reason with an ID'),
 (false, null, null),
-(false, null, 'this has a reason without an ID')
+(false, null, 'this has a reason without an ID');
 
 
 commit;
