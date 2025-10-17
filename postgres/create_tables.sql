@@ -110,4 +110,12 @@ BEGIN
 END;
 $do$;
 
+CREATE TABLE IF NOT EXISTS commands (
+	commandID INT GENERATED ALWAYS AS IDENTITY,
+	runByMod BOOL NOT NULL,
+	relatedEntityId INT NULL,
+	reason TEXT NULL,
+	PRIMARY KEY(commandID)
+);
+
 COMMIT;

@@ -5,6 +5,7 @@ delete from notes;
 delete from exiles;
 delete from strikes;
 delete from users;
+delete from commands;
 
 -- seed users
 insert into users 
@@ -30,5 +31,14 @@ values
 (800001, 'short exile, You said a bad word', '2024-11-20 15:15:01.279', '2024-11-20 16:15:01.279', 2),
 (800001, 'short exile, More bad words!', '2024-11-20 20:12:55.123', '2024-11-21 02:12:55.123', 2),
 (800001, 'Very long active exile', '2024-11-21 12:51:00.123', '2025-11-21 02:12:55.123', 1);
+
+-- seed commands
+insert into commands
+(runByMod, relatedEntityId, reason)
+values
+(true, 234, 'this has a reason with an ID'),
+(false, null, null),
+(false, null, 'this has a reason without an ID')
+
 
 commit;
