@@ -85,7 +85,7 @@ async def automod_thread(
         and thread.owner_id == user_id
         and starter_message is not None
     ):
-        # extracting the raids date from raidhelpers message
+        # extracting the raids date(unix time) from raidhelpers message
         date_pattern = re.compile(r"<t:(\d+):F>")
         date_match = date_pattern.search(starter_message.content)
 
