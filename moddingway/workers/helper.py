@@ -85,6 +85,7 @@ async def automod_thread(
         and thread.owner_id == user_id
         and starter_message is not None
     ):
+        # extracting the raids date from raidhelpers message
         date_pattern = re.compile(r"<t:(\d+):F>")
         date_match = date_pattern.search(starter_message.content)
 
@@ -96,9 +97,6 @@ async def automod_thread(
         time_since_raid = now.timestamp() - raid_timestamp
 
         if time_since_raid < (duration * 86400):  # 86400 seconds = 1 day
-            # logger.info(
-            #     f"Raid not started yet or duration not passed for thread {thread.id}"
-            # )
             return num_removed, num_errors
 
     if starter_message is not None and time_since < timedelta(days=duration):
