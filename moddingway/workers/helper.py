@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, re
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -75,10 +75,32 @@ async def automod_thread(
         pass
     except Exception as e:
         logger.error(e, exc_info=e)
-
     now = datetime.now(timezone.utc)
     last_post = thread.last_message_id
     time_since = now - snowflake_time(last_post)
+
+    # We want to apply this check to raidhelper threads after the raid time passed
+    if (
+        user_id is not None
+        and thread.owner_id == user_id
+        and starter_message is not None
+    ):
+        date_pattern = re.compile(r"<t:(\d+):F>")
+        date_match = date_pattern.search(starter_message.content)
+
+        if not date_match:
+            logger.error(f"No timestamp found in thread {thread.id}")
+            return num_removed, num_errors
+
+        raid_timestamp = int(date_match.group(1))
+        time_since_raid = now.timestamp() - raid_timestamp
+
+        if time_since_raid < (duration * 86400):  # 86400 seconds = 1 day
+            # logger.info(
+            #     f"Raid not started yet or duration not passed for thread {thread.id}"
+            # )
+            return num_removed, num_errors
+
     if starter_message is not None and time_since < timedelta(days=duration):
         return num_removed, num_errors
 
