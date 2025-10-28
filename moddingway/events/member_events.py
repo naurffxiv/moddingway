@@ -32,7 +32,7 @@ def register_events(bot: Bot):
             member, Role.NON_VERIFIED
         )
 
-        logger.info(f"Member joined: {member.display_name} ({member.id})")
+        logger.debug(f"Member joined: {member.display_name} ({member.id})")
 
         log_channel = get_log_channel(member.guild)
         if log_channel is None:
