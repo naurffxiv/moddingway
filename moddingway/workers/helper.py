@@ -92,27 +92,24 @@ async def automod_thread(
         return num_removed, num_errors + 1
 
 
-async def automod_channel(
-    messages,
-    duration: int,
-):
+async def automod_channel(messages, duration: int, channel: str):
     num_removed = 0
     num_errors = 0
 
     async for message in messages:
         # Skip any pinned messages
         if message.pinned:
-            print(f"{message.id} is pinned and will be skipped")
             continue
 
         # Delete message if older than 150 minutes
         now = datetime.now(timezone.utc)
         time_since = now - snowflake_time(message.id)
         if time_since > timedelta(minutes=duration):
-            print(f"{message.id} sent {time_since}")
             try:
                 await message.delete()
-                logger.info(f"Message {message.id} has been deleted successfully")
+                logger.info(
+                    f"Message {message.id} has been deleted successfully from #{channel}"
+                )
                 num_removed += 1
                 await asyncio.sleep(1)
             except Exception as e:
@@ -120,7 +117,5 @@ async def automod_channel(
                     f"Unexpected error for message {message.id}: {e}", exc_info=e
                 )
                 num_errors += 1
-        else:
-            print(f"{message.id} sent {time_since}")
 
     return num_removed, num_errors
