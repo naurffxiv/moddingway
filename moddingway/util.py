@@ -274,7 +274,7 @@ async def find_and_assign_role(
         # Assign the role to the member
         await member.add_roles(role)
         success_msg = f"Successfully assigned <@&{role.id}> role"
-        logger.info(success_msg)
+        logger.debug(success_msg)
         return True, success_msg, role
     except discord.Forbidden:
         error_msg = (
