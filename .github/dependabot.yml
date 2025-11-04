@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    open-pull-requests-limit: 30
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/**"
+    open-pull-requests-limit: 30
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: build
