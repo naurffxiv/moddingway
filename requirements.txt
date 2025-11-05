@@ -1,5 +1,5 @@
-discord
-pydantic
-psycopg2
-black
+discord==2.3.2
+pydantic==2.12.3
+psycopg2==2.9.11
+black==25.9.0
 fastapi[standard]==0.115.11
