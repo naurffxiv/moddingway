@@ -135,7 +135,7 @@ async def autodelete_posts(self):
             # Log interally if any messages are removed or failed to be removed
             if num_removed > 0 or num_errors > 0:
                 logger.info(
-                    f"Removed a total of {num_removed} messages from channel {channel_id} (#{channel.name}). {num_errors} failed removals."
+                    f"Removed a total of {num_removed} messages from channel #{channel.name}. {num_errors} failed removals."
                 )
 
                 # Log externally to monitor channel if any messages are failed to be removed
