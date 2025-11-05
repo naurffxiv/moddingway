@@ -119,3 +119,37 @@ async def create_response_context(interaction: discord.Interaction, sendEphemera
             await msg.edit(content=helper.message)
         except Exception as e:
             logger.error("Updating placeholder message failed")
+
+
+# Handles interaction responses that were deferred
+@asynccontextmanager
+async def create_deferred_response_context(
+    interaction: discord.Interaction, sendEphemeral=True
+):
+    # Can't yield a string since it's immutable, so create a helper class
+    class ResponseHelper:
+        def __init__(self):
+            self.message = ""
+
+        def set_string(self, message):
+            self.message = message
+
+        def append_string(self, message):
+            self.message = f"{self.message}\n{message}"
+
+    message = await interaction.original_response()
+    await message.edit(content="Processing...")
+    helper = ResponseHelper()
+    try:
+        yield helper
+    except Exception as e:
+        helper.append_string("An unexpected error has occurred")
+        raise e
+    finally:
+        try:
+            msg = await interaction.original_response()
+            if len(helper.message) == 0:
+                helper.set_string("Command finished without a response.")
+            await msg.edit(content=helper.message)
+        except Exception as e:
+            logger.error("Updating placeholder message failed")
