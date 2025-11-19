@@ -68,6 +68,11 @@ async def submit_form(request: FormRequest):
             submission_timestamp=datetime.now(timezone.utc),
         )
 
+        if len(form.reason) > 1024:
+            return {
+                "detail": "Appeal reason max length is 1024 characters. Please shorten the appeal reason."
+            }
+
         result = banforms_database.add_form(form)
 
         if result:

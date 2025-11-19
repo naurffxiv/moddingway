@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS roles (
 CREATE TABLE IF NOT EXISTS forms (
 	formID INT GENERATED ALWAYS AS IDENTITY,
 	userID INT NOT null,
-	reason TEXT,
+	reason VARCHAR(1024),
 	approvalNotes TEXT,
 	approval BOOL,
 	approvedByUserID INT,
