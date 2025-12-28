@@ -39,14 +39,26 @@ To run a dockerized version of our postgres database locally, run `make database
 ## Development recommendations
 
 ### First time setup
-You will need to create a personal verion of the moddingway bot via Discord's developer portal in order to run a version of the application locally. To do this, you can follow Step 1 of [Discord's Getting Started](https://discord.com/developers/docs/quick-start/getting-started#step-1-creating-an-app) tutorial. 
+First make sure to clone the repository, which will give you access to the files and importantly the .env example file.
 
-When you first are setting up the application, copy the file titled `.env_example` to be `.env`, and configure the missing enviornment variables. To add the bot account to your server, you can follow the [discord.py instructions](https://discordpy.readthedocs.io/en/stable/discord.html). The server that you use for development also will need to have a channel where the bot will output logging messages, and will need to have the following roles set up, in this priority order
+Second you will need to create a personal verion of the moddingway bot via [Discord's developer portal](https://discord.com/developers/applications) in order to run a version of the application locally. 
+
+[Discord's Getting Started](https://discord.com/developers/docs/quick-start/getting-started#step-1-creating-an-app) tutorial. 
+
+When you first are setting up the application, change the file titled `.env_example` to be `.env`, and configure the missing enviornment variables.
+
+- DISCORD_TOKEN=INSERTGENERATEDTOKEN (Add the Token generated in the Bot section in the Discord Developer Portal. You will need to click `Reset Token` if you have just made the bot to gain a token)
+- GUILD_ID=INSERTDISCORDSERVERID (You can find this by right clicking a server and click copy ID at the bottom. If you do not have this as an option please enable developer mode for Discord)
+- MOD_LOGGING_CHANNEL=INSERTDISCORDSERVERCHANNELID (Right click on a channel in a server and copy the channel's ID)
+
+To add the bot account to your server, you can follow the [discord.py instructions](https://discordpy.readthedocs.io/en/stable/discord.html). The server that you use for development also will need to have a channel where the bot will output logging messages, and will need to have the following roles set up, in this priority order
 * Mod
 * Verified
 * Exiled
 
 In addition, you will need to give yourself the `Mod` role in order to properly run all moderation commands.
+
+Once you've checked that all the requirements are installed (Scroll down to the API section if you need to look over on how to do so) run the command `docker compose build python-app` in the terminal. After run `docker compose down python-app-local` & `docker compose up python-app-local --build` (You can find all this in the Makefile if you need to look over it in the future). Finally just run `make run` and your bot should be working in the server. If there are any issues check the terminal for errors or feel free to ask for help.
 
 An optional step for development is getting a [virtual environment](https://docs.python.org/3/library/venv.html) set up for python before you start development. All required packages to run the application are defined in `requirements.txt`
 
