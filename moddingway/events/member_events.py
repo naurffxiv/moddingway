@@ -156,7 +156,6 @@ def register_events(bot: Bot):
             if not message or not message.content:
                 logger.error(f"No message content found in event thread {thread.id}")
                 return
-            logger.info(message.content)
             # Extract timestamp from Discord's timestamp format
             date_pattern = re.compile(r"<t:(\d+):F>")
             date_match = date_pattern.search(message.content)
