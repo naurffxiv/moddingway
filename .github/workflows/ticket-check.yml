@@ -1,0 +1,35 @@
+name: Check Ticket Number in Pull Request Description
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  check_ticket_in_pr_description:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check pull request description for ticket number
+        run: |
+          # 1. Read the PR body safely
+          PR_BODY=$(jq -r .pull_request.body "$GITHUB_EVENT_PATH")
+
+          # 2. explicit check: Is the body empty or null?
+          if [[ -z "$PR_BODY" || "$PR_BODY" == "null" ]]; then
+            echo "The pull request description is empty."
+            exit 1
+          fi
+
+          # 3. Check using grep (Case-insensitive)
+          # Matches:
+          # - "Ticket 123", "Ticket: 123"
+          # - "Fix/Fixed/Fixing", "Close/Closed/Closing", "Resolve/Resolved/Resolving"
+          # - "Refs #123"
+          # - "NA"
+          if echo "$PR_BODY" | grep -qiE '(ticket[: ]+[0-9]+|(fix(es|ed|ing)?|clos(e[ds]?|ing)|resolv(e[ds]?|ing)|ref(s)?)\s+#?[0-9]+|\bNA\b)'; then
+            echo "The pull request description contains a valid ticket format."
+            exit 0
+          else
+            echo "The pull request description does not contain a valid ticket number, closing keyword, or 'NA'."
+            exit 1
+          fi
